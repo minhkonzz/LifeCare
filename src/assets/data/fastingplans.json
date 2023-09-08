@@ -1,0 +1,40 @@
+[
+   {
+      "id": 1, 
+      "title": "Recommend", 
+      "list": [
+         {
+            "id": "1a", 
+            "title": "18:6", 
+            "background": "require('../../assets/images/PlanBackgrounds/18-06bg.jpg'"
+         }
+      ]
+   }, 
+   {
+      "id": 2, 
+      "title": "Beginners", 
+      "list": [
+         {
+            "id": "2a", 
+            "title": "14:10", 
+            "background": "require('../../assets/images/PlanBackgrounds/18-06bg.jpg'"
+         },
+         {
+            "id": "2b", 
+            "title": "15:9", 
+            "background": "require('../../assets/images/PlanBackgrounds/18-06bg.jpg'"
+         }
+      ]
+   },
+   {
+      "id": 3, 
+      "title": "Middle", 
+      "list": [
+         {
+            "id": "3a", 
+            "title": "16:8", 
+            "background": "require('../../assets/images/PlanBackgrounds/18-06bg.jpg'"
+         }
+      ]
+   }
+]
