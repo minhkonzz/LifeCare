@@ -6,7 +6,7 @@ import { horizontalScale, verticalScale } from '@utils/responsive'
 
 interface ButtonProps {
     title: string, 
-    onPress: () => void, 
+    onPress?: () => void, 
     size?: 'small' | 'medium' | 'large', 
     bgColor?: string | string[]
 }
@@ -46,7 +46,7 @@ export default ({
 
     buttonStyles.push({ backgroundColor: bgColor })
     return (
-	<TouchableOpacity {...{style: buttonStyles, activeOpacity: .9, onPress}}>
+	<TouchableOpacity {...{style: buttonStyles, activeOpacity: .3, onPress}}>
 	    <Text style={titleStyles}>{title}</Text>
 	</TouchableOpacity>
     )

@@ -1,11 +1,11 @@
 import { FC }  from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import FastAIOverview from '@screens/fast-ai-bot/Overview'
+import FeedBack from '@screens/feedback/FeedBack'
 
 export default (): FC => {
     return (
         <SafeAreaProvider>
-	    <FastAIOverview />
+	    <FeedBack />
 	</SafeAreaProvider>
     )
 }
