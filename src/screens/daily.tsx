@@ -474,48 +474,77 @@ const ChatbotAdvertise = (): JSX.Element => {
 
 export default (): JSX.Element => {
 	return (
-		<Screen>
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ 
-					width: '100%',
-					alignItems: 'center',
-					paddingHorizontal: hS(24),
-					// paddingBottom: vS(27),
-					paddingTop: vS(22)
-				}}>
-				<View style={styles.background}>
-					<View style={styles.gray} />
-					<View style={styles.lightBlue} />
+		<Screen scroll paddingHorzContent>
+			<View style={styles.background}>
+				<View style={styles.gray} />
+				<View style={styles.lightBlue} />
+			</View>
+			<Pressable style={styles.darkModeButton}>
+				<MoonIcon width={hS(16)} height={vS(16.5)} />
+			</Pressable>
+			<View style={styles.userGreet}>
+				<View>
+					<Text style={styles.nameGreet}>Hi, Pham!</Text>
+					<Text style={styles.titleGreet}>Welcome back</Text>
 				</View>
-				<Pressable style={styles.darkModeButton}>
-					<MoonIcon width={hS(16)} height={vS(16.5)} />
-				</Pressable>
-				<View style={styles.userGreet}>
-					<View>
-						<Text style={styles.nameGreet}>Hi, Pham!</Text>
-						<Text style={styles.titleGreet}>Welcome back</Text>
-					</View>
-					<Image style={styles.userAvatar} source={require('../assets/images/UserAvatar.png')} />
-				</View>
-				<DailyFastingState />
-				<View style={{
-					width: '100%',
-					flexDirection: 'row',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-					marginTop: vS(29)
-				}}>
-					<BMITrack />
-					<WaterTrack />
-				</View>
-				<NutritionTrack />
-				<WeightTrack />
-				<ChatbotAdvertise />
-			</ScrollView>
+				<Image style={styles.userAvatar} source={require('../assets/images/UserAvatar.png')} />
+			</View>
+			<DailyFastingState />
+			<View style={{
+				width: '100%',
+				flexDirection: 'row',
+				alignItems: 'center',
+				justifyContent: 'space-between',
+				marginTop: vS(29)
+			}}>
+				<BMITrack />
+				<WaterTrack />
+			</View>
+			<NutritionTrack />
+			<WeightTrack />
+			<ChatbotAdvertise />
 		</Screen>
 	)
 }
+
+{/* <ScrollView
+		showsVerticalScrollIndicator={false}
+		contentContainerStyle={{ 
+			width: '100%',
+			alignItems: 'center',
+			paddingHorizontal: hS(24),
+			// paddingBottom: vS(27),
+			paddingTop: vS(22)
+		}}>
+		<View style={styles.background}>
+			<View style={styles.gray} />
+			<View style={styles.lightBlue} />
+		</View>
+		<Pressable style={styles.darkModeButton}>
+			<MoonIcon width={hS(16)} height={vS(16.5)} />
+		</Pressable>
+		<View style={styles.userGreet}>
+			<View>
+				<Text style={styles.nameGreet}>Hi, Pham!</Text>
+				<Text style={styles.titleGreet}>Welcome back</Text>
+			</View>
+			<Image style={styles.userAvatar} source={require('../assets/images/UserAvatar.png')} />
+		</View>
+		<DailyFastingState />
+		<View style={{
+			width: '100%',
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			marginTop: vS(29)
+		}}>
+			<BMITrack />
+			<WaterTrack />
+		</View>
+		<NutritionTrack />
+		<WeightTrack />
+		<ChatbotAdvertise />
+	</ScrollView> */}
 
 const styles = StyleSheet.create({
 	nutritionTrack: {
@@ -712,11 +741,10 @@ const styles = StyleSheet.create({
 	waterUpdateButton: {
 		width: hS(36),
 		height: vS(36),
-		alignItems: 'flex-end',
 		borderRadius: 200,
 		backgroundColor: '#fff',
 		justifyContent: 'center',
-		// alignItems: 'center',
+		alignItems: 'center',
 		alignSelf: 'flex-end',
 		elevation: 7,
 		marginBottom: vS(-8),

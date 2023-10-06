@@ -3,6 +3,7 @@ import BottomTabs from '@navigations/bottom-tabs'
 import FastAIOverview from '@screens/fastai-overview'
 import Welcome from '@screens/welcome'
 import Splash from '@screens/splash'
+import Survey from '@screens/survey'
 
 const Stack = createStackNavigator()
 
@@ -12,6 +13,7 @@ export default (): JSX.Element => {
          initialRouteName='splash'
          screenOptions={{ headerShown: false }}>
          <Stack.Screen name='welcome' component={Welcome} />
+         <Stack.Screen name='survey' component={Survey} />
          <Stack.Screen name='splash' component={Splash} />
          <Stack.Screen name='main' component={BottomTabs} />
          <Stack.Screen name='fastai-overview' component={FastAIOverview} />

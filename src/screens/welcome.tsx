@@ -8,8 +8,9 @@ import {
 import Button from '@components/shared/button/Button'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { NavigationProp } from '@react-navigation/native'
 
-export default (): JSX.Element => {
+export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
 	return (
 		<View style={styles.container}>
 			<Image style={styles.storyset} source={require('../assets/images/storyset/welcome.gif')} />
@@ -18,6 +19,7 @@ export default (): JSX.Element => {
 				title='Get started'
 				size='large'
 				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+				onPress={() => navigation.navigate('survey')}
 			/>
 		</View>
 	)
@@ -27,7 +29,11 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: 'space-between',
-		alignItems: 'center'
+		alignItems: 'center',
+		paddingBottom: vS(27),
+		paddingHorizontal: hS(24), 
+		paddingTop: vS(22),
+		backgroundColor: '#fff'
 	},
 
 	title: {
@@ -39,7 +45,7 @@ const styles = StyleSheet.create({
 	},
 
 	storyset: {
-		width: hS(392),
-		height: vS(392)
+		width: hS(364),
+		height: vS(364)
 	}
 })
