@@ -1,0 +1,41 @@
+{
+    "personal-data-01": [
+	{
+	    "id": "r1", 
+	    "title": "Gender", 
+	    "value": "Male"
+	}, 
+
+	{
+	    "id": "r2", 
+	    "title": "Age", 
+	    "value": 22
+	}
+    ], 
+
+    "personal-data-02": [
+	{
+	    "id": "r3", 
+	    "title": "Height", 
+	    "value": "180cm"
+	},
+
+	{
+	    "id": "r4", 
+	    "title": "Current weight", 
+	    "value": "57kg"
+	}, 
+
+	{
+	    "id": "r5", 
+	    "title": "Target weight", 
+	    "value": "52kg"
+	}, 
+
+	{
+	    "id": "r6", 
+	    "title": "Your goal", 
+	    "value": "Lose weight / Improve health"
+	}
+    ]
+}

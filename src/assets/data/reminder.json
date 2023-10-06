@@ -1,0 +1,39 @@
+{
+    "Start fasting": [
+	{
+	    "title": "Remind before", 
+	    "value": "15 mins" 
+	}
+    ], 
+
+    "End fasting": [
+	{
+	    "title": "Remind before", 
+	    "value": "5 mins"
+	}
+    ], 
+
+    "Current weight": [
+	{
+	    "title": "Repeat", 
+	    "value": "T.7"
+	}
+    ],
+
+    "Drink water": [
+	{
+	    "title": "Start", 
+	    "value": "08:00"
+	}, 
+
+	{
+	    "title": "End", 
+	    "value": "22:30"
+	},
+
+	{
+	    "title": "Interval", 
+	    "value": "4 hrs"
+	}
+    ]
+}

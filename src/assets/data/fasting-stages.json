@@ -1,0 +1,30 @@
+[
+   {
+      "id": "ft1", 
+      "title": "Blood sugar rise", 
+      "from": 0, 
+      "to": 4,
+      "content": "You’ll feel pretty normal during the first hours of fasting because your body is going through the regular process of breaking down glycogen \n\nYour blood sugar rises. Your pancreas releases insulin to break down glucose for energy and store the extra glucose for later"
+   },
+   {
+      "id": "ft2", 
+      "title": "Blood sugar falls", 
+      "from": 4, 
+      "to": 8,
+      "content": "As a result of the effects of insulin, your blood sugar decreases to near normal after spiking\n\nAnd it typically doesn’t continue climbing because insulin is immediately delivered into your circulatory system after eating"
+   },
+   {
+      "id": "ft3", 
+      "title": "Blood sugar returns to normal", 
+      "from": 8, 
+      "to": 12,
+      "content": "Feel hungry? Your stomach is reminding you that it’s been a while since your last meal. However, you’re not actually feel hungry. Your body will continue to digest your last food intake. It starts to use stored glucose for energy, and continues to function as if you’ll eat again soon"
+   }, 
+   {
+      "id": "ft4", 
+      "title": "Burning stored fat", 
+      "from": 12, 
+      "to": 24,
+      "content": "Now, it’s the turn of fat to fuel your body. You’re in the metabolic state called ketosis\n\nThe glycogen is almost used up and your liver converts fat into ketone bodies, an alternative energy source for your body. Ketosis produces fewer inflammatory by-products. So it provides health benefits to your heart, metabolism and brain"
+   }
+]

@@ -1,11 +1,30 @@
-import { FC }  from 'react'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import FeedBack from '@screens/feedback/FeedBack'
+import { useEffect } from 'react'
+import { Platform, PermissionsAndroid } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context' 
+import TestPopup from '@screens/test-popup'
+import { configPushNotification } from './src/configs/push-notification'
 
-export default (): FC => {
-    return (
-        <SafeAreaProvider>
-	    <FeedBack />
-	</SafeAreaProvider>
-    )
+configPushNotification()
+
+export default (): JSX.Element => {
+   const requestNotificationPermission = async() => {
+      if (Platform.OS !== 'android') return
+      try {
+         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+      } catch (err) {
+         console.error(err)
+      }
+   }
+
+   useEffect(() => {
+      requestNotificationPermission()
+   }, [])
+
+   return (
+      <SafeAreaProvider>
+	   	<TestPopup />
+		</SafeAreaProvider>
+   )
 }
+
+

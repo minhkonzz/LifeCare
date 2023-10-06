@@ -1,0 +1,74 @@
+{
+    "About me": [
+        {
+	    "id": 1, 
+	    "title": "Personal data", 
+	    "type": "redirect"
+	}, 
+	    
+	{
+	    "id": 2, 
+	    "title": "Meal time", 
+	    "type": "redirect"
+	}
+    ],
+
+    "General": [
+        {
+	    "id": 1, 
+	    "title": "Notification", 
+	    "type": "toggle"
+	}, 
+
+	{
+	    "id": 2, 
+	    "title": "Reminder",
+	    "type": "redirect"
+	}, 
+
+	{
+	    "id": 3, 
+	    "title": "Widgets", 
+	    "type": "redirect"
+	}, 
+
+	{
+	    "id": 4, 
+	    "title": "Language", 
+	    "type": "value",
+	    "value": "English"
+	}, 
+
+	{
+	    "id": 5, 
+	    "title": "Dark mode", 
+	    "type": "toggle"
+	}, 
+
+	{
+	    "id": 6, 
+	    "title": "Sync to Google Fit", 
+	    "type": "toggle"
+	}	
+    ], 
+
+    "Contact us": [
+        {
+	    "id": 1, 
+	    "title": "Privacy policy", 
+	    "type": "redirect"
+	}, 
+
+	{
+	    "id": 2, 
+	    "title": "Rate us", 
+	    "type": "redirect"
+	}, 
+
+	{
+	    "id": 3, 
+	    "title": "Feedback", 
+	    "type": "redirect"
+	}
+    ]
+}
