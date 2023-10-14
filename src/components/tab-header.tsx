@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, Image } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
+import WaterCupIcon from '@assets/icons/watercup.svg'
 
 interface TabHeaderProps {
 	title: string
@@ -23,7 +24,7 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 					tintColor='#91C8E4'
 					onAnimationComplete={() => console.log('Animate completed')}
 					backgroundColor='#E3E3E3' />
-				<Image source={require('../assets/images/glass-of-water.png')} style={styles.watercup} />
+				<WaterCupIcon width={hS(12)} height={vS(18.2)} />
 			</View>
 		</View>
 	)
@@ -57,10 +58,5 @@ const styles = StyleSheet.create({
 		height: vS(40),
 		justifyContent: 'center',
 		alignItems: 'center'
-	},
-
-	watercup: {
-		width: hS(12),
-		height: vS(17)
 	}
 })

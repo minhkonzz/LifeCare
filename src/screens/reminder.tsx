@@ -19,14 +19,16 @@ interface ReminderSectionProps {
 }
 
 const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) => {
-	const height: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const [ isEnabled, setIsEnabled ] = useState<boolean>(false)
+	// console.log('render reminderSection', Date.now())
 
 	const onPress = () => {
-		Animated.timing(height, {
-			toValue: 350,
-			duration: 100,
-			easing: Easing.bounce,
+		// setIsEnabled(!isEnabled)
+		Animated.timing(animateValue, {
+			toValue: !isEnabled ? 1 : 0,
+			duration: 320,
+			easing: Easing.ease,
 			useNativeDriver: false
 		}).start(({ finished }) => {
 			setIsEnabled(!isEnabled)
@@ -38,9 +40,40 @@ const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) 
 			<Pressable {...{ onPress }}>
 				<SettingRow {...{ title, type: 'toggle' }} />
 			</Pressable>
-			<Animated.View style={{ width: '100%', height, borderWidth: 1 }}>
-				{settingList.map((e, i) => <SettingRow key={`${e.id}-${i}`} title={e.title} type='value' value={e.value} />)}
+			<Animated.View style={{ width: '100%', height: animateValue.interpolate({
+				inputRange: [ 0, 1 ], 
+				outputRange: [ 0, vS(settingList.length * 48) ]
+			}) }}>
+			{ 
+				settingList.map((e, i) => 
+					<View key={`${e.id}-${i}`}>
+						<View style={styles.gap} />
+						<SettingRow 
+							title={e.title} 
+							type='value' 
+							value={e.value} 
+						/>
+					</View>
+				) 
+			}
 			</Animated.View>
+			{/* { 
+				isEnabled &&
+				<View style={{ width: '100%' }}>
+					{ 
+						settingList.map((e, i) => 
+							<View key={`${e.id}-${i}`}>
+								<View style={styles.gap} />
+								<SettingRow 
+									title={e.title} 
+									type='value' 
+									value={e.value} 
+								/>
+							</View>
+						) 
+					}
+				</View>
+			} */}
 		</View>
 	)
 }
@@ -74,5 +107,9 @@ const styles = StyleSheet.create({
 	reminderSection: {
 		width: '100%',
 		marginBottom: vS(22)
+	},
+
+	gap: {
+		height: vS(12)
 	}
 })

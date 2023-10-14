@@ -8,7 +8,7 @@ import LinearGradient from 'react-native-linear-gradient'
 const darkPrimary: string = Colors.darkPrimary.hex
 
 export default (): JSX.Element => {
-	const opacity: number = useRef<Animated.Value>(new Animated.Value(0)).current
+	const opacity: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	useEffect(() => {
 		Animated.timing(opacity, {

@@ -1,29 +1,87 @@
-import { FC } from 'react'
 import {
-    View, 
+    View,
     Text,
-    StyleSheet, 
-    Animated, 
+    FlatList, 
+    StyleSheet,
+    Animated,
 } from 'react-native'
 
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-// import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import Screen from '@components/shared/screen'
+import StackHeader from '@components/shared/stack-header'
+import TimePicker from '@components/time-picker'
+import TimelineItem from '@components/timeline-item'
 
-export default (): FC => {
-    const bottomBarHeight: number = useDeviceBottomBarHeight()
+const dataTest: Array<any> = 
+[
+    {
+        id: 1, 
+        date: 'Today', 
+        time: '09:26'
+    }, 
+    {
+        id: 2, 
+        date: '', 
+        time: '11:02'
+    }, 
+    {
+        id: 3, 
+        date: 'Fri, 29 Aug',
+        time: '14:06'
+    }, 
+    {
+        id: 4, 
+        date: '', 
+        time: '12:02'
+    },
+    {
+        id: 5,
+        date: '', 
+        time: '08:14'
+    }
+]
+
+export default (): JSX.Element => {
     return (
-	<View style={[styles.container, { paddingBottom: vS(27) + bottomBarHeight }]}>
-
-	</View>
+        <Screen full scroll paddingHorzContent>
+            <StackHeader title='Timeline' /> 
+            <View style={styles.timePicker}>
+                <TimePicker title='From' indicatorColor={Colors.primary.hex} />
+                <TimePicker title='To' indicatorColor='#FF9B85' />
+            </View>
+            <FlatList 
+                contentContainerStyle={styles.timeline}
+                showsVerticalScrollIndicator={false}
+                data={dataTest} 
+                keyExtractor={item => item.id.toString()} 
+                renderItem={({ item, index }) => <TimelineItem {...{ item, index } } />} />
+        </Screen>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, 
-	alignItems: 'center'
-	paddingHorizontal: hS(24), 
-	paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: hS(24)
+    }, 
+    
+    timePicker: {
+        justifyContent: 'space-between',
+        marginTop: vS(12),
+        width: '100%',
+        borderRadius: hS(16), 
+        height: vS(114), 
+        elevation: 5, 
+        backgroundColor: '#fff', 
+        shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`,
+        paddingVertical: vS(21), 
+        paddingHorizontal: hS(24)
+    }, 
+
+    timeline: {
+        marginTop: vS(32),
+        alignItems: 'flex-end'
     }
 })

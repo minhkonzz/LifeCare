@@ -12,8 +12,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import Screen from '@components/shared/screen'
-
-import settingLayoutData from '../assets/data/setting-layout.json'
+import settingLayoutData from '@assets/data/setting-layout.json'
 
 const darkPrimary: any = {
 	hex: Colors.darkPrimary.hex,

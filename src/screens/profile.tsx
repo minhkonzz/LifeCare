@@ -1,14 +1,19 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import SettingIcon from '@assets/icons/setting.svg'
 import LogoutIcon from '@assets/icons/logout-red.svg'
+import ClockIcon from '@assets/icons/clock.svg'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import LatestBMI from '@components/latest-bmi'
 import FastingRecords from '@components/fasting-records'
 import HydrateRecords from '@components/hydrate-records'
+import BodyMeasure from '@components/body-measure-profile'
+import Weight from '@components/weight-profile'
 import Screen from '@components/shared/screen'
 import TabHeader from '@components/tab-header'
+import Backup from '@components/backup'
+import ProfileRedirect from '@components/profile-redirect'
 
 const darkPrimary: string = Colors.darkPrimary.hex
 
@@ -16,7 +21,7 @@ export default (): JSX.Element => {
 	return (
 		<>
 			<Screen scroll paddingHorzContent>
-				<View style={[styles.horz, styles.horzFullWidthBetween]}>
+				<View style={[styles.horz, styles.horzFullWidthBetween, { marginTop: vS(92) }]}>
 					<View style={styles.horz}>
 						<Image style={styles.avatar} source={require('../assets/images/UserAvatar.png')} />
 						<View style={styles.personalTexts}>
@@ -29,6 +34,7 @@ export default (): JSX.Element => {
 						<Text style={styles.logoutText}>Logout</Text>
 					</TouchableOpacity>
 				</View>
+				<Backup />
 				<LinearGradient
 					style={[styles.horz, styles.horzFullWidthBetween, styles.upgradePlan]}
 					colors={[`rgba(${Colors.lightPrimary.rgb.join(', ')}, .6)`, Colors.lightPrimary.hex]}
@@ -44,7 +50,15 @@ export default (): JSX.Element => {
 				</LinearGradient>
 				<LatestBMI />
 				<FastingRecords />
+				<Weight />
 				<HydrateRecords />
+				<BodyMeasure />
+				<ProfileRedirect title='Timeline'>
+					<ClockIcon width={hS(19)} height={vS(19)} />
+				</ProfileRedirect>
+				<ProfileRedirect title='Setting'>
+					<SettingIcon width={hS(20)} height={vS(20)} />
+				</ProfileRedirect>
 			</Screen>
 			<TabHeader title='Me' />
 		</>

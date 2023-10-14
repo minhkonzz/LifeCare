@@ -1,15 +1,11 @@
 import { useState } from 'react'
-import {
-   View,
-   StyleSheet 
-} from 'react-native'
-
+import { View } from 'react-native'
 import Popup from '@components/shared/popup'
 import Button from '@components/shared/button/Button'
-import Logout from '@components/shared/popup-content/logout'
+import RadioOptions from '@components/shared/popup-content/radio-options'
 
 export default (): JSX.Element => {
-   const [ visible, setVisible ] = useState(false)
+   const [ visible, setVisible ] = useState<boolean>(false)
    const open = () => {
       setVisible(true)
    }
@@ -19,11 +15,12 @@ export default (): JSX.Element => {
          <Button title='Open' size='medium' onPress={open} />
          { 
             visible && 
-            <Popup {...{ title: 'Logout', type: 'centered', visible, onClose: () => setVisible(false) }}>
-               <Logout />
+            <Popup {...{ title: 'Height', type: 'centered', visible, onClose: () => setVisible(false) }}>
+               <RadioOptions options={['English', 'Vietnamese', 'Chinese']} />
             </Popup>
          }
       </View>
    )
 }
+
 

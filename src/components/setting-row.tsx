@@ -16,21 +16,24 @@ import BackIcon from '@assets/icons/goback.svg'
 interface SettingRowProps {
     title: string,
     type: 'redirect' | 'value' | 'toggle' | 'toggleValue',
-    value?: string | number | [string, string]
+    value?: string | number | [string, string],
+    onPress?: () => void
 }
 
-const SettingRedirect: FC = () => <BackIcon style={{ transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
+const SettingRedirect: FC<{ onPress: () => void }> = ({ onPress }) => (
+    <Pressable style={styles.redirectWrapper} {...{ onPress }}>
+        <BackIcon style={{ transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
+    </Pressable>
+)
 
-const SettingValue: FC<{ value: string | number }> = ({ value }) => {
-    return (
-        <View style={styles.settingValue}>
-            <Text style={[styles.text, styles.valueTitle]}>{value}</Text>
-            <BackIcon style={{ marginTop: -1, transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
-        </View>
-    )
-}
+const SettingValue: FC<{ value: string | number, onPress: () => void }> = ({ value, onPress }) => (
+    <Pressable style={styles.settingValue} {...{ onPress }}>
+        <Text style={[styles.text, styles.valueTitle]}>{value}</Text>
+        <BackIcon style={{ marginTop: -1, transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
+    </Pressable>
+)
 
-const SettingToggleValue: FC<[string, string]> = ({ value }) => {
+const SettingToggleValue: FC<{ value: [string, string], onPress: () => void }> = ({ value, onPress }) => {
     const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const [ enabled, setEnabled ] = useState<boolean>(false)
 
@@ -43,8 +46,13 @@ const SettingToggleValue: FC<[string, string]> = ({ value }) => {
 		}).start()
 	}, [enabled])
 
+    const onTogglePressed = () => {
+        onPress()
+        setEnabled(!enabled)
+    }
+
 	return (
-		<Pressable style={styles.toggle} onPress={() => setEnabled(!enabled)}>
+		<Pressable style={styles.toggle} onPress={onTogglePressed}>
 			<Animated.View style={[styles.toggleButton, { transform: [{ translateX }] }]} />
 			<View style={styles.toggleBg}>
 				<Text style={styles.toggleText}>{value[0].toUpperCase()}</Text>
@@ -61,12 +69,12 @@ const settingTypes: any = {
     toggleValue: SettingToggleValue
 }
 
-export default ({ title, type, value }: SettingRowProps): JSX.Element => {
+export default ({ title, type, value, onPress }: SettingRowProps): JSX.Element => {
     const TargetView = settingTypes[type]
     return (
         <View style={styles.container}>
             <Text style={[styles.text, styles.title]}>{title}</Text>
-            <TargetView {...{ value }} />
+            <TargetView {...{ value, onPress }} />
         </View>
     )
 }
@@ -128,5 +136,10 @@ const styles = StyleSheet.create({
 	toggleText: {
 		fontSize: hS(13),
 		fontFamily: 'Poppins-Medium'
-	}
+	},
+
+    redirectWrapper: {
+        width: '40%', 
+        alignItems: 'flex-end'
+    }
 })
