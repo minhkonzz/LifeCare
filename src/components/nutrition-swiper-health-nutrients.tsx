@@ -39,8 +39,8 @@ export default (): JSX.Element => {
          data.map((e, i) => 
             <View key={`${e.id}-${i}`} style={{ marginTop: (i > 0 ? vS(20) : 0) }}>
                <View style={styles.header}>
-                  <Text style={styles.title}>{e.title}</Text>
-                  <Text style={styles.value}>{`took in: ${e.value} mg`}</Text>
+                  <Text style={[styles.itemText, styles.title]}>{e.title}</Text>
+                  <Text style={[styles.itemText, styles.value]}>{`took in: ${e.value} mg`}</Text>
                </View>
                <View style={styles.progressBar}>
                   <LinearGradient 
@@ -57,7 +57,9 @@ export default (): JSX.Element => {
 }
 
 const styles = StyleSheet.create({
-   container: {}, 
+   container: {
+      width: '100%'
+   }, 
    header: {
       flexDirection: 'row',
       justifyContent: 'space-between',  
