@@ -20,6 +20,7 @@ import MoonIcon from '@assets/icons/moon.svg'
 import BluePlusIcon from '@assets/icons/blue_plus.svg'
 import BackIcon from '@assets/icons/goback.svg'
 import EditIcon from '@assets/icons/edit.svg'
+import WatercupIcon from '@assets/icons/watercup.svg'
 
 const darkPrimary: string = Colors.darkPrimary.hex
 // const bmiRangesData: any = require('../assets/data/bmi-range-data.json')
@@ -92,14 +93,7 @@ const WaterTrack: FC = () => {
 					{ marginRight: hS(4) }
 				]}>
 					<Text style={styles.trackHeaderText}>Drink water</Text>
-					<Image
-						style={{
-							width: hS(10),
-							height: vS(13),
-							marginLeft: hS(6)
-						}}
-						source={require('../assets/images/glass-of-water.png')}
-					/>
+					<WatercupIcon width={hS(10)} height={vS(13)} />
 				</View>
 				<View style={{
 					marginRight: hS(4),

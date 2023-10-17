@@ -11,7 +11,7 @@ import { BOTTOMBAR_HEIGHT } from '@utils/constants/screen'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 
-interface ScreenProps {
+interface Props {
    paddingHorzContent?: boolean
    scroll?: boolean
    full?: boolean,
@@ -25,7 +25,7 @@ export default ({
    full, 
    additionalStyles, 
    children 
-}: ScreenProps): JSX.Element => {
+}: Props): JSX.Element => {
    const bottomBarHeight: number = useDeviceBottomBarHeight() 
    const bottomIndicatorStyles = {
       marginBottom: vS(27) + (full ? 0 : BOTTOMBAR_HEIGHT)
@@ -66,11 +66,11 @@ export default ({
 const styles = StyleSheet.create({
    container: {
       flex: 1, 
-      backgroundColor: '#fff'
+      backgroundColor: '#fff',
    }, 
 
    children: {
-      width: '100%',
+      flex: 1,
       paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0, 
       alignItems: 'center'
    }

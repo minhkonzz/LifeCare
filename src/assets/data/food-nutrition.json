@@ -1,0 +1,68 @@
+[
+   {
+      "id": "nt1", 
+      "title": "Protein", 
+      "value": 16.2,
+      "indicatorColor": [145, 200, 288], 
+      "subs": []
+   }, 
+   {
+      "id": "nt2", 
+      "title": "Carbs", 
+      "value": 2,
+      "indicatorColor": [234, 84, 85], 
+      "subs": [
+         {
+            "id": "nts1", 
+            "title": "Fibers", 
+            "value": 1.2
+         }, 
+         {
+            "id": "nts2", 
+            "title": "Sugar", 
+            "value": 0.8
+         }
+      ]
+   },
+   {
+      "id": "nt3", 
+      "title": "Fat", 
+      "value": 9.4,
+      "indicatorColor": [255, 211, 110], 
+      "subs": [
+         {
+            "id": "nts3", 
+            "title": "Saturated fat acids", 
+            "value": 1.8
+         }, 
+         {
+            "id": "nts4", 
+            "title": "Tras fat acids", 
+            "value": 0.8
+         },
+         {
+            "id": "nts5", 
+            "title": "Tras fat acids", 
+            "value": 0.8
+         }
+      ]
+   },
+   {
+      "id": "nt4", 
+      "title": "Other", 
+      "value": 0,
+      "indicatorColor": [86, 111, 106],
+      "subs": [
+         {
+            "id": "nts6", 
+            "title": "Cholesterol", 
+            "value": 0.2
+         }, 
+         {
+            "id": "nts7", 
+            "title": "Sodium", 
+            "value": 0.6
+         }
+      ]
+   }
+]

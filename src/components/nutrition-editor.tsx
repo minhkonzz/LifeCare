@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
    container: {
       width: '100%', 
       borderRadius: hS(24),
-      paddingHorizontal: hS(22),
+      paddingHorizontal: hS(17),
       paddingVertical: vS(16), 
       elevation: 5,
       shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`,

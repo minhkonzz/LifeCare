@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
 	title: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(18),
+		fontSize: hS(16),
 		color: Colors.darkPrimary.hex,
 		letterSpacing: .2
 	}

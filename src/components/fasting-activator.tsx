@@ -80,6 +80,7 @@ export default (): JSX.Element => {
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}>
 							<AnimatedCircularProgress
+								lineCap='round'
 								style={{ position: 'absolute' }}
 								width={hS(7)}
 								size={hS(80)}
@@ -204,6 +205,6 @@ const styles = StyleSheet.create({
 		height: vS(92),
 		justifyContent: 'space-between',
 		paddingHorizontal: hS(8),
-		paddingVertical: vS(7)
+		paddingVertical: vS(8)
 	}
 })

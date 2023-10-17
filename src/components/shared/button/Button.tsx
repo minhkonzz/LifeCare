@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     },
 
     largeTitle: {
-        fontSize: hS(16)
+        fontSize: hS(14)
     },
 
     smallButton: {

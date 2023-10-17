@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { Platform, PermissionsAndroid } from 'react-native'
-// import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context' 
-// import Stack from '@navigations/stack'
-import Reminder from '@screens/reminder'
+import Stack from '@navigations/stack'
+import Nutrition from '@screens/nutrition'
 import { configPushNotification } from './src/configs/push-notification'
 
 configPushNotification()
@@ -24,12 +24,10 @@ export default (): JSX.Element => {
 
    return (
       <SafeAreaProvider>
-         <Reminder />
+         <Nutrition />
 	   	{/* <NavigationContainer>
             <Stack />
          </NavigationContainer> */}
 		</SafeAreaProvider>
    )
 }
-
-

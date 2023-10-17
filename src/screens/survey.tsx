@@ -24,7 +24,7 @@ import {
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import WheelPicker from '@components/shared/wheel-picker'
+import ValueWheelPicker from '@components/shared/value-wheel-picker'
 import Button from '@components/shared/button/Button'
 import LinearGradient from 'react-native-linear-gradient'
 import CheckmarkIcon from '@assets/icons/checkmark.svg'
@@ -38,11 +38,11 @@ const MAX_CONTENT_WIDTH: number = SCREEN_WIDTH - (PADDING_SIDE * 2)
 const surveyTitles: Array<string> = [
     'Choose your goal',
     'How familiar are you with fasting?',
-    'How often do you exercise?',
-    'How old are you?',
-    'Your current height',
-    'Your current weight',
-    'Your goal weight'
+    'How often do you exercise?'
+    // 'How old are you?',
+    // 'Your current height',
+    // 'Your current weight',
+    // 'Your goal weight'
 ]
 
 interface OptionProps {
@@ -77,32 +77,8 @@ const Option: FC<OptionProps> = ({ item, index, data, setData }) => {
 
 const ExercisePerformanceSurvey: FC = memo(() => {
     return (
-        <View>
-
-        </View>
-    )
-})
-
-const HeightSurvey: FC = memo(() => {
-    return (
-        <View>
-
-        </View>
-    )
-})
-
-const WeightSurvey: FC = memo(() => {
-    return (
-        <View>
-
-        </View>
-    )
-})
-
-const GoalWeightSurvey: FC = memo(() => {
-    return (
-        <View>
-
+        <View style={[styles.surveyPart, { paddingTop: vS(72) }]}> 
+            <ValueWheelPicker items={[1, 2, 3, 4, 5, 6, 7, 8, 9]} itemHeight={vS(72)} />
         </View>
     )
 })
@@ -113,7 +89,7 @@ const AgeSurvey: FC<{ age: number, setAge: Dispatch<SetStateAction<string[]>> }>
 }) => {
     const ageNumbers: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
     return (
-        <View>
+        <View style={styles.surveyPart}>
 
         </View>
     )
@@ -138,11 +114,7 @@ const FastingFamiliarSurvey: FC<{ fastingFamiliar: string[], setFastingFamiliar:
         }
     ]
     return (
-        <View style={{
-            width: '100%',
-            marginTop: vS(14),
-            marginLeft: PADDING_SIDE
-        }}>
+        <View style={styles.surveyPart}>
             <Text style={styles.optionsTitle}>Choose one option</Text>
             <FlatList
                 style={{ marginTop: vS(10) }}
@@ -181,10 +153,7 @@ const GoalSurvey: FC<{ goal: string[], setGoal: Dispatch<SetStateAction<string[]
         }
     ]
     return (
-        <View style={{
-            width: '100%',
-            marginTop: vS(14)
-        }}>
+        <View style={styles.surveyPart}>
             <Text style={styles.optionsTitle}>Choose multiple options</Text>
             <FlatList
                 style={{ marginTop: vS(10) }}
@@ -229,7 +198,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 
     return (
         <View style={[styles.container, { paddingBottom: vS(27) + bottomBarHeight }]}>
-            <View style={{ width: '100%', alignItems: 'center' }}>
+            <View>
                 <View style={styles.indicator}>
                     {
                         Array.from({ length: surveyTitles.length }).map((e, i) => {
@@ -252,21 +221,17 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                 </View>
                 <Text style={styles.mainTitle}>{surveyTitles[surveyIndex]}</Text>
                 <Animated.View
-                    style={{
-                        width: MAX_CONTENT_WIDTH,
-                        flexDirection: 'row',
-                        transform: [{ translateX }]
-                    }}>
+                    style={[styles.surveysContainer, { transform: [{ translateX }] }]}>
                     <GoalSurvey {...{ goal, setGoal }} />
                     <FastingFamiliarSurvey {...{ fastingFamiliar, setFastingFamiliar }} />
                     <ExercisePerformanceSurvey {...{ exercisePerformance, setExercisePerformance }} />
-                    <AgeSurvey {...{ age, setAge }} />
+                    {/* <AgeSurvey {...{ age, setAge }} />
                     <HeightSurvey {...{ currentHeight, setCurrentHeight }} />
                     <WeightSurvey {...{ currentWeight, setCurrentWeight }} />
-                    <GoalWeightSurvey {...{ goalWeight, setGoalWeight }} />
+                    <GoalWeightSurvey {...{ goalWeight, setGoalWeight }} /> */}
                 </Animated.View>
             </View>
-            <View style={{ width: '100%', alignItems: 'center' }}>
+            <View style={styles.bottom}>
                 {
                     surveyIndex > 0 &&
                     <TouchableOpacity style={styles.backButton} onPress={() => changeSurvey(surveyIndex - 1)}>
@@ -288,8 +253,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: PADDING_SIDE,
         backgroundColor: '#fff',
         paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
     },
@@ -299,7 +262,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: vS(25),
-        alignSelf: 'flex-start'
+        alignSelf: 'flex-start', 
+        paddingHorizontal: PADDING_SIDE
     },
 
     indicatorPart: {
@@ -323,7 +287,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-SemiBold',
         fontSize: hS(24),
         marginTop: vS(22),
-        color: darkPrimary
+        color: darkPrimary, 
+        paddingHorizontal: PADDING_SIDE
     },
 
     backButtonText: {
@@ -363,7 +328,21 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Colors.primary.hex,
         backgroundColor: Colors.lightPrimary.hex
-    }
+    },
 
+    surveysContainer: {
+        width: MAX_CONTENT_WIDTH * surveyTitles.length, 
+        flexDirection: 'row', 
+        marginTop: vS(14)
+    },
+
+    surveyPart: {
+        width: MAX_CONTENT_WIDTH, 
+        marginLeft: PADDING_SIDE
+    },
+
+    bottom: {
+        paddingHorizontal: PADDING_SIDE
+    }
 })
 

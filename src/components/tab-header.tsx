@@ -16,15 +16,16 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 			<Text style={styles.title}>{title}</Text>
 			<View style={styles.watercupWrapper}>
 				<AnimatedCircularProgress
-					style={{ position: 'absolute' }}
-					width={hS(3)}
-					size={hS(40)}
+					lineCap='round'
+					width={hS(4.5)}
+					size={hS(45)}
 					rotation={360}
 					fill={80}
 					tintColor='#91C8E4'
-					onAnimationComplete={() => console.log('Animate completed')}
 					backgroundColor='#E3E3E3' />
-				<WaterCupIcon width={hS(12)} height={vS(18.2)} />
+				<View style={styles.watercupInside}>
+					<WaterCupIcon width={hS(14)} height={vS(19)} />
+				</View>
 			</View>
 		</View>
 	)
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
 		width: '100%',
 		paddingHorizontal: hS(24),
 		paddingVertical: vS(15),
-		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderBottomLeftRadius: hS(25),
@@ -50,13 +50,21 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(18),
 		color: Colors.darkPrimary.hex,
-		letterSpacing: .5
+		letterSpacing: .5, 
+		marginTop: vS(-32)
 	},
 
 	watercupWrapper: {
-		width: hS(40),
-		height: vS(40),
+		width: hS(45), 
+		height: vS(45),
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center', 
+		padding: 2,
+		alignSelf: 'flex-end',
+		marginTop: vS(-40) 
+	}, 
+
+	watercupInside: {
+		position: 'absolute'
 	}
 })
