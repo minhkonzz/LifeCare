@@ -7,6 +7,7 @@ import Animated, {
    useSharedValue,
    withTiming,
 } from 'react-native-reanimated'
+import { Colors } from '@utils/constants/colors'
 import { interpolatePath } from 'react-native-redash'
 import usePath from '@hooks/usePath'
 import { getPathXCenter } from '@utils/path'
@@ -56,7 +57,7 @@ export default ({ state, descriptors, navigation }) => {
    return (
       <View style={styles.tabBarContainer}>
          <Svg width={SCREEN_WIDTH} height={tHeight} style={styles.shadowMd}>
-            <AnimatedPath fill='' {...{ animatedProps }} />
+            <AnimatedPath fill={Colors.darkPrimary.hex} {...{ animatedProps }} />
          </Svg>
          <AnimatedCircle circleX={circleXCoordinate} />
          <View style={[styles.tabItemsContainer, { height: tHeight }]}>

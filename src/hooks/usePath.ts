@@ -23,12 +23,12 @@ const generateTabShapePath: GenerateTabShapePath = (position, adjustedHeight) =>
     const lineGenerator = line().curve(curveBasis)
     const tab = lineGenerator([
 	    [ tabX - 100 * SCALE, 0 ],
-        [ tabX - (82 + 35) * SCALE, 0 ],
-        [ tabX - (42 - 2) * SCALE, -1 * SCALE ],
-        [ tabX - (42 - 18) * SCALE, (adjustedHeight - 16) * SCALE ],
-        [ tabX + (42 - 18) * SCALE, (adjustedHeight - 16) * SCALE ],
-        [ tabX + (42 - 2) * SCALE, -1 * SCALE ],
-        [ tabX + (82 + 35) * SCALE, 0 ],
+        [ tabX - 96 * SCALE, 0 ],
+        [ tabX - 58 * SCALE, -1 * SCALE ],
+        [ tabX - 32 * SCALE, (adjustedHeight - 22) * SCALE ],
+        [ tabX + 32 * SCALE, (adjustedHeight - 22) * SCALE ],
+        [ tabX + 58 * SCALE, -1 * SCALE ],
+        [ tabX + 96 * SCALE, 0 ],
         [ tabX + 100 * SCALE, 0 ],
     ])
     return `${tab}`

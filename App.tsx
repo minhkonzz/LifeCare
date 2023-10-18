@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Platform, PermissionsAndroid } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context' 
-import Stack from '@navigations/stack'
+import BottomTabs from '@navigations/bottom-tabs'
 // import Nutrition from '@screens/nutrition'
 import { configPushNotification } from './src/configs/push-notification'
 
@@ -26,7 +26,7 @@ export default (): JSX.Element => {
       <SafeAreaProvider>
          {/* <Nutrition /> */}
 	   	<NavigationContainer>
-            <Stack />
+            <BottomTabs />
          </NavigationContainer>
 		</SafeAreaProvider>
    )

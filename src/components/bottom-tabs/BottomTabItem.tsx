@@ -30,7 +30,7 @@ const TabItem = ({
    const labelPosition = getPathXCenterByIndex(curvedPaths, index)
 
    const tabStyle = useAnimatedStyle(() => {
-      const translateY = animatedActiveIndex.value - 1 === index ? -10 : 20
+      const translateY = animatedActiveIndex.value - 1 === index ? -14 : 20
       const iconPositionX = iconPosition - index * ICON_SIZE;
       return {
          width: ICON_SIZE,
@@ -43,7 +43,7 @@ const TabItem = ({
    })
 
    const labelContainerStyle = useAnimatedStyle(() => {
-      const translateY = animatedActiveIndex.value - 1 === index ? 28 : 100;
+      const translateY = animatedActiveIndex.value - 1 === index ? 40 : 100;
       return {
          transform: [
             { translateY: withTiming(translateY) },
@@ -52,11 +52,11 @@ const TabItem = ({
       }
    })
 
-   const iconColor = useSharedValue(activeIndex === index + 1 ? '#fff' : 'rgba(128,128,128,0.8)')
+   const iconColor = useSharedValue('#fff')
 
    useEffect(() => {
       animatedActiveIndex.value = activeIndex;
-      iconColor.value = activeIndex === index + 1 && withTiming('#fff') || withTiming('rgba(128,128,128,0.8)')
+      iconColor.value = withTiming('#fff')
    }, [activeIndex])
    
    return (
