@@ -25,9 +25,9 @@ export default (): JSX.Element => {
    return (
       <SafeAreaProvider>
          {/* <Nutrition /> */}
-	   	<NavigationContainer>
+	   	{/* <NavigationContainer>
             <BottomTabs />
-         </NavigationContainer>
+         </NavigationContainer> */}
 		</SafeAreaProvider>
    )
 }

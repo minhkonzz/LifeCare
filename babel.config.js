@@ -11,13 +11,16 @@ module.exports = {
 					'@navigations': './src/navigations',
 					'@utils': './src/utils',
 					'@hooks': './src/hooks',
-					'@models': './src/models'
+					'@models': './src/models', 
+					'@services': './src/services', 
+					'@controllers': './src/controllers'
 				}
 			}
 		],
 		['react-native-reanimated/plugin'],
 		["@babel/plugin-proposal-decorators", { "legacy": true }],
-		["@babel/plugin-proposal-class-properties"]
+		["@babel/plugin-proposal-class-properties"],
+		["module:react-native-dotenv"]
 	],
 	assumptions: {
 		setPublicClassFields: false
