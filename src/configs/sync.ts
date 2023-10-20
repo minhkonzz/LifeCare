@@ -7,7 +7,7 @@ export async function supabaseSync() {
       pullChanges: async ({ lastPulledAt, schemaVersion, migration }) => {
          console.log('')
       }, 
-      pushChanges: async ({ changes, lastPulledAt }),
+      pushChanges: async ({ changes, lastPulledAt }) => {},
       migrationsEnabledAtVersion: 1,
    })
 }

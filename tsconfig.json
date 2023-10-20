@@ -2,14 +2,19 @@
   "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
     "paths": {
       "@assets/*": ["src/assets/*"],
+      "@assets/icons/*": ["src/assets/icons/*"],
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
       "@navigations/*": ["src/navigations/*"],
       "@utils/*": ["src/utils/*"],
-      "@hooks/*": ["src/hooks/*"]
-    }
+      "@hooks/*": ["src/hooks/*"],
+      "@configs/*": ["src/configs/*"], 
+      "@services/*": ["src/services/*"]
+    },
   },
   "useDefineForClassFields": true
 }

@@ -58,7 +58,7 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 	)
 }
 
-export default (): FC => {
+export default (): JSX.Element => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
 	const [tabIndexSelected, setTabIndexSelected] = useState<number>(0)
 	return (

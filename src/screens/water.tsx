@@ -1,12 +1,12 @@
 import { FC, useState, useEffect, useRef } from 'react'
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Animated,
-    Easing,
-    Dimensions
+   View,
+   Text,
+   StyleSheet,
+   TouchableOpacity,
+   Animated,
+   Easing,
+   Dimensions
 } from 'react-native'
 
 import { Colors } from '@utils/constants/colors'
@@ -16,7 +16,8 @@ import BackIcon from '@assets/icons/goback.svg'
 import SettingIcon from '@assets/icons/setting.svg'
 import WhitePlusIcon from '@assets/icons/white_plus.svg'
 import StrongBlueMinusIcon from '@assets/icons/strong_blue_minus.svg'
-import WaterWave from '@assets/images/light_wave.svg'
+import WaterWave from '@components/wave'
+// import WaterWave from '@assets/images/light_wave.svg'
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const PADDING_SIDE: number = hS(22)
@@ -56,11 +57,12 @@ const strongBlue: string = Colors.strongBlue.hex
 // }
 
 export default (): JSX.Element => {
-    const [ total, setTotal ] = useState<number>(1200)
-    return (
-        <View style={styles.container}>
-            {/* <WaterBackground /> */}
-            <View style={styles.interacts}>
+   const [total, setTotal] = useState<number>(1200)
+   return (
+      <View style={styles.container}>
+         {/* <WaterBackground /> */}
+         <WaterWave w={320} h={320} />
+         {/* <View style={styles.interacts}>
                 <View style={styles.header}>
                     <BackIcon width={hS(14)} height={vS(14)} />
                     <Text style={styles.headerTitle}>Total today</Text>
@@ -96,96 +98,102 @@ export default (): JSX.Element => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
-        </View>
-    )
+            </View> */}
+      </View>
+   )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
+   container: {
+      flex: 1
+   },
 
-    header: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
+   lottie: {
+      position: 'absolute',
+      width: SCREEN_WIDTH,
+      height: vS(700)
+   },
 
-    headerTitle: {
-        fontSize: 15,
-        fontFamily: 'Poppins-SemiBold',
-        color: darkPrimary
-    },
+   header: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+   },
 
-    interacts: {
-        flex: 1,
-        paddingTop: 36,
-        paddingBottom: vS(90),
-        paddingHorizontal: hS(22),
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
+   headerTitle: {
+      fontSize: 15,
+      fontFamily: 'Poppins-SemiBold',
+      color: darkPrimary
+   },
 
-    results: {
-        alignItems: 'center',
-        marginBottom: vS(50)
-    },
+   interacts: {
+      flex: 1,
+      paddingTop: 36,
+      paddingBottom: vS(90),
+      paddingHorizontal: hS(22),
+      justifyContent: 'space-between',
+      alignItems: 'center'
+   },
 
-    totalMilText: {
-        fontSize: hS(36),
-        fontFamily: 'Poppins-SemiBold',
-        color: strongBlue
-    },
+   results: {
+      alignItems: 'center',
+      marginBottom: vS(50)
+   },
 
-    goalMilText: {
-        fontFamily: 'Poppins-Medium',
-        fontSize: hS(14),
-        color: darkPrimary
-    },
+   totalMilText: {
+      fontSize: hS(36),
+      fontFamily: 'Poppins-SemiBold',
+      color: strongBlue
+   },
 
-    updates: {
-        width: '75%',
-        alignItems: 'center'
-    },
+   goalMilText: {
+      fontFamily: 'Poppins-Medium',
+      fontSize: hS(14),
+      color: darkPrimary
+   },
 
-    increaseMilButton: {
-        width: hS(110),
-        height: vS(110),
-        borderRadius: 500,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
+   updates: {
+      width: '75%',
+      alignItems: 'center'
+   },
 
-    sideUpdates: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
+   increaseMilButton: {
+      width: hS(110),
+      height: vS(110),
+      borderRadius: 500,
+      justifyContent: 'center',
+      alignItems: 'center'
+   },
 
-    sideUpdateButton: {
-        width: hS(70),
-        height: vS(70),
-        backgroundColor: `rgba(${Colors.strongBlue.rgb.join(', ')}, .2)`,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 500
-    },
+   sideUpdates: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+   },
 
-    increaseMilAmount: {
-        fontFamily: 'Poppins-Medium',
-        color: '#fff',
-        marginTop: 10
-    },
+   sideUpdateButton: {
+      width: hS(70),
+      height: vS(70),
+      backgroundColor: `rgba(${Colors.strongBlue.rgb.join(', ')}, .2)`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 500
+   },
 
-    waterBackground: {
-        flexDirection: 'row',
-        position: 'absolute',
-        top: SCREEN_HEIGHT,
-        left: 0,
-        bottom: 0,
-        right: 0
-    }
+   increaseMilAmount: {
+      fontFamily: 'Poppins-Medium',
+      color: '#fff',
+      marginTop: 10
+   },
+
+   waterBackground: {
+      flexDirection: 'row',
+      position: 'absolute',
+      top: SCREEN_HEIGHT,
+      left: 0,
+      bottom: 0,
+      right: 0
+   }
 })
