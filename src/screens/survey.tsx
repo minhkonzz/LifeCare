@@ -183,7 +183,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 
     const changeSurvey: (index: number) => void = (newSurveyIndex: number) => {
         if (newSurveyIndex === surveyTitles.length) {
-            navigation.navigate('main')
+            navigation.navigate('auth')
             return
         }
         Animated.timing(translateX, {

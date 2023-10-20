@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import appReducer from './app-slice'
-import authReducer from './auth-slice'
+import appReducer from './app'
+import authReducer from './auth'
+import networkReducer from './network'
 
 const store = configureStore({
    reducer: {
       app: appReducer, 
-      auth: authReducer
+      auth: authReducer,
+      network: networkReducer
    }
 })
 

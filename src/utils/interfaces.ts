@@ -10,3 +10,7 @@ export interface LoginComponentProps {
    setIsLogin: Dispatch<SetStateAction<boolean>>,
    navigation: NavigationProp<any>
 }
+
+export interface NetworkState {
+   isOnline: boolean
+}

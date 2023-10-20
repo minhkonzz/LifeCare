@@ -29,20 +29,20 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
-   const titleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    useEffect(() => {
-      Animated.timing(titleAnimateValue, {
+      Animated.timing(animateValue, {
          toValue: 1, 
-         duration: 1000, 
+         duration: 640, 
          useNativeDriver: true
       }).start()
    }, [])
 
    const changeToSignIn = () => {
-      Animated.timing(titleAnimateValue, {
+      Animated.timing(animateValue, {
          toValue: 0,
-         duration: 1000,
+         duration: 640,
          useNativeDriver: true
       }).start(({ finished }) => {
          setIsLogin(true)
@@ -66,13 +66,13 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
 
    return (
       <View style={styles.container}>
-         <Animated.Image style={styles.storyset} source={require('../assets/images/storyset/signup.gif')} />
+         <Animated.Image style={[styles.storyset, { transform: [{ scale: animateValue }] }]} source={require('../assets/images/storyset/signup.gif')} />
          <Animated.View style={[
             styles.titleWrapper,
             styles.horz, 
             {
-               opacity: titleAnimateValue,
-               transform: [{ translateX: titleAnimateValue.interpolate({
+               opacity: animateValue,
+               transform: [{ translateX: animateValue.interpolate({
                   inputRange: [0, 1],
                   outputRange: [-200, 0]
                }) }]   
@@ -81,26 +81,36 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
             <Pressable onPress={changeToSignIn}><BackIcon width={hS(18)} height={vS(18)} /></Pressable>
             <Text style={styles.title}>Sign up</Text>
          </Animated.View>
-         <AuthInput 
-            placeholder='Email' 
-            type='email'
-            height={vS(48)}>
-            <AtIcon width={hS(22)} height={vS(22)} />
-         </AuthInput>
-         <AuthInput placeholder='Password' type='password' height={vS(48)} hide>
-            <LockIcon width={hS(22)} height={vS(22)} />
-         </AuthInput>
-         <AuthInput placeholder='Confirm password' type='password-confirm' height={vS(48)} hide>
-            <LockIcon width={hS(22)} height={vS(22)} />
-         </AuthInput>
-         <AuthInput placeholder='Your name' type='name' height={vS(48)}>
-            <UserFieldIcon width={hS(20)} height={vS(20)} />
-         </AuthInput>
-         <View style={styles.termsRef}>
+         <Animated.View style={{
+            width: '100%',
+            transform: [{ translateX: animateValue.interpolate({
+               inputRange: [0, 1], 
+               outputRange: [-800, 0]
+            }) }]
+         }}>
+            <AuthInput 
+               placeholder='Email' 
+               type='email'
+               height={vS(48)}>
+               <AtIcon width={hS(22)} height={vS(22)} />
+            </AuthInput>
+            <AuthInput placeholder='Password' type='password' height={vS(48)} hide>
+               <LockIcon width={hS(22)} height={vS(22)} />
+            </AuthInput>
+            <AuthInput placeholder='Confirm password' type='password-confirm' height={vS(48)} hide>
+               <LockIcon width={hS(22)} height={vS(22)} />
+            </AuthInput>
+            <AuthInput placeholder='Your name' type='name' height={vS(48)}>
+               <UserFieldIcon width={hS(20)} height={vS(20)} />
+            </AuthInput>
+         </Animated.View>
+         <Animated.View style={[styles.termsRef, { opacity: animateValue }]}>
             <Animated.Text style={styles.termsRefTitle}>By signing up, you're agree with our</Animated.Text>
             <Animated.Text style={styles.termsRefHl}>Terms & conditions and Privacy policy</Animated.Text>
-         </View>
-         <SignupButton />
+         </Animated.View>
+         <Animated.View style={{ transform: [{ scale: animateValue }] }}>
+            <SignupButton />
+         </Animated.View>
       </View>
    )
 })

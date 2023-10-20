@@ -5,7 +5,7 @@ import {
    Animated
 } from 'react-native'
 import { useDispatch } from 'react-redux'
-import { updateEmail, updatePassword, updatePasswordConfirm, updateName } from '../store/auth-slice'
+import { updateEmail, updatePassword, updatePasswordConfirm, updateName } from '../store/auth'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 
@@ -35,7 +35,6 @@ export default ({
    fontSize,
    hide = false
 }: AuthInputProps): JSX.Element => {
-   console.log('\nrender authinput')
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const dispatch = useDispatch()
    const onChangeTextAction = onChangeTextActions[type]

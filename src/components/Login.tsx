@@ -35,7 +35,7 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1, 
-			duration: 920, 
+			duration: 640, 
 			useNativeDriver: true
 		}).start()
 	}, [])
@@ -43,7 +43,7 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 	const onBeforeNavigate = (onAnimateCompleted?: () => void) => {
 		Animated.timing(animateValue, {
 			toValue: 0, 
-			duration: 920, 
+			duration: 640, 
 			useNativeDriver: true
 		}).start(({ finished }) => {
 			if (onAnimateCompleted) onAnimateCompleted()
@@ -59,7 +59,10 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 		const onSignIn = async() => {
 			try {
 				const data = await AuthService.signInPassword(email, password)
-				onBeforeNavigate(() => { navigation.navigate('main') })
+				onBeforeNavigate(() => { 
+					console.log('navigation now:', navigation)
+					navigation.navigate('main')
+				})
 			} catch (err) {
 				console.error(err)
 			}
@@ -75,12 +78,12 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 				style={[styles.storyset, { transform: [{ scale: animateValue }] }]} 
 				source={require('../assets/images/storyset/login.gif')} 
 			/>
-			<View style={[
+			<Animated.View style={[
 				styles.main,
 				{ 
 					transform: [{ translateX: animateValue.interpolate({
 						inputRange: [0, 1], 
-						outputRange: [-300, 0]
+						outputRange: [-800, 0]
 					}) }]
 				}
 			]}>
@@ -122,7 +125,7 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 						<Text style={styles.googleLoginButtonText}>Sign in with Google</Text>
 					</TouchableOpacity>
 				</View>
-			</View>
+			</Animated.View>
 			<Animated.View style={[styles.registerRef, { opacity: animateValue }]}>
 				<Text style={styles.registerRefTitle}>Are you new come in?</Text>
 				<Pressable style={styles.registerRefPress} onPress={changeToSignUp}>
