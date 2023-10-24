@@ -10,7 +10,7 @@ import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 interface StackHeaderProps {
-	title: string,
+	title?: string,
 	onPressBack?: () => void
 }
 

@@ -1,4 +1,3 @@
-
 import Svg, { Path } from 'react-native-svg'
 import { WaterWaveProps } from '@utils/interfaces'
 import Animated, { 

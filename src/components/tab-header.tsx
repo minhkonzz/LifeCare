@@ -1,12 +1,11 @@
-import { FC } from 'react'
-import { View, Text, StyleSheet, Animated, Image } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
 import WaterCupIcon from '@assets/icons/watercup.svg'
 
 interface TabHeaderProps {
-	title: string
+	title?: string
 }
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
@@ -37,13 +36,13 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		width: '100%',
 		paddingHorizontal: hS(24),
-		paddingVertical: vS(15),
+		paddingVertical: vS(12),
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderBottomLeftRadius: hS(25),
 		borderBottomRightRadius: hS(25),
-		elevation: 5,
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`
+		elevation: 10,
+		shadowColor: Colors.darkPrimary.hex
 	},
 
 	title: {

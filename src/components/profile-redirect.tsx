@@ -30,10 +30,10 @@ export default ({ title, onPress, children }: ProfileRedirectProps): JSX.Element
 
 const styles = StyleSheet.create({
    container: { 
-      width: '100%',
+      width: hS(370),
+      height: vS(68),
       justifyContent: 'space-between',
       paddingHorizontal: hS(24), 
-      paddingVertical: hS(24),
       borderRadius: hS(24), 
       backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`, 
       marginTop: vS(16)

@@ -1,64 +1,62 @@
-import { ReactNode } from 'react'
+import { useCallback, useState } from 'react'
 import {
    View,
-   ScrollView, 
+   FlatList, 
    Platform, 
    StatusBar, 
    StyleSheet
 } from 'react-native'
-
+import TabHeader from '@components/tab-header'
+import StackHeader from './stack-header'
 import { BOTTOMBAR_HEIGHT } from '@utils/constants/screen'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 
 interface Props {
+   content: Array<any>
    paddingHorzContent?: boolean
-   scroll?: boolean
-   full?: boolean,
+   full?: boolean
    additionalStyles?: any, 
-   children?: ReactNode
+   header?: 'tab' | 'stack', 
+   title?: string
 } 
 
+const headers = {
+   tab: TabHeader,
+   stack: StackHeader
+}
+
 export default ({ 
+   content,
    paddingHorzContent, 
-   scroll, 
    full, 
    additionalStyles, 
-   children 
+   header,
+   title
 }: Props): JSX.Element => {
-   const bottomBarHeight: number = useDeviceBottomBarHeight() 
-   const bottomIndicatorStyles = {
-      marginBottom: vS(27) + (full ? 0 : BOTTOMBAR_HEIGHT)
-   }
+   const [ visibleIndexes, setVisibleIndexes ] = useState<Array<number>>([])
+   const bottomIndicatorStyles = { marginBottom: vS(27) + (full ? 0 : BOTTOMBAR_HEIGHT) }
+
+   const onViewableItemsChanged = useCallback((info) => {
+      const indexes = info.viewableItems.map(e => e.index)
+      setVisibleIndexes(indexes)
+   }, [])
+
+   const Header = header && headers[header] || null
+
    return (
       <View style={styles.container}>
-         {
-            scroll && 
-            <ScrollView 
-               showsVerticalScrollIndicator={false}
-               contentContainerStyle={[
-                  styles.children, 
-                  additionalStyles, 
-                  { 
-                     paddingBottom: bottomBarHeight,
-                     paddingHorizontal: (paddingHorzContent ? hS(22) : 0)
-                  }
-               ]}>
-               { children }
-               <View style={bottomIndicatorStyles} />
-            </ScrollView> || 
-            <View style={[
-               styles.children,
-               additionalStyles, 
-               {
-                  paddingBottom: bottomBarHeight,  
-                  paddingHorizontal: (paddingHorzContent ? hS(22) : 0) 
-               }
-            ]}>
-               { children }
-               <View style={bottomIndicatorStyles} />
-            </View>
-         }
+         <FlatList 
+            style={styles.wrapper}
+            contentContainerStyle={[styles.content, additionalStyles]}
+            {...{ onViewableItemsChanged }}
+            data={Array.from({ length: content.length }).fill(1)} 
+            showsVerticalScrollIndicator={false} 
+            renderItem={({ item, index }) => {
+               const RenderItem = content[index]
+               return <RenderItem {...{ isViewable: visibleIndexes.includes(index) }} />
+            }}/>
+         <View style={bottomIndicatorStyles} />
+         { Header && <Header title={title} /> }
       </View>
    )
 }
@@ -66,12 +64,18 @@ export default ({
 const styles = StyleSheet.create({
    container: {
       flex: 1, 
-      backgroundColor: '#fff',
-   }, 
-
-   children: {
-      flex: 1,
-      paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0, 
       alignItems: 'center'
+   },
+
+   wrapper: {
+      width: '100%',
+      height: '100%', 
+      backgroundColor: '#fff'
+   },
+
+   content: {
+      width: '100%',
+      alignItems: 'center',
+      paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
    }
 })

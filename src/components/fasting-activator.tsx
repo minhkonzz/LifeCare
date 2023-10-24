@@ -9,9 +9,12 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 const darkPrimary: string = Colors.darkPrimary.hex
 const primary: string = Colors.primary.hex
 
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+
 interface ActivateTimeProps {
-	activate: boolean
-	current: boolean
+	activate?: boolean
+	current?: boolean
 	value?: string
 }
 
@@ -54,7 +57,7 @@ export default (): JSX.Element => {
 			<TouchableOpacity activeOpacity={.7} onPress={() => { }}>
 				<LinearGradient
 					style={styles.startStopButton}
-					colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .5, y: 1 }}>
 					<Text style={styles.startStopButtonText}>Stop Fasting</Text>
@@ -63,7 +66,7 @@ export default (): JSX.Element => {
 			<Pressable onPress={() => { }}>
 				<LinearGradient
 					style={styles.stage}
-					colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`, darkPrimary]}
+					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .51, y: .5 }}>
 					<View style={{ flexDirection: 'row' }}>
@@ -122,12 +125,12 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
 	container: {
-		width: '100%',
+		width: hS(366),
 		borderRadius: hS(32),
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		elevation: 5,
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .3)`,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .3)`,
 		bordeRadius: hS(32),
 		paddingVertical: vS(20),
 		paddingHorizontal: hS(18),
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
 		height: vS(16),
 		borderLeftWidth: .2,
 		marginLeft: hS(7),
-		borderLeftColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .4)`
+		borderLeftColor: `rgba(${darkRgb.join(', ')}, .4)`
 	},
 
 	fastingActivateTime: {
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
 		borderWidth: .8,
 		borderRadius: 28,
 		marginRight: .12,
-		borderColor: darkPrimary
+		borderColor: darkHex
 	},
 
 	startStopButton: {
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		borderRadius: hS(36),
 		elevation: 4,
-		shadowColor: Colors.primary.hex
+		shadowColor: primaryHex
 	},
 
 	startStopButtonText: {

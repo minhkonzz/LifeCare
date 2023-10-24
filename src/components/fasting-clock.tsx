@@ -1,3 +1,4 @@
+import { memo, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Image } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -5,12 +6,32 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Circle } from 'react-native-svg'
 import FireColorIcon from '@assets/icons/fire-color.svg'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const { rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
-export default (): JSX.Element => {
+export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0, 
+			duration: 1010,
+			useNativeDriver: true
+		}).start()
+	}, [isViewable])
+
 	return (
-		<View style={styles.container}>
+		<Animated.View 
+			style={[
+				styles.container, 
+				{
+					opacity: animateValue,
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-100, 0]
+					}) }]
+				}
+			]}>
 			<View style={styles.main}>
 				<Text style={styles.elapsedTime}>{'Elapsed time (60%)'}</Text>
 				<Text style={styles.time}>15:27:02</Text>
@@ -30,9 +51,9 @@ export default (): JSX.Element => {
 				backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
 				renderCap={({ center }) => <Circle cx={center.x} cy={center.y} r={hS(20)} fill={darkHex} />}
 			/>
-		</View>
+		</Animated.View>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {

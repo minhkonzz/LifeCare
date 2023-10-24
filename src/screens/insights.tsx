@@ -2,16 +2,13 @@ import InsightCategory from '@components/insight-category'
 import FeedBackReference from '@components/feedback-reference'
 import TabHeader from '@components/tab-header'
 import Screen from '@components/shared/screen'
-import useDatabaseAdapter from '@hooks/useDatabaseAdapter'
 
 export default (): JSX.Element => {
    return (
-      <>
-         <Screen scroll paddingHorzContent>
-            <InsightCategory />
-            <FeedBackReference />
-         </Screen>
+      <Screen paddingHorzContent>
+         <InsightCategory />
+         <FeedBackReference />
          <TabHeader title='Insights for you' />
-      </>
+      </Screen>
    )
 }

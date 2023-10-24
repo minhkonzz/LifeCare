@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import appReducer from './app'
 import authReducer from './auth'
 import networkReducer from './network'

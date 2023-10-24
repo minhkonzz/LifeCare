@@ -7,4 +7,8 @@ export class WatermelonDBAdapter extends DatabaseAdapter<any> {
       super(database)
       this.watermelonDB = database
    }
+
+   async getLatestBMI(userId: string): Promise<number> {
+      return 28.25
+   }
 }

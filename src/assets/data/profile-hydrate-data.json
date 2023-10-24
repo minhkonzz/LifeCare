@@ -1,25 +1,42 @@
 [
 	{
+      "id": 1,
 		"day": 25,
 		"month": "Aug",
-		"hrs": 17
+      "hrs": 5
 	},
 	{
+      "id": 2, 
 		"day": 26,
 		"month": "Aug",
 		"hrs": 24
 	},
 	{
+      "id": 3,
 		"day": 27,
 		"month": "Aug",
 		"hrs": 0
 	},
 	{
+      "id": 4,
 		"day": 28,
 		"month": "Aug",
 		"hrs": 16
 	},
 	{
+      "id": 5,
+		"day": 29,
+		"month": "Aug",
+		"hrs": 12
+	},
+   {
+      "id": 6,
+		"day": 28,
+		"month": "Aug",
+		"hrs": 16
+	},
+	{
+      "id": 7,
 		"day": 29,
 		"month": "Aug",
 		"hrs": 12

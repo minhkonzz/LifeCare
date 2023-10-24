@@ -70,11 +70,43 @@ const settingTypes: any = {
 }
 
 export default ({ title, type, value, onPress }: SettingRowProps): JSX.Element => {
+    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+
+    useEffect(() => {
+        Animated.timing(animateValue, {
+            toValue: 1, 
+            duration: 720,
+            delay: 100,
+            useNativeDriver: true
+        }).start()
+    }, [])
+
     const TargetView = settingTypes[type]
     return (
         <View style={styles.container}>
-            <Text style={[styles.text, styles.title]}>{title}</Text>
-            <TargetView {...{ value, onPress }} />
+            <Animated.Text 
+                style={[
+                    styles.text, 
+                    styles.title,
+                    {
+                        opacity: animateValue, 
+                        transform: [{ translateX: animateValue.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [-150, 0]
+                        }) }]
+                    }
+                ]}>
+                {title}
+            </Animated.Text>
+            <Animated.View style={{
+                opacity: animateValue,
+                transform: [{ translateX: animateValue.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [150, 0]
+                }) }]
+            }}>
+                <TargetView {...{ value, onPress }} />
+            </Animated.View>
         </View>
     )
 }

@@ -1,7 +1,9 @@
+import { memo, useEffect, useRef } from 'react'
 import {
    View, 
    Text, 
    TouchableOpacity,
+   Animated,
    StyleSheet
 } from 'react-native'
 
@@ -13,8 +15,9 @@ import EditIcon from '@assets/icons/edit.svg'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
-export default (): JSX.Element => {
+export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    return (
+      isViewable && 
       <LinearGradient
          style={styles.container}
          colors={[`rgba(255, 211, 110, .2)`, `rgba(255, 211, 110, .8)`]}
@@ -48,14 +51,15 @@ export default (): JSX.Element => {
                <Text style={styles.progressText}>Goal: 62.5 lb</Text>
             </View>
          </View>
-      </LinearGradient>
+      </LinearGradient> || <View style={styles.container} />
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {
       marginTop: vS(24),
-      width: '100%', 
+      width: hS(370),
+      height: vS(250), 
       borderRadius: hS(24),
       paddingRight: hS(12),
       paddingVertical: vS(16), 

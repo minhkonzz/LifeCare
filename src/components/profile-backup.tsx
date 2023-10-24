@@ -34,7 +34,8 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      width: '100%', 
+      width: hS(370),
+      height: vS(160),
       flexDirection: 'row', 
       justifyContent: 'space-between',
       alignItems: 'flex-end',
@@ -57,8 +58,8 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins-Medium', 
       fontSize: hS(10), 
       color: '#fff', 
-      letterSpacing: .2, 
-      marginTop: hS(8)
+      letterSpacing: .2,
+      marginTop: vS(4)
    }, 
 
    syncDataButton: {
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center', 
       alignItems: 'center', 
       backgroundColor: '#fff', 
-      marginTop: vS(30)
+      marginTop: vS(28)
    }, 
 
    syncDataButtonText: {

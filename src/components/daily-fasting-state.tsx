@@ -1,3 +1,4 @@
+import { memo, useEffect, useRef } from 'react'
 import {
 	View,
 	Text,
@@ -5,24 +6,54 @@ import {
 	Animated,
 	Pressable
 } from 'react-native'
-import { horizontalScale, verticalScale } from '@utils/responsive'
+import { AnimatedCircularProgress } from 'react-native-circular-progress'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback.svg'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { rgb: primaryRgb } = Colors.primary
 
-export default (): JSX.Element => {
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+
+export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0, 
+			duration: 920, 
+			useNativeDriver: true
+		}).start()
+	}, [isViewable])
+
 	return (
-		<Pressable onPress={() => { }}>
+		isViewable && 
+		<AnimatedPressable style={{
+			opacity: animateValue, 
+			transform: [{ translateX: animateValue.interpolate({
+				inputRange: [0, 1], 
+				outputRange: [-100, 0]
+			}) }]
+		}}>
 			<LinearGradient
-				colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`, darkPrimary]}
+				colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 				start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }}
 				style={styles.container}>
 				<View style={styles.main}>
 					<View style={styles.circle}>
 						<Text style={styles.progressText}>99%</Text>
+						<AnimatedCircularProgress 
+							lineCap='round' 
+							width={hS(8)}
+							size={hS(105)}
+							rotation={360}
+							fill={70}
+							tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
+							backgroundColor={`rgba(255, 255, 255, .7)`}
+						/>
 					</View>
 					<View style={styles.mainTexts}>
 						<Text style={styles.t1}>You're fasting</Text>
@@ -31,24 +62,25 @@ export default (): JSX.Element => {
 						<Text style={styles.t4}>Period will end at 11:30 today</Text>
 					</View>
 				</View>
-				<BackIcon style={styles.redirectIcon} width={horizontalScale(8)} height={verticalScale(14)} />
+				<BackIcon style={styles.redirectIcon} width={hS(8)} height={vS(14)} />
 			</LinearGradient>
-		</Pressable>
+		</AnimatedPressable> || <View style={{ height: vS(132) }}></View>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
-		width: horizontalScale(365),
-		height: verticalScale(111),
+		width: hS(365),
+		height: vS(132),
 		borderRadius: 500,
-		paddingLeft: horizontalScale(10),
-		paddingRight: horizontalScale(49),
+		paddingLeft: hS(10),
+		paddingRight: hS(36),
+		paddingVertical: vS(10),
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		elevation: 20,
-		shadowColor: darkPrimary
+		shadowColor: darkHex
 	},
 
 	main: {
@@ -58,63 +90,56 @@ const styles = StyleSheet.create({
 	},
 
 	mainTexts: {
-		paddingTop: verticalScale(6),
-		marginLeft: horizontalScale(12),
+		marginLeft: hS(12),
 		height: '100%'
 	},
 
 	circle: {
-		width: horizontalScale(92),
-		height: verticalScale(92),
-		borderWidth: horizontalScale(8),
-		borderRadius: 500,
-		borderColor: Colors.primary.hex,
 		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#fff'
+		alignItems: 'center'
 	},
 
 	progressText: {
+		position: 'absolute',
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: horizontalScale(20),
-		color: darkPrimary,
-		letterSpacing: .2,
-		marginTop: verticalScale(4)
+		fontSize: hS(20),
+		color: '#fff',
+		letterSpacing: .2
 	},
 
 	t1: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: horizontalScale(16),
+		fontSize: hS(16),
 		color: '#fff',
 		letterSpacing: .2
 	},
 
 	t2: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: horizontalScale(8),
+		fontSize: hS(8),
 		color: '#fff',
 		letterSpacing: .2,
-		marginTop: verticalScale(-2)
+		marginTop: vS(-2)
 	},
 
 	t3: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: horizontalScale(24),
+		fontSize: hS(24),
 		color: '#fff',
 		letterSpacing: 2,
-		marginTop: verticalScale(-2)
+		marginTop: vS(-2)
 	},
 
 	t4: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: horizontalScale(8),
+		fontSize: hS(8),
 		color: '#fff',
 		letterSpacing: .2,
-		paddingHorizontal: horizontalScale(10),
-		paddingVertical: verticalScale(3),
+		paddingHorizontal: hS(10),
+		paddingVertical: vS(3),
 		backgroundColor: `rgba(255, 255, 255, .12)`,
 		borderRadius: 200,
-		marginTop: verticalScale(-3)
+		marginTop: vS(-3)
 	},
 
 	redirectIcon: {

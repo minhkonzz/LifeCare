@@ -4,4 +4,6 @@ export abstract class DatabaseAdapter<T> {
    constructor(database: T) {
       this.database = database
    }
+
+   abstract getLatestBMI(userId: string): Promise<number>
 }

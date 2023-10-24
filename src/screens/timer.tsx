@@ -1,47 +1,87 @@
+import { memo, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import BackIcon from '@assets/icons/goback.svg'
-import Button from '@components/shared/button/Button'
-import TabHeader from '@components/tab-header'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
-import FastingRecords from '@components/FastingRecords'
+import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+
+const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0, 
+			duration: 1010, 
+			useNativeDriver: true
+		}).start()
+	}, [isViewable])
+
+	return (
+		isViewable && 
+		<View style={styles.mainTop}>
+			<Animated.Text style={[
+				styles.mainTopTitle, 
+				{
+					opacity: animateValue, 
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-100, 0]
+					}) }]
+				}
+			]}>
+				You're fasting now
+			</Animated.Text>
+			<Animated.View style={[
+				styles.plans, 
+				{
+					opacity: animateValue, 
+					transform: [{ translateX: animateValue.interpolate({ 
+						inputRange: [0, 1], 
+						outputRange: [-100, 0]
+					}) }]
+				}
+			]}>
+				<Pressable style={styles.plansBox}>
+					<Text style={styles.plansBoxText}>16:8 Intermittent Fasting plan</Text>
+					<BackIcon
+						style={{ transform: [{ rotate: '-90deg' }], marginLeft: hS(9.7) }}
+						width={hS(5)}
+						height={vS(10)}
+					/>
+				</Pressable>
+				<Pressable style={styles.planRef} onPress={() => { }}>
+					<Text style={styles.planRefText}>?</Text>
+				</Pressable>
+			</Animated.View>
+		</View> || <View style={styles.mainTop} />
+	)
+})
 
 export default (): JSX.Element => {
 	return (
-		<>
-			<Screen scroll paddingHorzContent>
-				<View style={styles.mainTop}>
-					<Text style={styles.mainTopTitle}>You're fasting now</Text>
-					<View style={styles.plans}>
-						<Pressable style={styles.plansBox}>
-							<Text style={styles.plansBoxText}>16:8 Intermittent Fasting plan</Text>
-							<BackIcon
-								style={{ transform: [{ rotate: '-90deg' }], marginLeft: hS(9.7) }}
-								width={hS(5)}
-								height={vS(10)}
-							/>
-						</Pressable>
-						<Pressable style={styles.planRef} onPress={() => { }}>
-							<Text style={styles.planRefText}>?</Text>
-						</Pressable>
-					</View>
-				</View>
-				<FastingClock />
-				<FastingActivator />
-				<FastingRecords />
-			</Screen>
-			<TabHeader title='Timer' />
-		</>
+		<Screen 
+			full
+			header='tab'
+			title='Timer'
+			paddingHorzContent 
+			content={[
+				MainTop,
+				FastingClock,
+				FastingActivator,
+				FastingRecords
+			]} 
+		/>
 	)
 }
 
 const styles = StyleSheet.create({
 	mainTop: {
+		height: vS(180), 
 		alignItems: 'center',
 		marginTop: vS(35),
 		marginBottom: vS(30)
@@ -51,7 +91,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Bold',
 		fontSize: hS(22),
 		letterSpacing: .5,
-		color: darkPrimary
+		color: darkHex
 	},
 
 	plans: {
@@ -70,20 +110,20 @@ const styles = StyleSheet.create({
 		paddingVertical: vS(12),
 		paddingHorizontal: hS(13),
 		elevation: 14,
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .3)`
+		shadowColor: `rgba(${darkRgb.join(', ')}, .3)`
 	},
 
 	plansBoxText: {
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
-		color: darkPrimary,
+		color: darkHex,
 		letterSpacing: .2
 	},
 
 	planRef: {
 		width: hS(22),
 		height: vS(22),
-		backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .18)`,
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .18)`,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 300,
@@ -93,6 +133,6 @@ const styles = StyleSheet.create({
 	planRefText: {
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
-		color: darkPrimary
+		color: darkHex
 	}
 })

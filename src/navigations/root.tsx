@@ -3,6 +3,8 @@ import { NavigationContainer } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
 import { updateNetworkOnline } from '../store/network'
 import Stack from './stack'
+import BottomTabs from './bottom-tabs'
+import Profile from '@screens/profile'
 import NetInfo from '@react-native-community/netinfo'
 
 export default (): JSX.Element => {
@@ -19,5 +21,6 @@ export default (): JSX.Element => {
       <NavigationContainer>
          <Stack />
       </NavigationContainer>
+      // <Profile />
    )
 }

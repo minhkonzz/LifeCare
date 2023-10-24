@@ -1,10 +1,10 @@
-import { FC, useState } from 'react'
 import { View, Text, FlatList, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
-import { horizontalScale, verticalScale } from '@utils/responsive'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 import fastingRecordsData from '@assets/data/timer-fasting-records.json'
 
 export default (): JSX.Element => {
@@ -12,20 +12,20 @@ export default (): JSX.Element => {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<Text style={styles.title}>Fasting records</Text>
-				<View style={[styles.hrz, { marginTop: verticalScale(8) }]}>
+				<View style={[styles.hrz, { marginTop: vS(8) }]}>
 					<View style={styles.hrz}>
 						<LinearGradient
 							style={styles.noteColor}
-							colors={[`rgba(${Colors.primary.rgb.join(', ')}, .3)`, Colors.primary.hex]}
+							colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
 						/>
 						<Text style={styles.noteTitle}>Completed</Text>
 					</View>
-					<View style={[styles.hrz, { marginLeft: horizontalScale(38) }]}>
+					<View style={[styles.hrz, { marginLeft: hS(38) }]}>
 						<LinearGradient
 							style={styles.noteColor}
-							colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .05)`, `rgba(${Colors.darkPrimary.rgb.join(', ')}, .2)`]}
+							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
 						/>
@@ -34,27 +34,27 @@ export default (): JSX.Element => {
 				</View>
 			</View>
 			<FlatList
-				style={{ width: '100%', marginTop: verticalScale(20) }}
+				style={styles.records}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				data={fastingRecordsData}
 				renderItem={({ item, index }) => (
-					<View key={index} style={[styles.rec, { marginLeft: (index > 0 ? horizontalScale(15) : 0) }]}>
-						<Text style={[styles.recText, { height: verticalScale(22) }]}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
+					<View key={index} style={[styles.rec, { marginLeft: (index > 0 ? hS(15) : 0) }]}>
+						<Text style={[styles.recText, { height: vS(22) }]}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
 						<LinearGradient
 							style={styles.recProg}
-							colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .05)`, `rgba(${Colors.darkPrimary.rgb.join(', ')}, .2)`]}
+							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}>
 							<LinearGradient
 								style={[styles.recProgValue, { height: `${item.hrs / 24 * 100}%` }]}
-								colors={[`rgba(${Colors.primary.rgb.join(', ')}, .2)`, Colors.primary.hex]}
+								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 								start={{ x: .5, y: 0 }}
 								end={{ x: .5, y: 1 }} />
 						</LinearGradient>
-						<View style={{ alignItems: 'center', marginTop: verticalScale(7) }}>
+						<View style={{ alignItems: 'center', marginTop: vS(7) }}>
 							<Text style={styles.recText}>{item.day}</Text>
-							<Text style={[styles.recText, { marginTop: verticalScale(-2) }]}>{item.month}</Text>
+							<Text style={[styles.recText, { marginTop: vS(-2) }]}>{item.month}</Text>
 						</View>
 					</View>
 				)}
@@ -70,14 +70,14 @@ const styles = StyleSheet.create({
 	container: {
 		alignItems: 'center',
 		backgroundColor: '#fff',
-		width: horizontalScale(369),
-		borderRadius: horizontalScale(32),
+		width: hS(369),
+		borderRadius: hS(32),
 		elevation: 5,
 		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .7)`,
-		paddingHorizontal: horizontalScale(18),
-		paddingTop: verticalScale(18),
-		paddingBottom: verticalScale(8),
-		marginTop: verticalScale(27)
+		paddingHorizontal: hS(18),
+		paddingTop: vS(18),
+		paddingBottom: vS(8),
+		marginTop: vS(27)
 	},
 
 	header: {
@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
 
 	title: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: horizontalScale(15),
-		color: darkPrimary
+		fontSize: hS(15),
+		color: darkHex
 	},
 
 	hrz: {
@@ -96,17 +96,22 @@ const styles = StyleSheet.create({
 	},
 
 	noteColor: {
-		width: horizontalScale(10),
-		height: verticalScale(10),
+		width: hS(10),
+		height: vS(10),
 		borderRadius: 25
 	},
 
 	noteTitle: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: horizontalScale(12),
-		color: darkPrimary,
+		fontSize: hS(12),
+		color: darkHex,
 		letterSpacing: .2,
-		marginLeft: horizontalScale(8)
+		marginLeft: hS(8)
+	},
+
+	records: {
+		width: '100%', 
+		marginTop: vS(20)
 	},
 
 	rec: {
@@ -115,14 +120,14 @@ const styles = StyleSheet.create({
 
 	recText: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: horizontalScale(11),
-		color: darkPrimary,
+		fontSize: hS(11),
+		color: darkHex,
 		letterSpacing: .4
 	},
 
 	recProg: {
-		width: horizontalScale(54),
-		height: verticalScale(121),
+		width: hS(54),
+		height: vS(121),
 		borderRadius: 200,
 		justifyContent: 'flex-end'
 	},
@@ -133,13 +138,13 @@ const styles = StyleSheet.create({
 	},
 
 	timelineRef: {
-		marginTop: verticalScale(16)
+		marginTop: vS(16)
 	},
 
 	timelineText: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: horizontalScale(13),
-		color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .8)`,
+		fontSize: hS(13),
+		color: `rgba(${darkRgb.join(', ')}, .8)`,
 		letterSpacing: .4
 	}
 })
