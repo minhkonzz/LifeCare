@@ -1,9 +1,7 @@
 import { 
 	useEffect, 
 	memo, 
-	useRef, 
-	Dispatch, 
-	SetStateAction 
+	useRef
 } from 'react'
 import {
 	View,
@@ -24,7 +22,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { LoginComponentProps } from '@utils/interfaces'
 import { AppState } from '../store'
-import AuthService from '@services/auth'
+import UserService from '@services/user'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -58,11 +56,13 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 		const { email, password } = useSelector((state: AppState) => state.auth)
 		const onSignIn = async() => {
 			try {
-				const data = await AuthService.signInPassword(email, password)
-				onBeforeNavigate(() => { 
-					console.log('navigation now:', navigation)
-					navigation.navigate('main')
-				})
+				const { data, error } = await UserService.signInPassword(email, password)
+				if (error) throw new Error('Something went wrong when sign in: Login not success')
+				const userId = data.session.user.id
+				if (!userId) throw new Error('Something when wrong when sign in: Cannot detect user id')
+				const isSurveyed = await UserService.checkUserSurveyed(userId)
+				const routeName = isSurveyed && 'main' || 'survey'
+				onBeforeNavigate(() => { navigation.navigate(routeName) })
 			} catch (err) {
 				console.error(err)
 			}

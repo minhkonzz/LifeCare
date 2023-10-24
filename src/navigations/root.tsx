@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
 import { updateNetworkOnline } from '../store/network'
+import { updateSession } from '../store/user'
+import { supabase } from '@configs/supabase'
 import Stack from './stack'
 import BottomTabs from './bottom-tabs'
 import Profile from '@screens/profile'
@@ -11,10 +13,17 @@ export default (): JSX.Element => {
    const dispatch = useDispatch()
 
    useEffect(() => {
-      const unsubscribe = NetInfo.addEventListener(state => {
+      const netInfoUnsubscribe = NetInfo.addEventListener(state => {
          dispatch(updateNetworkOnline(state.isConnected))
       })
-      return () => unsubscribe()
+      const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
+         dispatch(updateSession(session))
+      })
+
+      return () => {
+         netInfoUnsubscribe()
+         supabaseAuthListener.subscription.unsubscribe()
+      }
    }, [])
 
    return (

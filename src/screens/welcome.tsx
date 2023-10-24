@@ -19,7 +19,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 				title='Get started'
 				size='large'
 				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
-				onPress={() => navigation.navigate('survey')}
+				onPress={() => navigation.navigate('auth')}
 			/>
 		</View>
 	)

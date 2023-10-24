@@ -3,10 +3,13 @@ import { Platform, PermissionsAndroid, Alert } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context' 
 import { configPushNotification } from './src/configs/push-notification'
 import { Provider } from 'react-redux'
+import { persistStore } from 'redux-persist'
+import { PersistGate } from 'redux-persist/integration/react'
 import store from './src/store'
 import RootNavigator from '@navigations/root'
 
 // configPushNotification()
+const persistor = persistStore(store)
 
 export default (): JSX.Element => {
    // const requestNotificationPermission = async() => {
@@ -24,9 +27,11 @@ export default (): JSX.Element => {
 
    return (
       <Provider {...{ store }}>
-         <SafeAreaProvider>
-            <RootNavigator />
-         </SafeAreaProvider>
+         <PersistGate {...{ persistor }}>
+            <SafeAreaProvider>
+               <RootNavigator />
+            </SafeAreaProvider>
+         </PersistGate>
       </Provider>
    )
 }

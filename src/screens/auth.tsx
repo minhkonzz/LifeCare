@@ -8,8 +8,8 @@ import {
 import { NavigationProp } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import Login from '@components/login'
-import Register from '@components/register'
+import Login from '@components/signin'
+import Register from '@components/signup'
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const bottomBarHeight: number = useDeviceBottomBarHeight()

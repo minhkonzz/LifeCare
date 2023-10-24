@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
 import { AppState } from '../store'
-import AuthService from '@services/auth'
+import AuthService from '@services/user'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
