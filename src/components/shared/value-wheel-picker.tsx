@@ -2,14 +2,15 @@ import { View, StyleSheet } from 'react-native'
 import WheelPicker from './wheel-picker'
 import { Colors } from '@utils/constants/colors'
 import { verticalScale as vS } from '@utils/responsive'
+import { WheelPickerProps } from '@utils/interfaces'
 
-interface ValueWheelPickerProps {
-   items: string[] | number[]
-   itemHeight: number, 
-   onIndexChange?: (index: number) => void
-}
+// interface ValueWheelPickerProps {
+//    items: string[] | number[]
+//    itemHeight: number, 
+//    onIndexChange?: (index: number) => void
+// }
 
-export default ({ items, itemHeight, onIndexChange }: ValueWheelPickerProps): JSX.Element => {
+export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Element => {
    return (
       <View style={[styles.container, { height: itemHeight * 5 }]}>
          <View style={styles.indicator} />

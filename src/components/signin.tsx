@@ -9,8 +9,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Pressable, 
-	Animated, 
-	Alert
+	Animated
 } from 'react-native'
 import GoogleIcon from '@assets/icons/google_logo.svg'
 import AtIcon from '@assets/icons/at.svg'
@@ -61,14 +60,19 @@ export default memo(({ setIsLogin, navigation }: LoginComponentProps): JSX.Eleme
 				const userId = data.session.user.id
 				if (!userId) throw new Error('Something when wrong when sign in: Cannot detect user id')
 				const isSurveyed = await UserService.checkUserSurveyed(userId)
-				const routeName = isSurveyed && 'main' || 'survey'
+				const routeName: string = isSurveyed && 'main' || 'survey'
 				onBeforeNavigate(() => { navigation.navigate(routeName) })
 			} catch (err) {
 				console.error(err)
 			}
 		}
 		return (
-			<Button title='Sign in' size='large' style={{ marginTop: vS(30) }} bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} onPress={onSignIn} />
+			<Button 
+				title='Sign in' 
+				size='large' 
+				style={{ marginTop: vS(30) }} 
+				bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
+				onPress={onSignIn} />
 		)
 	}
 

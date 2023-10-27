@@ -8,6 +8,7 @@
       "@assets/*": ["src/assets/*"],
       "@assets/icons/*": ["src/assets/icons/*"],
       "@components/*": ["src/components/*"],
+      "@contexts": ["src/contexts/*"],
       "@screens/*": ["src/screens/*"],
       "@navigations/*": ["src/navigations/*"],
       "@utils/*": ["src/utils/*"],

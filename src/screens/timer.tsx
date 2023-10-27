@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import BackIcon from '@assets/icons/goback.svg'
@@ -12,6 +13,7 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const navigation = useNavigation()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -46,7 +48,7 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 					}) }]
 				}
 			]}>
-				<Pressable style={styles.plansBox}>
+				<Pressable style={styles.plansBox} onPress={() => navigation.navigate('plans')}>
 					<Text style={styles.plansBoxText}>16:8 Intermittent Fasting plan</Text>
 					<BackIcon
 						style={{ transform: [{ rotate: '-90deg' }], marginLeft: hS(9.7) }}
@@ -64,18 +66,12 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 
 export default (): JSX.Element => {
 	return (
-		<Screen 
-			full
-			header='tab'
-			title='Timer'
-			paddingHorzContent 
-			content={[
-				MainTop,
-				FastingClock,
-				FastingActivator,
-				FastingRecords
-			]} 
-		/>
+		<Screen header='tab' title='Timer' paddingHorzContent content={[
+			MainTop,
+			FastingClock,
+			FastingActivator,
+			FastingRecords
+		]} />
 	)
 }
 

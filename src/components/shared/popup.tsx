@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useEffect } from 'react'
+import { memo, ReactNode, Dispatch, SetStateAction, useEffect } from 'react'
 import { View, Text, Animated, Pressable, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
@@ -9,22 +9,22 @@ const darkPrimary: string = Colors.darkPrimary.hex
 interface PopupProps {
 	type: 'bottomsheet' | 'centered'
 	title: string,
-	visible?: boolean,
-	onClose?: () => void,
+	animateValue: Animated.Value,
+	setVisible: Dispatch<SetStateAction<ReactNode>>
+	width?: number, 
 	children?: ReactNode
 }
 
-export default ({
+export default memo(({
 	type,
 	title,
-	visible,
-	onClose,
+	animateValue,
+	setVisible,
+	width,
 	children
 }: PopupProps): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	useEffect(() => {
-		if (!visible) return
 		Animated.timing(animateValue, {
 			toValue: 1,
 			duration: 300,
@@ -33,13 +33,12 @@ export default ({
 	}, [])
 
 	const closePopup = () => {
-		if (!visible) return
 		Animated.timing(animateValue, {
 			toValue: 0,
 			duration: 300,
 			useNativeDriver: true
 		}).start(({ finished }) => {
-			if (onClose) onClose()
+			setVisible(null)
 		})
 	}
 
@@ -59,42 +58,38 @@ export default ({
 	}
 
 	return (
-		<>
-		{
-			visible && 
-			<Animated.View style={[
-				styles.overlay, 
-				{ 
-					opacity: animateValue, 
-					justifyContent: type === 'bottomsheet' && 'flex-end' || 'center' 
-				}
-			]}>
-			{
-				type === 'bottomsheet' && 
-				<Animated.View
-					style={[
-						styles.bottomSheet,
-						{
-							transform: [{
-								translateY: animateValue.interpolate({
-									inputRange: [0, 1],
-									outputRange: [300, 0]
-								})
-							}]
-						}
-					]}>
-					<PopupContent />
-				</Animated.View> ||
-				<Animated.View 
-					style={[styles.popupCenter, { transform: [{ scale: animateValue }] }]}>
-					<PopupContent />
-				</Animated.View>
+		<Animated.View style={[
+			styles.overlay, 
+			{ 
+				opacity: animateValue, 
+				justifyContent: type === 'bottomsheet' && 'flex-end' || 'center' 
 			}
-			</Animated.View> 
+		]}>
+		{
+			type === 'bottomsheet' && 
+			<Animated.View
+				style={[
+					styles.bottomSheet,
+					{
+						width, 
+						transform: [{
+							translateY: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [300, 0]
+							})
+						}]
+					}
+				]}>
+				<PopupContent />
+			</Animated.View> ||
+			<Animated.View 
+				style={[styles.popupCenter, { width, transform: [{ scale: animateValue }] }]}>
+				<PopupContent />
+			</Animated.View>
 		}
-		</>
+		</Animated.View> 
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	bottomSheet: {
@@ -111,11 +106,10 @@ const styles = StyleSheet.create({
 	},
 
 	popupCenter: {
-		width: hS(300), 
 		alignItems: 'center',
 		backgroundColor: '#fff',
 		paddingHorizontal: hS(21),
-		paddingBottom: vS(20), 
+		paddingVertical: vS(16), 
 		borderRadius: hS(24)
 	},
 
@@ -124,7 +118,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		paddingVertical: vS(16)
+		paddingBottom: vS(16)
 	},
 
 	headerTitle: {

@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { updateNetworkOnline } from '../store/network'
 import { updateSession } from '../store/user'
+import { AppState } from '../store'
 import { supabase } from '@configs/supabase'
 import Stack from './stack'
-import BottomTabs from './bottom-tabs'
-import Profile from '@screens/profile'
 import NetInfo from '@react-native-community/netinfo'
 
 export default (): JSX.Element => {
    const dispatch = useDispatch()
+   const { session } = useSelector((state: AppState) => state.user)
 
    useEffect(() => {
       const netInfoUnsubscribe = NetInfo.addEventListener(state => {
@@ -30,6 +30,5 @@ export default (): JSX.Element => {
       <NavigationContainer>
          <Stack />
       </NavigationContainer>
-      // <Profile />
    )
 }

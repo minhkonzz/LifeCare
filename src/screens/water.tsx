@@ -1,104 +1,124 @@
-import { FC, useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
    View,
    Text,
    StyleSheet,
-   TouchableOpacity,
    Animated,
-   Easing,
-   Dimensions
+   TouchableOpacity, 
+   Pressable
 } from 'react-native'
 
+import { NavigationProp } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { horizontalScale as hS, verticalScale as vS, SCREEN_HEIGHT } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback.svg'
 import SettingIcon from '@assets/icons/setting.svg'
 import WhitePlusIcon from '@assets/icons/white_plus.svg'
 import StrongBlueMinusIcon from '@assets/icons/strong_blue_minus.svg'
 import WaterWave from '@components/wave'
-// import WaterWave from '@assets/images/light_wave.svg'
+import AnimatedNumber from '@components/shared/animated-text'
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
-const PADDING_SIDE: number = hS(22)
 const darkPrimary: string = Colors.darkPrimary.hex
 const lightBlue: string = Colors.lightBlue.hex
 const strongBlue: string = Colors.strongBlue.hex
 
-// const WaterBackground: FC = () => {
-//     const translateX = useRef<Animated.Value>(new Animated.Value(0)).current
-//     const translateY = useRef<Animated.Value>(new Animated.Value(0)).current
-
-//     useEffect(() => {
-//         Animated.timing(translateY, {
-//             duration: 5000,
-//             toValue: -SCREEN_HEIGHT + vS(400),
-//             useNativeDriver: true,
-//             easing: Easing.easeInOut
-//         }).start()
-
-//         const waterAnimation = Animated.loop(
-//             Animated.timing(translateX, {
-//                 duration: 2000,
-//                 toValue: -SCREEN_WIDTH - hS(92),
-//                 easing: Easing.linear,
-//                 useNativeDriver: true
-//             })
-//         ).start()
-//         return () => { waterAnimation.stop() }
-//     }, [])
-
-//     return (
-//         <Animated.View
-//             style={[styles.waterBackground, { transform: [{ translateX }, { translateY }] }]}>
-//             <WaterWave />
-//         </Animated.View>
-//     )
-// }
-
-export default (): JSX.Element => {
+export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
+   // const waterHeight: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const [total, setTotal] = useState<number>(1200)
+
+   useEffect(() => {
+      Animated.timing(animateValue, {
+         toValue: 1, 
+         duration: 920, 
+         useNativeDriver: true
+      }).start()
+   }, [])
+
+   const increaseQuantity = () => {
+      // Animated.timing(waterHeight, {
+      //    toValue: waterHeight._value + vS(200) * SCREEN_WIDTH / total, 
+      //    duration: 500, 
+      //    useNativeDriver: false
+      // }).start()
+   }
+
+   const decreaseQuantity = () => {
+      // Animated.timing(waterHeight, {
+      //    toValue: waterHeight._value - vS(200) * SCREEN_WIDTH / total, 
+      //    duration: 500, 
+      //    useNativeDriver: false
+      // }).start()
+   }
+
    return (
       <View style={styles.container}>
-         {/* <WaterBackground /> */}
-         <WaterWave w={320} h={320} />
-         {/* <View style={styles.interacts}>
-                <View style={styles.header}>
-                    <BackIcon width={hS(14)} height={vS(14)} />
-                    <Text style={styles.headerTitle}>Total today</Text>
-                    <SettingIcon width={hS(18)} height={vS(18)} />
-                </View>
-                <View style={styles.results}>
-                    <Text style={styles.totalMilText}>{`${total} ml`}</Text>
-                    <Text style={styles.goalMilText}>{`Goal today: ${3000} ml`}</Text>
-                </View>
-                <View style={styles.updates}>
-                    <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={() => { }}>
-                        <LinearGradient
-                            style={styles.increaseMilButton}
-                            colors={[lightBlue, `rgba(${Colors.strongBlue.rgb.join(', ')}, .6)`]}
-                            start={{ x: .2, y: 0 }}
-                            end={{ x: .5, y: 1 }}>
-                            <WhitePlusIcon width={hS(20)} height={vS(20)} />
-                            <Text style={styles.increaseMilAmount}>200 ml</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <View style={styles.sideUpdates}>
-                        <TouchableOpacity
-                            style={[styles.sideUpdateButton, styles.decreaseMilAmountButton]}
-                            activeOpacity={.8}
-                            onPress={() => { }}>
-                            <StrongBlueMinusIcon width={hS(22)} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.sideUpdateButton, styles.openSettingButton]}
-                            activeOpacity={.8}
-                            onPress={() => { }}>
-
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View> */}
+         <View style={styles.waveContainer}>
+            <WaterWave w={SCREEN_HEIGHT - 300} h={SCREEN_HEIGHT - 300} />
+         </View>
+         <View style={styles.interacts}>
+            <View style={styles.header}>
+               <BackIcon width={hS(14)} height={vS(14)} />
+               <Text style={styles.headerTitle}>Total today</Text>
+               <Pressable onPress={() => navigation.navigate('water-setting') }>
+                  <SettingIcon width={hS(18)} height={vS(18)} />
+               </Pressable>
+            </View>
+            <View style={styles.results}>
+               <Animated.View 
+                  style={[
+                     styles.totalMilTextWrapper, 
+                     {
+                        opacity: animateValue, 
+                        transform: [{ translateX: animateValue.interpolate({
+                           inputRange: [0, 1], 
+                           outputRange: [-150, 0]
+                        }) }]
+                     }
+                  ]}>
+                  <AnimatedNumber style={styles.totalMilText} value={total} />
+                  <Text style={[styles.totalMilText, styles.totalMilSymbText]}>ml</Text>
+               </Animated.View>
+               <Animated.Text 
+                  style={[
+                     styles.goalMilText, 
+                     {
+                        opacity: animateValue, 
+                        transform: [{ translateY: animateValue.interpolate({
+                           inputRange: [0, 1], 
+                           outputRange: [-20, 0]
+                        }) }]
+                     }
+                  ]}>
+                  {`Goal today: ${3000} ml`}
+               </Animated.Text>
+            </View>
+            <View style={styles.updates}>
+               <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseQuantity}>
+                  <LinearGradient
+                     style={styles.increaseMilButton}
+                     colors={[lightBlue, `rgba(${Colors.strongBlue.rgb.join(', ')}, .6)`]}
+                     start={{ x: .2, y: 0 }}
+                     end={{ x: .5, y: 1 }}>
+                     <WhitePlusIcon width={hS(20)} height={vS(20)} />
+                     <Text style={styles.increaseMilAmount}>200 ml</Text>
+                  </LinearGradient>
+               </TouchableOpacity>
+               <View style={styles.sideUpdates}>
+                  <TouchableOpacity
+                     style={styles.sideUpdateButton}
+                     activeOpacity={.8}
+                     onPress={decreaseQuantity}>
+                     <StrongBlueMinusIcon width={hS(22)} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                     style={styles.sideUpdateButton}
+                     activeOpacity={.8}>
+                  </TouchableOpacity>
+               </View>
+            </View>
+         </View>
       </View>
    )
 }
@@ -108,10 +128,11 @@ const styles = StyleSheet.create({
       flex: 1
    },
 
-   lottie: {
-      position: 'absolute',
-      width: SCREEN_WIDTH,
-      height: vS(700)
+   waveContainer: {
+      left: 0, 
+      right: 0,
+      bottom: 0,
+      position: 'absolute'
    },
 
    header: {
@@ -122,18 +143,18 @@ const styles = StyleSheet.create({
    },
 
    headerTitle: {
-      fontSize: 15,
+      fontSize: hS(15),
       fontFamily: 'Poppins-SemiBold',
       color: darkPrimary
    },
 
    interacts: {
       flex: 1,
-      paddingTop: 36,
       paddingBottom: vS(90),
       paddingHorizontal: hS(22),
       justifyContent: 'space-between',
-      alignItems: 'center'
+      alignItems: 'center', 
+      paddingTop: vS(22)
    },
 
    results: {
@@ -141,10 +162,20 @@ const styles = StyleSheet.create({
       marginBottom: vS(50)
    },
 
+   totalMilTextWrapper: { 
+      flexDirection: 'row', 
+      alignItems: 'flex-end', 
+      justifyContent: 'space-between'
+   },
+
    totalMilText: {
       fontSize: hS(36),
       fontFamily: 'Poppins-SemiBold',
       color: strongBlue
+   },
+
+   totalMilSymbText: {
+      marginLeft: hS(8)
    },
 
    goalMilText: {
@@ -186,14 +217,5 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins-Medium',
       color: '#fff',
       marginTop: 10
-   },
-
-   waterBackground: {
-      flexDirection: 'row',
-      position: 'absolute',
-      top: SCREEN_HEIGHT,
-      left: 0,
-      bottom: 0,
-      right: 0
    }
 })

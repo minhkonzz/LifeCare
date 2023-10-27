@@ -2,6 +2,8 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import userReducer from './user'
 import authReducer from './auth'
 import networkReducer from './network'
+import surveyReducer from './survey'
+import fastingReducer from './fasting'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { 
    persistReducer,
@@ -16,14 +18,16 @@ import {
 const persistConfig = {
    key: 'root', 
    storage: AsyncStorage,
-   whitelist: ['user'], 
-   blacklist: ['auth', 'network']
+   whitelist: ['user', 'fasting'], 
+   blacklist: ['auth', 'network', 'survey']
 }
 
 const rootReducer = combineReducers({
    user: userReducer, 
    auth: authReducer, 
-   network: networkReducer
+   network: networkReducer, 
+   survey: surveyReducer, 
+   fasting: fastingReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

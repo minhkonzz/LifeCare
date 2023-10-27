@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useState, useContext } from 'react'
 import {
 	View,
 	Text,
@@ -11,18 +11,18 @@ import {
 	ScrollView,
 	Image
 } from 'react-native'
-
+import { PopupContext } from '../contexts/popup'
+import PopupProvider from '../contexts/popup'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
-import StackHeader from '@components/shared/StackHeader'
+import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
-import RestaurantIcon from '@assets/icons/restaurant.svg'
-import ElectroIcon from '@assets/icons/electro.svg'
-
-import planCategories from '../assets/data/plan-categories.json'
 import plansData from '../assets/data/plans.json'
-const darkPrimary: string = Colors.darkPrimary.hex
+
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 type PlanCategorySectionProps = {
 	title: string,
@@ -40,7 +40,7 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 			<View style={styles.planCategorySectionHeader}>
 				<LinearGradient
 					style={styles.planCategorySectionDecor}
-					colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .5, y: 1 }}
 				/>
@@ -53,14 +53,16 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={item => item.id}
 				data={plansData}
-				renderItem={({ item, index }) => <DayPlanItem itemData={item} />} />
+				renderItem={({ item }) => <DayPlanItem {...{ item }} />} />
 		</View>
 	)
 }
 
-export default (): JSX.Element => {
+const Plans = () => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const [tabIndexSelected, setTabIndexSelected] = useState<number>(0)
+	const [ tabIndexSelected, setTabIndexSelected ] = useState<number>(0)
+	const { popup: Popup, setPopup } = useContext(PopupContext)
+
 	return (
 		<View style={[styles.container, { paddingBottom: bottomBarHeight }]}>
 			<View style={styles.header}>
@@ -70,20 +72,20 @@ export default (): JSX.Element => {
 				<FlatList
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					data={planCategories}
+					data={plansData}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item, index }) =>
 						<View style={[
 							styles.planCategory,
 							{
 								borderBottomWidth: vS(4),
-								borderBottomColor: Colors.primary.hex
+								borderBottomColor: primaryHex
 							}
 						]}>
 							<Text style={[
 								styles.planCategoryTitle,
-								{ color: index === tabIndexSelected ? darkPrimary : `rgba(${Colors.darkPrimary.rgb.join(', ')}, .8)` }]}>
-								{item.title}
+								{ color: index === tabIndexSelected ? darkHex : `rgba(${darkRgb.join(', ')}, .8)` }]}>
+								{item.name}
 							</Text>
 						</View>
 					} />
@@ -92,19 +94,26 @@ export default (): JSX.Element => {
 				<PlanCategorySection
 					title='Beginner'
 					description='Skip one meal each day'
-					plansData={plansData} />
+					plansData={plansData[0].items.filter(e => e.group_name === 'Beginner')} />
 				<PlanCategorySection
-					style={{ marginTop: vS(32) }}
 					title='Intermediate'
 					description='Eat only one meal each day'
-					plansData={plansData} />
+					plansData={plansData[0].items.filter(e => e.group_name === 'Intermediate')} />
 				<PlanCategorySection
-					style={{ marginTop: vS(32) }}
 					title='Advance'
 					description='Keep fasting more than 20 hours'
-					plansData={plansData} />
+					plansData={plansData[0].items.filter(e => e.group_name === 'Advance')} />
 			</ScrollView>
+			{ Popup && <Popup setVisible={setPopup} /> }
 		</View>
+	)
+}
+
+export default (): JSX.Element => {
+	return (
+		<PopupProvider>
+			<Plans />
+		</PopupProvider>
 	)
 }
 
@@ -112,7 +121,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		height: 5000,
 		alignItems: 'center',
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
 	},
@@ -140,7 +148,7 @@ const styles = StyleSheet.create({
 	},
 
 	planCategorySection: {
-		marginTop: vS(16)
+		marginVertical: vS(16)
 	},
 
 	planCategorySectionHeader: {
@@ -158,7 +166,7 @@ const styles = StyleSheet.create({
 	planCategorySectionTitle: {
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(28),
-		color: darkPrimary,
+		color: darkHex,
 		letterSpacing: .2,
 		marginLeft: hS(10),
 		marginTop: vS(4)
@@ -167,7 +175,7 @@ const styles = StyleSheet.create({
 	planCategorySectionDesc: {
 		fontFamily: 'Poppins-Regular',
 		fontSize: hS(12),
-		color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .8)`,
+		color: `rgba(${darkRgb.join(', ')}, .8)`,
 		letterSpacing: .2,
 		marginTop: vS(7),
 		marginLeft: hS(24)
@@ -179,7 +187,7 @@ const styles = StyleSheet.create({
 		width: hS(257),
 		height: vS(148),
 		elevation: 4,
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
 		backgroundColor: '#fff',
 		borderRadius: hS(32),
 		paddingTop: vS(16),

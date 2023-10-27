@@ -11,12 +11,7 @@ import {
 
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS } from '@utils/responsive'
-
-interface WheelPickerProps {
-	items: string[] | number[]
-	itemHeight: number
-	onIndexChange?: (index: number) => void
-}
+import { WheelPickerProps } from '@utils/interfaces'
 
 export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Element => {
 	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -26,6 +21,7 @@ export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Ele
 	) => {
 		const y = event.nativeEvent.contentOffset.y
 		const index = Math.round(y / itemHeight)
+		console.log('item:', items[index])
 		if (onIndexChange) onIndexChange(index)
 	}
 

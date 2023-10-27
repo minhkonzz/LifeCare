@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Colors } from '@utils/constants/colors'
+import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'  
 import BluePlusIcon from '@assets/icons/blue_plus.svg'
 import WatercupIcon from '@assets/icons/watercup.svg'
@@ -22,6 +23,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 export default (): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const reportAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const navigation = useNavigation()
 
    useEffect(() => {
       Animated.parallel([
@@ -88,7 +90,10 @@ export default (): JSX.Element => {
                   <Text style={styles.symbolText}>ml</Text>
                </View>
             </Animated.View>
-            <AnimatedTouchableOpacity style={[styles.updateButton, { transform: [{ scale: animateValue }] }]} activeOpacity={.7}>
+            <AnimatedTouchableOpacity 
+               style={[styles.updateButton, { transform: [{ scale: animateValue }] }]} 
+               activeOpacity={.7}
+               onPress={() => navigation.navigate('water')}>
 					<BluePlusIcon width={hS(15)} height={vS(14)} />
 				</AnimatedTouchableOpacity>
          </View>

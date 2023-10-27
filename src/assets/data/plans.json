@@ -1,29 +1,90 @@
 [
-    {
-	"id": "pl1", 
-	"plan_category_name": "1 day plan", 
-	"hrs_fasting": 12,
-	"hrs_eating": 12
-    },
-
-    {
-	"id": "pl2", 
-	"plan_category_name": "1 day plan", 
-	"hrs_fasting": 13, 
-	"hrs_eating": 11
-    },
-
-    {
-	"id": "pl3", 
-	"plan_category_name": "1 day plan", 
-	"hrs_fasting": 14, 
-	"hrs_eating": 10
-    },
-
-    {
-	"id": "pl4", 
-	"plan_category_name": "1 day plan", 
-	"hrs_fasting": 15,
-	"hrs_eating": 9
-    }
+	{
+		"id": "fpc001", 
+		"name": "1 day plan", 
+		"items": [
+			{
+				"id": "fp001", 
+				"name": "12-12", 
+				"group_name": "Beginner",
+				"hrs_fast": 12,
+				"hrs_eat": 12, 
+				"source_text": "The practice of 12/12 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp002", 
+				"name": "13-11", 
+				"group_name": "Beginner",
+				"hrs_fast": 13,
+				"hrs_eat": 11, 
+				"source_text": "The practice of 13/11 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp003", 
+				"name": "14-10", 
+				"group_name": "Beginner",
+				"hrs_fast": 14,
+				"hrs_eat": 10, 
+				"source_text": "The practice of 14/10 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp004", 
+				"name": "16-8", 
+				"group_name": "Intermediate",
+				"hrs_fast": 16,
+				"hrs_eat": 8, 
+				"source_text": "The practice of 16/8 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp005", 
+				"name": "17-7", 
+				"group_name": "Intermediate",
+				"hrs_fast": 17,
+				"hrs_eat": 7, 
+				"source_text": "The practice of 17/7 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp006", 
+				"name": "18-6", 
+				"group_name": "Intermediate",
+				"hrs_fast": 18,
+				"hrs_eat": 6, 
+				"source_text": "The practice of 18/6 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp007", 
+				"name": "21-3", 
+				"group_name": "Advance",
+				"hrs_fast": 21,
+				"hrs_eat": 3, 
+				"source_text": "The practice of 12/12 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp008", 
+				"name": "22-2", 
+				"group_name": "Advance",
+				"hrs_fast": 22,
+				"hrs_eat": 2, 
+				"source_text": "The practice of 22/2 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			},
+			{
+				"id": "fp009", 
+				"name": "23-1", 
+				"group_name": "Advance",
+				"hrs_fast": 23,
+				"hrs_eat": 1, 
+				"source_text": "The practice of 23/1 intermittent fasting involves limiting your intake of foods and calorie-containing beverages to a set window of 8 hours per day. You abstain from food for the remaining 16 hours, though you’re still allowed to drink water and other no-calorie beverages, like plain coffee or tea.\n\nYou can repeat this cycle as frequently as you’d like — from just once or twice per week to every day, depending on your preference."
+			}
+		]
+	},
+	{
+		"id": "fpc002", 
+		"name": "7 days plan", 
+		"items": []
+	},
+	{
+		"id": "fpc003", 
+		"name": "28 days plan", 
+		"items": []
+	}
 ]

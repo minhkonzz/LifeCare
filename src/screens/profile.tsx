@@ -140,7 +140,7 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 export default (): JSX.Element => {
 	return (
-		<Screen full paddingHorzContent header='tab' title='Me' content={[
+		<Screen paddingHorzContent header='tab' title='Me' content={[
 			ProfileUser, 
 			Backup, 
 			PlanUpgrade, 

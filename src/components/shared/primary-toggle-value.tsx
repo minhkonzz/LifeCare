@@ -13,8 +13,10 @@ import LinearGradient from 'react-native-linear-gradient'
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const options: Array<string> = ["cm/ft", "kg/lb"]
-const darkPrimary: string = Colors.darkPrimary.hex
 const OPTION_WIDTH: number = hS(98)
+
+const { rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface PrimaryToggleValue {
    onChangeOption?: () => void
@@ -39,7 +41,7 @@ export default ({ onChangeOption }: PrimaryToggleValue): JSX.Element => {
       <View style={styles.container}>
          <AnimatedLinearGradient
             style={[styles.toggleButton, { transform: [{ translateX }] }]}
-            colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+            colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
             start={{ x: .5, y: 0 }}
             end={{ x: .52, y: 1 }} />
          {
@@ -52,7 +54,7 @@ export default ({ onChangeOption }: PrimaryToggleValue): JSX.Element => {
                      styles.optionText, 
                      {  
                         fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
-                        color: i === selectedIndex && '#fff' || `rgba(${Colors.darkPrimary.rgb.join(', ')}, .8)`
+                        color: i === selectedIndex && '#fff' || `rgba(${primaryRgb.join(', ')}, .8)`
                      }
                   ]}>
                      {e}
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
    container: {
       flexDirection: 'row',
       borderRadius: 100,
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .1)`
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`
    }, 
 
    toggleButton: {

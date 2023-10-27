@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
 		width: hS(369),
 		borderRadius: hS(32),
 		elevation: 5,
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .7)`,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .7)`,
 		paddingHorizontal: hS(18),
 		paddingTop: vS(18),
 		paddingBottom: vS(8),

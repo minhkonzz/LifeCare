@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
+import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
 import WaterCupIcon from '@assets/icons/watercup.svg'
@@ -9,6 +10,8 @@ interface TabHeaderProps {
 }
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
+	const navigation = useNavigation()
+
 	return (
 		<View style={styles.container}>
 			<View style={{ width: hS(52), height: vS(40) }} />
@@ -23,7 +26,9 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 					tintColor='#91C8E4'
 					backgroundColor='#E3E3E3' />
 				<View style={styles.watercupInside}>
-					<WaterCupIcon width={hS(14)} height={vS(19)} />
+					<Pressable onPress={() => navigation.navigate('water')}>
+						<WaterCupIcon width={hS(14)} height={vS(19)} />
+					</Pressable>
 				</View>
 			</View>
 		</View>

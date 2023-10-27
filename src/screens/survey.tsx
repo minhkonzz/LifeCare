@@ -1,38 +1,46 @@
 import {
-   FC,
-   useState,
    useEffect,
    useRef,
-   SetStateAction,
-   Dispatch,
    memo
 } from 'react'
 
 import {
    View,
    Text,
-   Pressable,
    FlatList,
    TouchableOpacity,
    StyleSheet,
    Animated,
-   Easing,
    Dimensions,
    Platform,
    StatusBar
 } from 'react-native'
 
+import { 
+   updateSurveyIndex,
+   updateGoal,
+   updateFastingFamiliar,
+   updateExercisePerformance,
+   updateGender,
+   updateAge,
+   updateCurrentHeight,
+   updateCurrentWeight,
+   updateGoalWeight
+} from '../store/survey'
+
+import { AppState } from '../store'
+import { useDispatch, useSelector } from 'react-redux'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import ValueWheelPicker from '@components/shared/value-wheel-picker'
 import Button from '@components/shared/button/Button'
+import MeasureInput from '@components/shared/measure-input'
 import LinearGradient from 'react-native-linear-gradient'
-import CheckmarkIcon from '@assets/icons/checkmark.svg'
 import { NavigationProp } from '@react-navigation/native'
+import SurveyOption from '@components/survey-option'
 
 const { hex: darkHex } = Colors.darkPrimary
-const { hex: lightHex } = Colors.lightPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const SCREEN_WIDTH: number = Dimensions.get('window').width
@@ -42,72 +50,131 @@ const MAX_CONTENT_WIDTH: number = SCREEN_WIDTH - (PADDING_SIDE * 2)
 const surveyTitles: Array<string> = [
    'Choose your goal',
    'How familiar are you with fasting?',
-   'How often do you exercise?'
-   // 'How old are you?',
-   // 'Your current height',
-   // 'Your current weight',
-   // 'Your goal weight'
+   'How often do you exercise?',
+   'How old are you?',
+   'Let us know your gender',
+   'Your current height?',
+   'Your current weight?',
+   'Your goal weight?'
 ]
 
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-
-interface OptionProps {
-   item: { id: number, title: string }
-   index: number,
-   data: ({ id: number, title: string })[],
-   setData: Dispatch<SetStateAction<({ id: number, title: string })[]>>
-}
-
-const Option: FC<OptionProps> = ({ item, index, data, setData }) => {
-   const [isChecked, setIsChecked] = useState<boolean>(false)
-
-   const onPress: () => void = () => {
-      setData(isChecked && data.filter(e => e !== item) || [...data, item])
-      setIsChecked(!isChecked)
-   }
-
+const ExercisePerformanceSurvey = memo(() => {
+   const exercisePerformanceData = [
+      { id: 2, title: 'Usually' },
+      { id: 3, title: '1 time / week' },
+      { id: 4, title: '1 time / month'},
+      { id: 5, title: 'Never' }
+   ]
    return (
-      <Pressable
-         {...{ onPress }}
-         key={`opt${index}`}
-         style={{
-            ...styles.optionContainer,
-            ...(isChecked && styles.checked),
-            marginTop: (index > 0 ? vS(18) : 0)
-         }}>
-         <Text style={styles.optionTitle}>{item.title}</Text>
-         { isChecked && <CheckmarkIcon width={styles.checkmark.width} height={styles.checkmark.height} /> }
-      </Pressable>
-   )
-}
-
-const ExercisePerformanceSurvey: FC = memo(() => {
-   return (
-      <View style={[styles.surveyPart, { paddingTop: vS(72) }]}>
-         <ValueWheelPicker items={[1, 2, 3, 4, 5, 6, 7, 8, 9]} itemHeight={vS(72)} />
+      <View style={styles.surveyPart}>
+         <Text style={styles.optionsTitle}>Choose one option</Text>
+         <FlatList
+            style={styles.options}
+            showsVerticalScrollIndicator={false}
+            data={exercisePerformanceData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item, index }) =>
+               <SurveyOption {...{ 
+                  item: item.title, 
+                  index,
+                  stateKey: 'exercisePerformance', 
+                  action: updateExercisePerformance 
+               }} />
+            }
+         />
       </View>
    )
 })
 
-const AgeSurvey: FC<{ age: number, setAge: Dispatch<SetStateAction<string[]>> }> = memo(({
-   age,
-   setAge
-}) => {
+const GenderSurvey = memo(() => {
+   const genderData = [
+      { id: 1, title: 'Male' },
+      { id: 2, title: 'Female' },
+      { id: 3, title: 'Other' },
+   ]
+   return (
+      <View style={styles.surveyPart}>
+         <Text style={styles.optionsTitle}>Choose one option</Text>
+         <FlatList
+            style={styles.options}
+            showsVerticalScrollIndicator={false}
+            data={genderData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item, index }) =>
+               <SurveyOption {...{ 
+                  item: item.title, 
+                  index,
+                  stateKey: 'gender', 
+                  action: updateGender
+               }} />
+            }
+         />
+      </View>
+   )
+})
+
+const GoalWeightSurvey = memo(() => {
+   const dispatch = useDispatch()
+   const goalWeight = useSelector((state: AppState) => state.survey.goalWeight)
+   return (
+      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+         <MeasureInput 
+            symb='kg' 
+            value={goalWeight.toString()}
+            contentCentered 
+            additionalStyles={{ marginLeft: hS(10) }} 
+            onChangeText={(t: string) => dispatch(updateGoalWeight(Number(t)))}
+         />
+      </View>
+   )
+})
+
+const CurrentWeightSurvey = memo(() => {
+   const dispatch = useDispatch()
+   const currentWeight = useSelector((state: AppState) => state.survey.currentWeight)
+   return (
+      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+         <MeasureInput 
+            symb='kg' 
+            value={currentWeight.toString()}
+            contentCentered 
+            additionalStyles={{ marginLeft: hS(10) }} 
+            onChangeText={(t: string) => dispatch(updateCurrentWeight((Number(t))))}
+         />
+      </View>
+   )
+})
+
+const CurrentHeightSurvey = memo(() => {
+   const dispatch = useDispatch()
+   const currentHeight = useSelector((state: AppState) => state.survey.currentHeight)
+   return (
+      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+         <MeasureInput 
+            symb='cm' 
+            value={currentHeight.toString()}
+            contentCentered 
+            additionalStyles={{ marginLeft: hS(10) }}
+            onChangeText={(t: string) => dispatch(updateCurrentHeight((Number(t))))}
+         />
+      </View>
+   )
+})
+
+const AgeSurvey = memo(() => {
+   const dispatch = useDispatch()
    const ageNumbers: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
    return (
       <View style={styles.surveyPart}>
-
+         <ValueWheelPicker 
+            items={ageNumbers} 
+            itemHeight={vS(72)} 
+            onIndexChange={(index) => dispatch(updateAge(ageNumbers[index]))} />
       </View>
    )
 })
 
-const FastingFamiliarSurvey: FC<{ 
-   fastingFamiliar: ({ id: number, title: string })[], 
-   setFastingFamiliar: Dispatch<SetStateAction<({ id: number, title: string })[]>> 
-}> = memo(({
-   fastingFamiliar,
-   setFastingFamiliar
-}) => {
+const FastingFamiliarSurvey = memo(() => {
    const fastingFamiliarData = [
       { id: 2, title: 'Beginner' },
       { id: 3, title: 'Intermediate' },
@@ -117,25 +184,24 @@ const FastingFamiliarSurvey: FC<{
       <View style={styles.surveyPart}>
          <Text style={styles.optionsTitle}>Choose one option</Text>
          <FlatList
-            style={{ marginTop: vS(10) }}
+            style={styles.options}
             showsVerticalScrollIndicator={false}
             data={fastingFamiliarData}
             keyExtractor={item => item.id.toString()}
             renderItem={({ item, index }) =>
-               <Option {...{ item, index }} data={fastingFamiliar} setData={setFastingFamiliar} />
+               <SurveyOption {...{ 
+                  item: item.title, 
+                  index,
+                  stateKey: 'fastingFamiliar', 
+                  action: updateFastingFamiliar 
+               }} />
             }
          />
       </View>
    )
 })
 
-const GoalSurvey: FC<{ 
-   goal: ({ id: number, title: string })[], 
-   setGoal: Dispatch<SetStateAction<({ id: number, title: string })[]>> 
-}> = memo(({
-   goal,
-   setGoal
-}) => {
+const GoalSurvey = memo(() => {
    const goalSurveyData = [
       { id: 2, title: 'Lose weight' },
       { id: 3, title: 'Live longer' },
@@ -146,29 +212,38 @@ const GoalSurvey: FC<{
       <View style={styles.surveyPart}>
          <Text style={styles.optionsTitle}>Choose multiple options</Text>
          <FlatList
-            style={{ marginTop: vS(10) }}
+            style={styles.options}
             showsVerticalScrollIndicator={false}
             data={goalSurveyData}
             keyExtractor={item => item.id.toString()}
             renderItem={({ item, index }) =>
-               <Option {...{ item, index }} data={goal} setData={setGoal} />
+               <SurveyOption {...{ 
+                  item: item.title, 
+                  index,
+                  stateKey: 'goal', 
+                  action: updateGoal
+               }} />
             }
          />
       </View>
    )
 })
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+const surveyComponents = [
+   GoalSurvey, 
+   FastingFamiliarSurvey, 
+   ExercisePerformanceSurvey, 
+   AgeSurvey,
+   GenderSurvey,
+   CurrentHeightSurvey,
+   CurrentWeightSurvey, 
+   GoalWeightSurvey
+]
 
-   const [surveyIndex, setSurveyIndex] = useState<number>(0)
-   const [goal, setGoal] = useState<({ id: number, title: string })[]>([])
-   const [fastingFamiliar, setFastingFamiliar] = useState<({ id: number, title: string })[]>([])
-   const [exercisePerformance, setExercisePerformance] = useState<string>('')
-   const [currentHeight, setCurrentHeight] = useState<string>('')
-   const [currentWeight, setCurrentWeight] = useState<string>('')
-   const [age, setAge] = useState<number>(0)
-   const [goalWeight, setGoalWeight] = useState<string>('')
+export default ({ navigation }: { navigation?: NavigationProp<any> }): JSX.Element => {
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const dispatch = useDispatch()
+   const surveyIndex = useSelector((state: AppState) => state.survey.surveyIndex)
    const bottomBarHeight: number = useDeviceBottomBarHeight()
 
    useEffect(() => {
@@ -179,17 +254,19 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
       }).start()
    }, [surveyIndex])
 
-   const changeSurvey: (index: number) => void = (newSurveyIndex: number) => {
-      if (newSurveyIndex === surveyTitles.length) {
-         navigation.navigate('auth')
+   const changeSurvey = (newSurveyIndex: number) => {
+      if (newSurveyIndex === surveyTitles.length && navigation) {
+         navigation.navigate('survey-loading')
          return
       }
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 920, 
          useNativeDriver: true
-      }).start(({ finished }) => { setSurveyIndex(newSurveyIndex) })
+      }).start(({ finished }) => { dispatch(updateSurveyIndex(newSurveyIndex)) })
    }
+
+   const SurveyComponent = surveyComponents[surveyIndex]
 
    return (
       <View style={[styles.container, { paddingBottom: vS(27) + bottomBarHeight }]}>
@@ -233,8 +310,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                   outputRange: [-300, 0]
                }) }]
             }]}>
-               { surveyIndex === 0 && <GoalSurvey {...{ goal, setGoal }} /> }
-               { surveyIndex === 1 && <FastingFamiliarSurvey {...{ fastingFamiliar, setFastingFamiliar }} /> }
+               <SurveyComponent />
             </Animated.View>
          </View>
          <Animated.View 
@@ -312,37 +388,14 @@ const styles = StyleSheet.create({
       fontSize: hS(14)
    },
 
-   optionContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      height: vS(70),
-      backgroundColor: '#f3f3f3',
-      borderRadius: hS(12),
-      paddingHorizontal: hS(26)
+   options: {
+      marginTop: vS(10)
    },
 
    optionsTitle: {
-      fontSize: hS(14),
       fontFamily: 'Poppins-Medium',
+      fontSize: hS(14), 
       color: '#9f9f9f'
-   },
-
-   optionTitle: {
-      fontFamily: 'Poppins-Medium',
-      fontSize: hS(14),
-      color: darkHex
-   },
-
-   checkmark: {
-      width: hS(32),
-      height: vS(32)
-   },
-
-   checked: {
-      borderWidth: 1,
-      borderColor: primaryHex,
-      backgroundColor: lightHex
    },
 
    surveysContainer: {

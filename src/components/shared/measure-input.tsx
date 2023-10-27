@@ -8,19 +8,21 @@ import {
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 interface MeasureInputProps {
    symb: string, 
+   value: string
    placeholder?: string, 
    paddingBottom?: number, 
    contentCentered?: boolean,
    additionalStyles?: any,
-   onChangeText?: () => void
+   onChangeText?: (input: string) => void
 }
 
 export default ({ 
    symb, 
+   value,
    placeholder, 
    paddingBottom = 2, 
    contentCentered, 
@@ -31,7 +33,7 @@ export default ({
       <View style={[styles.container, additionalStyles]}>
          <TextInput 
             style={[styles.input, { textAlign: contentCentered && 'center' || 'left', paddingBottom }]}
-            {...{ placeholder, onChangeText }} />
+            {...{ value, placeholder, onChangeText }} />
          <Text style={styles.symb}>{symb}</Text>         
       </View>
    )
@@ -46,7 +48,7 @@ const styles = StyleSheet.create({
    symb: {
       fontFamily: 'Poppins-Regular', 
       fontSize: hS(14), 
-      color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .8)`, 
+      color: `rgba(${darkRgb.join(', ')}, .8)`, 
       letterSpacing: .2, 
       marginLeft: hS(8),
       marginTop: vS(16)
@@ -56,9 +58,9 @@ const styles = StyleSheet.create({
       width: hS(127),
       paddingLeft: hS(8),
       fontFamily: 'Poppins-Medium',
-      color: darkPrimary,
+      color: darkHex,
       fontSize: hS(32), 
       borderBottomWidth: 1, 
-      borderBottomColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .3)`
+      borderBottomColor: `rgba(${darkRgb.join(', ')}, .3)`
    }
 })

@@ -157,7 +157,7 @@ const RowMetrics = ({ isViewable }: { isViewable: boolean }) => {
 }
 
 export default (): JSX.Element => (
-	<Screen full paddingHorzContent content={[
+	<Screen paddingHorzContent content={[
 		Header,
 		DailyFastingState,
 		RowMetrics,
