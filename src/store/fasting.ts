@@ -4,21 +4,24 @@ import { FastingState } from '@utils/types'
 const initialState: FastingState = {
    planCategoryId: '',
    planId: '',
-   startTimeStamp: 0,
-   endTimeStamp: 0
+   startTimeStamp: 0
 }
 
 const FastingSlice = createSlice({
    name: 'fasting', 
    initialState, 
    reducers: {
-      updateFastingTimes: (state, action) => {
-         const { _start, _end } = action.payload
-         state.startTimeStamp = _start
-         state.endTimeStamp = _end
+      updateNewPlan: (state, action) => {
+         const { planCategoryId, planId } = action.payload
+         state.planCategoryId = planCategoryId, 
+         state.planId = planId
+      },
+
+      updateStartTime: (state, action) => {
+         state.startTimeStamp = action.payload
       }
    }
 })
 
-export const { updateFastingTimes }  = FastingSlice.actions
+export const { updateStartTime, updateNewPlan }  = FastingSlice.actions
 export default FastingSlice.reducer

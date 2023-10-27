@@ -7,6 +7,16 @@ export type AuthState = {
    name: string
 }
 
+export type PlanSelectionType = {
+   planCategoryId: string, 
+   planId: string
+}
+
+export type PlanSelectionContextType = {
+   planSelected: PlanSelectionType, 
+   setPlanSelected: Dispatch<SetStateAction<PlanSelectionType>>
+}
+
 export type PopupContextType = {
    popup: ReactNode, 
    setPopup: Dispatch<SetStateAction<ReactNode>>
@@ -15,8 +25,7 @@ export type PopupContextType = {
 export type FastingState = {
    planCategoryId: string,
    planId: string, 
-   startTimeStamp: number, 
-   endTimeStamp: number
+   startTimeStamp: number
 }
 
 export type InitialPersonalData = {

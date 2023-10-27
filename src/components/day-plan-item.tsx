@@ -7,8 +7,9 @@ import {
 	Pressable,
 	Image
 } from 'react-native'
-import { PopupContextType } from '@utils/types'
-import { PopupContext } from '../contexts/popup'
+
+import { PlanSelectionContext } from '@contexts/plan-selection'
+import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -22,10 +23,15 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 export default ({ item }): JSX.Element => {
 	const startTimeStamp = useSelector((state: AppState) => state.fasting.startTimeStamp)
 	const { setPopup } = useContext(PopupContext)
+	const { setPlanSelected } = useContext(PlanSelectionContext)
 
 	const onSelectPlan = () => {
 		const Popup = startTimeStamp && RequireEndFastingPopup || ConfirmPopup
 		setPopup(Popup)
+		setPlanSelected({
+			planCategoryId: item.planCategoryId, 
+			planId: item.id
+		})
 	}
 
 	return (

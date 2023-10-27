@@ -9,7 +9,9 @@ import {
 	Animated,
 	ScrollView
 } from 'react-native'
-
+import { getTimeStamp } from '@utils/datetimes'
+import { AppState } from '../store'
+import { useSelector, useDispatch } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
@@ -22,6 +24,8 @@ import RestaurantIcon from '@assets/icons/restaurant.svg'
 import ElectroIcon from '@assets/icons/electro.svg'
 import LightIcon from '@assets/icons/light.svg'
 import LinearGradient from 'react-native-linear-gradient'
+import plansData from '@assets/data/plans.json'
+import { updateStartTime } from 'src/store/fasting'
 
 const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -71,6 +75,9 @@ const TimeSetting = () => {
 }
 
 const Content = memo(() => {
+	const dispatch = useDispatch()
+	const { planCategoryId, planId } = useSelector((state: AppState) => state.fasting)
+
 	return (
 		<View style={styles.main}>
 			<LinearGradient
@@ -108,7 +115,8 @@ const Content = memo(() => {
 				<Button 
 					title='Start fasting' 
 					bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
-					size='large' />
+					size='large' 
+					onPress={() => dispatch(updateStartTime(getTimeStamp()))} />
 			</View>
 		</View>
 	)
