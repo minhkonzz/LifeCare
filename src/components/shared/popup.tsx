@@ -10,9 +10,10 @@ interface PopupProps {
 	type: 'bottomsheet' | 'centered'
 	title: string,
 	animateValue: Animated.Value,
-	setVisible: Dispatch<SetStateAction<ReactNode>>
+	setVisible: Dispatch<SetStateAction<any>>
 	width?: number, 
-	children?: ReactNode
+	children?: ReactNode, 
+	onSelfClose?: () => void
 }
 
 export default memo(({
@@ -21,7 +22,8 @@ export default memo(({
 	animateValue,
 	setVisible,
 	width,
-	children
+	children,
+	onSelfClose
 }: PopupProps): JSX.Element => {
 
 	useEffect(() => {
@@ -38,6 +40,7 @@ export default memo(({
 			duration: 300,
 			useNativeDriver: true
 		}).start(({ finished }) => {
+			if (onSelfClose) onSelfClose()
 			setVisible(null)
 		})
 	}

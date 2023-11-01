@@ -1,394 +1,501 @@
-import { FC } from 'react'
-import {
-    View, 
-    Text, 
-    StyleSheet, 
-    Animated, 
-    Pressable, 
-    StatusBar, 
-    TouchableOpacity, 
-    ScrollView
-} from 'react-native'
-
+import { memo, Dispatch, SetStateAction, useState, useRef, useEffect } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback-white.svg'
-import EditPrimary from '@assets/icons/edit-primary.svg'
 import EditWhite from '@assets/icons/edit-white.svg'
+import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
+import AnimatedNumber from '@components/shared/animated-text'
+import {
+	View,
+	Text,
+	StyleSheet,
+	Animated,
+	Platform,
+	StatusBar,
+	TouchableOpacity,
+	ScrollView
+} from 'react-native'
 
-const TimeSetting: FC = () => {
-    return (
-	<View style={styles.fastingTimes}>
-	    <View style={styles.planName}>
-	    	<Text style={styles.planNameText}>16:8 Intermittent Fasting plan</Text>
-	    </View>
-	    <View style={{ width: '100%' }}>
-		<View style={styles.timeSetting}>
-		    <View style={styles.timeSettingTitle}>
-			<View style={[styles.timeSettingDecor, { backgroundColor: Colors.primary.hex }]} />
-			<Text style={styles.timeSettingTitleText}>Start</Text>
-		    </View>
-		    <View style={styles.timeSettingValue}>
-			<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text> 
-			<EditPrimary width={hS(16)} height={vS(16)} />
-		    </View>
-		</View>
-		<View style={[styles.timeSetting, { marginTop: vS(28) }]}>
-		    <View style={styles.timeSettingTitle}>
-			<View style={[styles.timeSettingDecor, { backgroundColor: 'rgb(255, 155, 133)' }]} />
-			<Text style={styles.timeSettingTitleText}>End</Text>
-		    </View>
-		    <View style={styles.timeSettingValue}>
-			<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text> 
-			<EditPrimary width={hS(16)} height={vS(16)} />
-		    </View>
-		</View>	
-	    </View>
-	    <Text style={styles.timeNote}>Please select the time you start fasting</Text>
-	</View>
-    )
-}
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const TrackWeight: FC = () => {
-    return (
-	<View style={styles.trackWeight}>
-	    <View style={styles.trackWeightHeader}>
-	        <View>
-	  	    <Text style={styles.trackWeightTitle}>Track your weight</Text>
-		    <View style={styles.trackWeightValue}>
-		        <Text style={styles.trackWeightValueText}>64.5 kg</Text>
-		        <Text style={styles.trackWeightValueNote}>until now</Text>
-		    </View>
-		</View>
-		<TouchableOpacity
-		    activeOpacity={.7}
-		    onPress={() => {}}>
-		    <LinearGradient
-		        style={styles.trackWeightButton}
-			colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
-			start={{ x: .5, y: 0 }}
-			end={{ x: .5, y: 1 }}>
-			<EditWhite width={hS(20)} height={vS(20)} />
-		    </LinearGradient>
-		</TouchableOpacity>
-	    </View>
-	    <View style={styles.weightProcess}>
-	        <View style={styles.weightProcessBar}>
-		    <LinearGradient 
-		        style={styles.weightProcessValueBar} 
-			colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]} 
-			start={{ x: .5, y: 0 }} 
-			end={{ x: .5, y: 1 }} />
-		</View>
-		<View style={styles.weightProcessTexts}>
-		    <Text style={styles.weightProcessText}>Starting: 89 kg</Text>
-		    <Text style={styles.weightProcessText}>Goal: 62 kg</Text>
-		</View>
-	    </View>
-	</View>
-    )
-}
+const TimeSetting = memo(() => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
-export default (): FC => {
-    const bottomBarHeight = useDeviceBottomBarHeight()
-    return (
-	<ScrollView contentContainerStyle={[styles.container, { paddingBottom: vS(27) + bottomBarHeight }]}>
-	    <LinearGradient 
-	        style={styles.primeDecor} 
-		colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
-		start={{ x: .5, y: 0 }}
-		end={{ x: .5, y: 1 }} />
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: 1, 
+			duration: 1200, 
+			useNativeDriver: true
+		}).start()
+	}, [])
 
-	    <View style={styles.header}>
-	        <BackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
-		<Text style={styles.headerTitle}>Total fasting time</Text>
-		<View style={styles.timeTitle}>
-		    <Text style={styles.numTitle}>16</Text>
-		    <Text style={styles.symbolTitle}>h</Text>
-		    <Text style={[styles.numTitle, { marginLeft: hS(17) }]}>24</Text>
-		    <Text style={styles.symbolTitle}>m</Text>
-		</View>
-	    </View>
-	    <TimeSetting />
-	    <TrackWeight />
-	    <View style={styles.bottom}>
-		<TouchableOpacity
-		    activeOpacity={.7}
-		    onPress={() => {}}>
-		    <LinearGradient
-		        style={styles.bottomButton}
-			colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`, Colors.darkPrimary.hex]}
-			start={{ x: .5, y: 0 }}
-			end={{ x: .5, y: 1 }}>
-			<Text style={styles.bottomButtonText}>Delete</Text>
-		    </LinearGradient>
-		</TouchableOpacity>
-		<TouchableOpacity
-		    activeOpacity={.7}
-		    onPress={() => {}}>
-		    <LinearGradient
-		        style={styles.bottomButton}
-			colors={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
-			start={{ x: .5, y: 0 }}
-			end={{ x: .5, y: 1 }}>
-			<Text style={styles.bottomButtonText}>Save</Text>
-		    </LinearGradient>
-		</TouchableOpacity>
-	    </View>
-	</ScrollView>
-    )
+	return (
+		<Animated.View style={{...styles.fastingTimes, opacity: animateValue}}>
+			<Animated.View style={{
+				...styles.planName,
+				opacity: animateValue,
+				transform: [{ translateY: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [16, 0]
+				}) }]
+			}}>
+				<Text style={styles.planNameText}>16:8 Intermittent Fasting plan</Text>
+			</Animated.View>
+			<View style={{ width: '100%' }}>
+				<View style={styles.timeSetting}>
+					<View style={styles.timeSettingTitle}>
+						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
+						<Text style={styles.timeSettingTitleText}>Start</Text>
+					</View>
+					<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
+				</View>
+				<View style={{...styles.timeSetting, marginTop: vS(28) }}>
+					<View style={styles.timeSettingTitle}>
+						<View style={[styles.timeSettingDecor, { backgroundColor: 'rgb(255, 155, 133)' }]} />
+						<Text style={styles.timeSettingTitleText}>End</Text>
+					</View>
+					<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
+				</View>
+			</View>
+		</Animated.View>
+	)
+})
+
+const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+
+	useEffect(() => {
+		Animated.parallel([
+			Animated.timing(animateValue, {
+				toValue: 1, 
+				duration: 920, 
+				useNativeDriver: true
+			}),
+			Animated.timing(progressAnimateValue, {
+				toValue: 1, 
+				duration: 920, 
+				useNativeDriver: false
+			})
+		]).start()
+	}, [])
+
+	return (
+		<Animated.View style={{...styles.trackWeight, opacity: animateValue }}>
+			<View style={styles.trackWeightHeader}>
+				<View>
+					<Animated.Text 
+						style={{
+							...styles.trackWeightTitle,
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [-30, 0]
+							}) }]
+						}}>
+						Track your weight
+					</Animated.Text>
+					<View style={styles.trackWeightValue}>
+						<Animated.Text 
+							style={{
+								...styles.trackWeightValueText,
+								transform: [{ translateY: animateValue.interpolate({
+									inputRange: [0, 1], 
+									outputRange: [10, 0]
+								}) }]
+							}}>
+							64.5 kg
+						</Animated.Text>
+						<Animated.Text style={{
+							...styles.trackWeightValueNote, 
+							opacity: animateValue,
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [-10, 0]
+							}) }]
+						}}>
+							until now
+						</Animated.Text>
+					</View>
+				</View>
+				<TouchableOpacity
+					activeOpacity={.7}
+					onPress={() => setVisible(true)}>
+					<LinearGradient
+						style={styles.trackWeightButton}
+						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }}>
+						<EditWhite width={hS(20)} height={vS(20)} />
+					</LinearGradient>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.weightProcess}>
+				<Animated.View style={{...styles.weightProcessBar, opacity: animateValue}}>
+					<AnimatedLinearGradient
+						style={{
+							...styles.weightProcessValueBar,
+							width: progressAnimateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: ['0%', '60%']
+							})
+						}}
+						colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} />
+				</Animated.View>
+				<View style={styles.weightProcessTexts}>
+					<Animated.Text 
+						style={{
+							...styles.weightProcessText,
+							opacity: animateValue,
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [-10, 0]
+							}) }]
+						}}>
+						Starting: 89 kg
+					</Animated.Text>
+					<Animated.Text 
+						style={{
+							...styles.weightProcessText,
+							opacity: animateValue,
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [10, 0]
+							}) }]
+						}}>
+						Goal: 62 kg
+					</Animated.Text>
+				</View>
+			</View>
+		</Animated.View>
+	)
+})
+
+export default (): JSX.Element => {
+	const bottomBarHeight = useDeviceBottomBarHeight()
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const [ visible, setVisible ] = useState<boolean>(false)
+
+   useEffect(() => {
+      Animated.timing(animateValue, {
+         toValue: 1,
+         duration: 920, 
+         useNativeDriver: true
+      }).start()
+   }, [])
+
+	return (
+		<ScrollView contentContainerStyle={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
+			<AnimatedLinearGradient
+				style={[
+               styles.primeDecor,
+               {
+                  opacity: animateValue,
+                  transform: [{ scale: animateValue }]
+               }
+            ]}
+				colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
+				start={{ x: .5, y: 0 }}
+				end={{ x: .52, y: .5 }} />
+			<View style={styles.header}>
+				<BackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
+				<Animated.Text 
+					style={[
+						styles.headerTitle,
+						{
+							opacity: animateValue,
+							transform: [{ translateY: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [-10, 0]
+							}) }]
+						}
+					]}>
+					Total fasting time
+				</Animated.Text>
+				<Animated.View style={[
+					styles.timeTitle, 
+					{
+						opacity: animateValue,
+						transform: [{ translateY: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [10, 0]
+						}) }]
+					}
+				]}>
+					<AnimatedNumber value={16} style={styles.numTitle} />
+					<Text style={styles.symbolTitle}>h</Text>
+					<AnimatedNumber value={24} style={{...styles.numTitle, marginLeft: hS(17)}} />
+					<Text style={styles.symbolTitle}>m</Text>
+				</Animated.View>
+			</View>
+			<TimeSetting />
+			<TrackWeight {...{ setVisible }} />
+			<View style={styles.bottom}>
+				<TouchableOpacity
+					activeOpacity={.7}
+					onPress={() => { }}>
+					<LinearGradient
+						style={styles.bottomButton}
+						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }}>
+						<Text style={styles.bottomButtonText}>Delete</Text>
+					</LinearGradient>
+				</TouchableOpacity>
+				<TouchableOpacity
+					activeOpacity={.7}
+					onPress={() => { }}>
+					<LinearGradient
+						style={styles.bottomButton}
+						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }}>
+						<Text style={styles.bottomButtonText}>Save</Text>
+					</LinearGradient>
+				</TouchableOpacity>
+			</View>
+			{ visible && <CurrentWeightPopup {...{ setVisible }} /> }
+		</ScrollView>
+	)
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#fff',
-    	flex: 1, 
-	alignItems: 'center', 
-	paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
-    },
+	container: {
+		backgroundColor: '#fff',
+		flex: 1,
+		alignItems: 'center',
+		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
+	},
 
-    primeDecor: {
-	width: hS(800), 
-	height: vS(800), 
-	borderRadius: 600, 
-	position: 'absolute', 
-	top: vS(-466)
-    }, 
+	primeDecor: {
+		width: hS(800),
+		height: vS(800),
+		borderRadius: 600,
+		position: 'absolute',
+		top: vS(-466)
+	},
 
-    header: {
-	width: '100%', 
-	alignItems: 'center', 
-	paddingHorizontal: hS(24)
-    }, 
+	header: {
+		width: '100%',
+		alignItems: 'center',
+		paddingHorizontal: hS(24)
+	},
 
-    backIcon: {
-	alignSelf: 'flex-start', 
-	marginTop: vS(28)
-    },
+	backIcon: {
+		alignSelf: 'flex-start',
+		marginTop: vS(28)
+	},
 
-    headerTitle: {
-        fontFamily: 'Poppins-SemiBold', 
-        fontSize: hS(22),
-	color: '#fff', 
-	letterSpacing: .2, 
-	marginTop: vS(15)
-    }, 
+	headerTitle: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(22),
+		color: '#fff',
+		letterSpacing: .2,
+		marginTop: vS(15)
+	},
 
-    timeTitle: {
-	flexDirection: 'row', 
-	alignItems: 'flex-end', 
-	marginTop: vS(8), 
-	marginLeft: hS(10)
-    }, 
+	timeTitle: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		marginTop: vS(8),
+		marginLeft: hS(10)
+	},
 
-    numTitle: {
-	fontFamily: 'Poppins-Bold', 
-	fontSize: hS(50), 
-	color: '#fff', 
-	letterSpacing: .2
-    }, 
+	numTitle: {
+		fontFamily: 'Poppins-Bold',
+		fontSize: hS(50),
+		color: '#fff',
+		letterSpacing: .2
+	},
 
-    symbolTitle: {
-	fontFamily: 'Poppins-SemiBold', 
-	fontSize: hS(22), 
-	color: '#fff', 
-	marginLeft: hS(10), 
-	marginBottom: vS(16)
-    }, 
+	symbolTitle: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(22),
+		color: '#fff',
+		marginLeft: hS(10),
+		marginBottom: vS(20)
+	},
 
-    bottom: {
-        position: 'absolute',
-	bottom: 0,
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
-	alignItems: 'center', 
-	width: '100%', 
-	elevation: 5, 
-	shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`, 
-	paddingHorizontal: hS(22), 
-	paddingVertical: vS(20)
-    },
+	bottom: {
+		position: 'absolute',
+		bottom: 0,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		width: '100%',
+		elevation: 15,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .6)`,
+		paddingHorizontal: hS(22),
+		paddingVertical: vS(20)
+	},
 
-    bottomButton: {
-	width: hS(172), 
-	height: vS(72), 
-	borderRadius: 100, 
-	justifyContent: 'center', 
-	alignItems: 'center'
-    },
+	bottomButton: {
+		width: hS(172),
+		height: vS(72),
+		borderRadius: 100,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
 
-    bottomButtonText: {
-	fontFamily: 'Poppins-SemiBold', 
-	fontSize: hS(14), 
-	color: '#fff',
-	letterSpacing: .2
-    },
+	bottomButtonText: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(14),
+		color: '#fff',
+		letterSpacing: .2
+	},
 
-    fastingTimes: {
-        marginTop: vS(52), 
-        backgroundColor: '#fff',
-        alignItems: 'center', 
-        paddingTop: vS(50),
-	paddingBottom: vS(22), 
-	paddingHorizontal: hS(24),
-	width: hS(366),  
-	elevation: 4, 
-	shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`,
-	borderRadius: hS(32)
-    }, 
+	fastingTimes: {
+		marginTop: vS(52),
+		backgroundColor: '#fff',
+		alignItems: 'center',
+		paddingTop: vS(50),
+		paddingBottom: vS(22),
+		paddingHorizontal: hS(24),
+		width: hS(366),
+		elevation: 4,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
+		borderRadius: hS(32)
+	},
 
-    planName: {
-        position: 'absolute',
-	top: vS(-20),
-	width: hS(229), 
-	height: vS(41), 
-	elevation: 4, 
-	shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`,
-	borderRadius: hS(25), 
-	justifyContent: 'center', 
-	alignItems: 'center', 
-	backgroundColor: '#fff'
-    }, 
+	planName: {
+		position: 'absolute',
+		top: vS(-20),
+		paddingHorizontal: hS(23),
+		paddingVertical: vS(10), 
+		elevation: 10,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
+		borderRadius: hS(25),
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#fff'
+	},
 
-    planNameText: {
-	fontFamily: 'Poppins-Medium', 
-	fontSize: hS(12), 
-	color: Colors.darkPrimary.hex,
-	letterSpacing: .2
-    },
+	planNameText: {
+		fontFamily: 'Poppins-Medium',
+		fontSize: hS(12),
+		color: darkHex,
+		letterSpacing: .2
+	},
 
-    timeSetting: {
-        flexDirection: 'row', 
-	width: '100%',
-	justifyContent: 'space-between',
-	alignItems: 'center'
-    },
+	timeSetting: {
+		flexDirection: 'row',
+		width: '100%',
+		justifyContent: 'space-between',
+		alignItems: 'center'
+	},
 
-    timeSettingTitle: {
-	flexDirection: 'row', 
-	alignItems: 'center'
-    },
+	timeSettingTitle: {
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
 
-    timeSettingDecor: {
-	width: hS(7), 
-	height: vS(7), 
-	borderRadius: hS(12)
-    },
+	timeSettingDecor: {
+		width: hS(7),
+		height: vS(7),
+		borderRadius: hS(12)
+	},
 
-    timeSettingTitleText: {
-	fontFamily: 'Poppins-Regular', 
-	fontSize: hS(12),
-	color: Colors.darkPrimary.hex, 
-	letterSpacing: .2,
-	marginLeft: hS(19)
-    },
+	timeSettingTitleText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(12),
+		color: darkHex,
+		letterSpacing: .2,
+		marginLeft: hS(19)
+	},
 
-    timeSettingValue: {
-	flexDirection: 'row', 
-	alignItems: 'center'
-    }, 
+	timeSettingValueText: {
+		fontFamily: 'Poppins-Medium',
+		fontSize: hS(12),
+		letterSpacing: .2,
+		color: darkHex
+	},
 
-    timeSettingValueText: {
-	fontFamily: 'Poppins-SemiBold', 
-	fontSize: hS(12), 
-	letterSpacing: .2, 
-	color: Colors.primary.hex, 
-	marginRight: hS(20)
-    },
+	trackWeight: {
+		marginTop: vS(37),
+		width: hS(366),
+		backgroundColor: '#fff',
+		paddingHorizontal: hS(22),
+		paddingVertical: vS(22),
+		borderRadius: hS(32),
+		elevation: 10,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .4)`
+	},
 
-    timeNote: {
-	fontFamily: 'Poppins-Regular', 
-	fontSize: hS(11), 
-	color: Colors.darkPrimary.hex, 
-	marginTop: vS(18),
-	letterSpacing: .2
-    },
+	trackWeightHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
 
-    trackWeight: {
-        marginTop: vS(37),
-        width: hS(366),
-        backgroundColor: '#fff',
-        paddingHorizontal: hS(22), 
-	paddingVertical: vS(22),
-        borderRadius: hS(32),
-	height: vS(180),
-	elevation: 4, 
-	shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`
-    }, 
+	trackWeightTitle: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(16),
+		color: darkHex,
+		letterSpacing: .2
+	},
 
-    trackWeightHeader: { 
-	flexDirection: 'row', 
-	justifyContent: 'space-between'
-    },
+	trackWeightValue: {
+		flexDirection: 'row',
+		marginTop: vS(10)
+	},
 
-    trackWeightTitle: {
-	fontFamily: 'Poppins-SemiBold', 
-	fontSize: hS(16), 
-	color: Colors.darkPrimary.hex,
-	letterSpacing: .2
-    },
+	trackWeightValueText: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(28),
+		color: primaryHex,
+		letterSpacing: .2
+	},
 
-    trackWeightValue: {
-	flexDirection: 'row', 
-	marginTop: vS(10)
-    }, 
+	trackWeightValueNote: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(12),
+		color: darkHex,
+		marginLeft: hS(6),
+		marginTop: vS(18)
+	},
 
-    trackWeightValueText: {
-	fontFamily: 'Poppins-SemiBold', 
-	fontSize: hS(28), 
-	color: Colors.primary.hex, 
-	letterSpacing: .2
-    },
+	trackWeightButton: {
+		width: hS(52),
+		height: vS(52),
+		borderRadius: hS(22),
+		justifyContent: 'center',
+		alignItems: 'center',
+		elevation: 5,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
+	},
 
-    trackWeightValueNote: {
-	fontFamily: 'Poppins-Regular',
-	fontSize: hS(12), 
-	color: Colors.darkPrimary.hex,
-	marginLeft: hS(6), 
-	marginTop: vS(18)
-    },
+	weightProcess: {
+		width: '100%',
+		marginTop: vS(16)
+	},
 
-    trackWeightButton: {
-	width: hS(52), 
-	height: vS(52), 
-	borderRadius: hS(22),
-	justifyContent: 'center', 
-	alignItems: 'center',
-	elevation: 5, 
-	shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`
-    },
+	weightProcessBar: {
+		width: '100%',
+		height: vS(12),
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`,
+		borderRadius: 45
+	},
 
-    weightProcess: {
-	width: '100%', 
-	marginTop: vS(16)
-    }, 
+	weightProcessValueBar: {
+		height: '100%',
+		borderRadius: 45
+	},
 
-    weightProcessBar: {
-	width: '100%', 
-	height: vS(12), 
-	backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .1)`, 
-        borderRadius: 45
-    }, 
+	weightProcessTexts: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginTop: vS(10)
+	},
 
-    weightProcessValueBar: {
-	width: '60%', 
-	height: '100%',
-	borderRadius: 45
-    },
-
-    weightProcessTexts: {
-	flexDirection: 'row', 
-	justifyContent: 'space-between', 
-	alignItems: 'center', 
-	marginTop: vS(10)
-    },
-
-    weightProcessText: {
-	fontFamily: 'Poppins-Regular', 
-	fontSize: hS(10), 
-	color: Colors.darkPrimary.hex, 
-	letterSpacing: .2 
-    }
+	weightProcessText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(10),
+		color: darkHex,
+		letterSpacing: .2
+	}
 })

@@ -1,8 +1,19 @@
-import { memo, useEffect, useRef } from 'react'
+import { 
+	memo, 
+	ReactNode, 
+	useEffect, 
+	useRef, 
+	useContext, 
+	Dispatch, 
+	SetStateAction 
+} from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
+import { AppState } from '../store'
+import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import PopupProvider, { PopupContext } from '@contexts/popup'
 import BackIcon from '@assets/icons/goback.svg'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
@@ -13,6 +24,7 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const navigation = useNavigation()
 
 	useEffect(() => {
@@ -36,7 +48,7 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 					}) }]
 				}
 			]}>
-				You're fasting now
+				{ startTimeStamp && endTimeStamp && "You're fasting now" || "You're in eating period" }
 			</Animated.Text>
 			<Animated.View style={[
 				styles.plans, 
@@ -49,14 +61,14 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 				}
 			]}>
 				<Pressable style={styles.plansBox} onPress={() => navigation.navigate('plans')}>
-					<Text style={styles.plansBoxText}>16:8 Intermittent Fasting plan</Text>
+					<Text style={styles.plansBoxText}>{currentPlan && `${currentPlan.name} Intermittent Fasting plan` || 'Select plan'}</Text>
 					<BackIcon
-						style={{ transform: [{ rotate: '-90deg' }], marginLeft: hS(9.7) }}
+						style={styles.backIc}
 						width={hS(5)}
 						height={vS(10)}
 					/>
 				</Pressable>
-				<Pressable style={styles.planRef} onPress={() => { }}>
+				<Pressable style={styles.planRef}>
 					<Text style={styles.planRefText}>?</Text>
 				</Pressable>
 			</Animated.View>
@@ -64,22 +76,38 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
+const Main = memo(() => {
+	const { popup: Popup, setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
+	return (
+		<>
+			<Screen header='tab' title='Timer' paddingHorzContent content={[
+				MainTop,
+				FastingClock,
+				FastingActivator,
+				FastingRecords
+			]} />
+			{ Popup && <Popup setVisible={setPopup} /> }
+		</>
+	)
+})
+
 export default (): JSX.Element => {
 	return (
-		<Screen header='tab' title='Timer' paddingHorzContent content={[
-			MainTop,
-			FastingClock,
-			FastingActivator,
-			FastingRecords
-		]} />
+		<View style={styles.container}>
+			<PopupProvider>
+				<Main />
+			</PopupProvider>
+		</View>
 	)
 }
 
 const styles = StyleSheet.create({
+	container: { flex: 1 },
+
 	mainTop: {
-		height: vS(180), 
+		height: vS(120),
 		alignItems: 'center',
-		marginTop: vS(35),
+		marginTop: vS(110),
 		marginBottom: vS(30)
 	},
 
@@ -130,5 +158,10 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
 		color: darkHex
+	},
+
+	backIc: {
+		transform: [{ rotate: '-90deg' }], 
+		marginLeft: hS(9.7)
 	}
 })

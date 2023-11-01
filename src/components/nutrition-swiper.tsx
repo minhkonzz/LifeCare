@@ -89,7 +89,7 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      width: '100%',
+      width: hS(366),
       height: vS(244),
       borderRadius: hS(32), 
       marginTop: vS(28), 

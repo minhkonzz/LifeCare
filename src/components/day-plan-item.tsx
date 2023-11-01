@@ -1,4 +1,4 @@
-import { Context, useContext } from 'react'
+import { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import {
 	View,
@@ -7,8 +7,8 @@ import {
 	Pressable,
 	Image
 } from 'react-native'
-
-import { PlanSelectionContext } from '@contexts/plan-selection'
+import { useDispatch } from 'react-redux'
+import { updateNewPlan } from '../store/fasting'
 import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { AppState } from '../store'
@@ -21,17 +21,22 @@ import ConfirmPopup from '@components/shared/popup-content/ask-start-fasting'
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ item }): JSX.Element => {
-	const startTimeStamp = useSelector((state: AppState) => state.fasting.startTimeStamp)
+	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const { setPopup } = useContext(PopupContext)
-	const { setPlanSelected } = useContext(PlanSelectionContext)
+	const dispatch = useDispatch()
 
 	const onSelectPlan = () => {
-		const Popup = startTimeStamp && RequireEndFastingPopup || ConfirmPopup
+		if (!startTimeStamp || !endTimeStamp) {
+			dispatch(updateNewPlan({
+				id: item.id,
+				name: item.name, 
+				sourceText: item.source_text,
+				hrsFast: item.hrs_fast,
+				hrsEat: item.hrs_eat
+			}))
+		}
+		const Popup = startTimeStamp && endTimeStamp && RequireEndFastingPopup || ConfirmPopup
 		setPopup(Popup)
-		setPlanSelected({
-			planCategoryId: item.planCategoryId, 
-			planId: item.id
-		})
 	}
 
 	return (

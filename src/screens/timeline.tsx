@@ -5,10 +5,8 @@ import {
     StyleSheet,
     Animated,
 } from 'react-native'
-
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import Screen from '@components/shared/screen'
 import StackHeader from '@components/shared/stack-header'
 import TimePicker from '@components/time-picker'
 import TimelineItem from '@components/timeline-item'
@@ -44,7 +42,7 @@ const dataTest: Array<any> =
 
 export default (): JSX.Element => {
     return (
-        <Screen full scroll paddingHorzContent>
+        <View style={styles.container}>
             <StackHeader title='Timeline' /> 
             <View style={styles.timePicker}>
                 <TimePicker title='From' indicatorColor={Colors.primary.hex} />
@@ -56,7 +54,7 @@ export default (): JSX.Element => {
                 data={dataTest} 
                 keyExtractor={item => item.id.toString()} 
                 renderItem={({ item, index }) => <TimelineItem {...{ item, index } } />} />
-        </Screen>
+        </View>
     )
 }
 

@@ -15,7 +15,7 @@ import TabItem from './BottomTabItem'
 import AnimatedCircle from './AnimatedCircle'
 import HomeWhiteIcon from '@assets/icons/home-white.svg'
 import TimerWhiteIcon from '@assets/icons/timer-white.svg'
-// import CalendarWhiteIcon from '@assets/icons/calendar-white.svg'
+import CalendarWhiteIcon from '@assets/icons/calendar-white.svg'
 import ExploreWhiteIcon from '@assets/icons/explore-white.svg'
 import UserWhiteIcon from '@assets/icons/user-white.svg'
 
@@ -24,6 +24,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path)
 const tabIcons = {
    'daily': HomeWhiteIcon,
    'timer': TimerWhiteIcon,
+   'nutrition': CalendarWhiteIcon,
    'insights': ExploreWhiteIcon,
    'profile': UserWhiteIcon
 }

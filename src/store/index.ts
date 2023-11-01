@@ -4,6 +4,8 @@ import authReducer from './auth'
 import networkReducer from './network'
 import surveyReducer from './survey'
 import fastingReducer from './fasting'
+import waterReducer from './water'
+import settingReducer from './setting'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { 
    persistReducer,
@@ -18,7 +20,7 @@ import {
 const persistConfig = {
    key: 'root', 
    storage: AsyncStorage,
-   whitelist: ['user', 'fasting'], 
+   whitelist: ['user', 'fasting', 'setting', 'water'], 
    blacklist: ['auth', 'network', 'survey']
 }
 
@@ -27,7 +29,9 @@ const rootReducer = combineReducers({
    auth: authReducer, 
    network: networkReducer, 
    survey: surveyReducer, 
-   fasting: fastingReducer
+   fasting: fastingReducer,
+   setting: settingReducer,
+   water: waterReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

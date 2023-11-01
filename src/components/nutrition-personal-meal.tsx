@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
    },
 
    header: {
+      width: '100%',
       paddingHorizontal: hS(16),
       paddingVertical: vS(16),
       borderRadius: hS(18),

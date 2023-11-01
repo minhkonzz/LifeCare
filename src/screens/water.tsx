@@ -1,4 +1,18 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../store'
+import { NavigationProp } from '@react-navigation/native'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS, SCREEN_HEIGHT } from '@utils/responsive'
+import { INCREASE, DECREASE } from '@utils/constants/indent'
+import { updateLiquid } from '../store/water'
+import LinearGradient from 'react-native-linear-gradient'
+import BackIcon from '@assets/icons/goback.svg'
+import SettingIcon from '@assets/icons/setting.svg'
+import WhitePlusIcon from '@assets/icons/white_plus.svg'
+import StrongBlueMinusIcon from '@assets/icons/strong_blue_minus.svg'
+import WaterWave from '@components/wave'
+import AnimatedNumber from '@components/shared/animated-text'
 import {
    View,
    Text,
@@ -8,17 +22,6 @@ import {
    Pressable
 } from 'react-native'
 
-import { NavigationProp } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS, SCREEN_HEIGHT } from '@utils/responsive'
-import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback.svg'
-import SettingIcon from '@assets/icons/setting.svg'
-import WhitePlusIcon from '@assets/icons/white_plus.svg'
-import StrongBlueMinusIcon from '@assets/icons/strong_blue_minus.svg'
-import WaterWave from '@components/wave'
-import AnimatedNumber from '@components/shared/animated-text'
-
 const darkPrimary: string = Colors.darkPrimary.hex
 const lightBlue: string = Colors.lightBlue.hex
 const strongBlue: string = Colors.strongBlue.hex
@@ -26,7 +29,8 @@ const strongBlue: string = Colors.strongBlue.hex
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    // const waterHeight: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const [total, setTotal] = useState<number>(1200)
+   const liquidDrinked = useSelector((state: AppState) => state.water.drinked)
+   const dispatch = useDispatch()
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -36,20 +40,22 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
       }).start()
    }, [])
 
-   const increaseQuantity = () => {
+   const increaseLiquid = () => {
       // Animated.timing(waterHeight, {
       //    toValue: waterHeight._value + vS(200) * SCREEN_WIDTH / total, 
       //    duration: 500, 
       //    useNativeDriver: false
       // }).start()
+      dispatch(updateLiquid(INCREASE))
    }
 
-   const decreaseQuantity = () => {
+   const decreaseLiquid = () => {
       // Animated.timing(waterHeight, {
       //    toValue: waterHeight._value - vS(200) * SCREEN_WIDTH / total, 
       //    duration: 500, 
       //    useNativeDriver: false
       // }).start()
+      dispatch(updateLiquid(DECREASE))
    }
 
    return (
@@ -77,7 +83,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                         }) }]
                      }
                   ]}>
-                  <AnimatedNumber style={styles.totalMilText} value={total} />
+                  <AnimatedNumber style={styles.totalMilText} value={liquidDrinked} />
                   <Text style={[styles.totalMilText, styles.totalMilSymbText]}>ml</Text>
                </Animated.View>
                <Animated.Text 
@@ -95,7 +101,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                </Animated.Text>
             </View>
             <View style={styles.updates}>
-               <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseQuantity}>
+               <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseLiquid}>
                   <LinearGradient
                      style={styles.increaseMilButton}
                      colors={[lightBlue, `rgba(${Colors.strongBlue.rgb.join(', ')}, .6)`]}
@@ -109,7 +115,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                   <TouchableOpacity
                      style={styles.sideUpdateButton}
                      activeOpacity={.8}
-                     onPress={decreaseQuantity}>
+                     onPress={decreaseLiquid}>
                      <StrongBlueMinusIcon width={hS(22)} />
                   </TouchableOpacity>
                   <TouchableOpacity

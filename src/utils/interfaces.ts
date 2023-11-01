@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react'
+import { ReactNode, Dispatch, SetStateAction } from 'react'
 import { NavigationProp } from '@react-navigation/native'
 import { Animated } from 'react-native'
 
@@ -14,8 +14,9 @@ export interface LoginComponentProps {
 
 export interface WheelPickerProps {
    items: string[] | number[]
-	itemHeight: number
-	onIndexChange?: (index: number) => void
+	itemHeight: number, 
+   fs?: number,
+	onIndexChange?: (index: number) => void,
 }
 
 export interface OptionProps {
@@ -23,6 +24,18 @@ export interface OptionProps {
    index: number, 
    stateKey: string, 
    action: any
+}
+
+export interface AnimatedNumberProps {
+   value: number, 
+   style?: any
+}
+
+export interface NutritionEditorProps {
+   title: string,
+   totalCalories: number,
+   caloriesMethod: string,
+   children?: ReactNode
 }
 
 export interface NetworkState {

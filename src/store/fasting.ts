@@ -2,9 +2,11 @@ import { createSlice } from '@reduxjs/toolkit'
 import { FastingState } from '@utils/types'
 
 const initialState: FastingState = {
-   planCategoryId: '',
-   planId: '',
-   startTimeStamp: 0
+   newPlan: null, 
+   currentPlan: null,
+   startTimeStamp: 0,
+   endTimeStamp: 0, 
+   isFasting: false
 }
 
 const FastingSlice = createSlice({
@@ -12,16 +14,31 @@ const FastingSlice = createSlice({
    initialState, 
    reducers: {
       updateNewPlan: (state, action) => {
-         const { planCategoryId, planId } = action.payload
-         state.planCategoryId = planCategoryId, 
-         state.planId = planId
+         state.newPlan = action.payload
       },
 
-      updateStartTime: (state, action) => {
-         state.startTimeStamp = action.payload
+      updateCurrentPlan: (state) => {
+         state.currentPlan = { ...state.newPlan }
+         state.newPlan = null
+      },
+
+      updateTimes: (state, action) => {
+         const { _start, _end } = action.payload
+         state.startTimeStamp = _start, 
+         state.endTimeStamp = _end
+      },
+
+      resetTimes: (state) => {
+         state.startTimeStamp = 0
+         state.endTimeStamp = 0
       }
    }
 })
 
-export const { updateStartTime, updateNewPlan }  = FastingSlice.actions
+export const { 
+   updateNewPlan, 
+   updateCurrentPlan,
+   updateTimes,
+   resetTimes
+}  = FastingSlice.actions
 export default FastingSlice.reducer

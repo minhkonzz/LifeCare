@@ -17,7 +17,6 @@ import WhiteScanIcon from '@assets/icons/scan-white.svg'
 import SearchIcon from '@assets/icons/search.svg'
 import NutritionAddTotal from '@components/nutrition-add-total'
 import WhitePlusIcon from '@assets/icons/white_plus.svg'
-import Screen from '@components/shared/screen'
 import addFoodList from '@assets/data/add-food-list.json'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -25,61 +24,59 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    return (
-      <Screen>
+      <View style={styles.container}>
          <LinearGradient 
             style={styles.decor}
             colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
             start={{ x: .5, y: 0 }}
             end={{ x: .5, y: 1 }}
          />
-         <View style={styles.container}>
-            <View style={styles.header}>
-               <Pressable>
-                  <WhiteBackIcon width={hS(9.2)} height={vS(16)} />
-               </Pressable>
-               <View style={styles.headerTitle}>
-                  <Text style={styles.title}>Lunch</Text>
-                  <Text style={styles.recommendTitle}>Recommend 638 - 850 kcal</Text>
-               </View>
-               <Pressable>
-                  <WhiteScanIcon width={hS(20)} height={vS(20)} />
-               </Pressable>
+         <View style={styles.header}>
+            <Pressable>
+               <WhiteBackIcon width={hS(9.2)} height={vS(16)} />
+            </Pressable>
+            <View style={styles.headerTitle}>
+               <Text style={styles.title}>Lunch</Text>
+               <Text style={styles.recommendTitle}>Recommend 638 - 850 kcal</Text>
             </View>
-            <View style={styles.search}>
-               <SearchIcon width={hS(18)} height={vS(18)} />
-               <TextInput placeholder='Search food' style={styles.searchInput} />
-            </View>
-            <FlatList 
-               style={styles.list} 
-               showsVerticalScrollIndicator={false}
-               data={addFoodList} 
-               keyExtractor={item => item.id.toString()} 
-               renderItem={({ item }) => 
-                  <View style={styles.food}>
-                     <View style={styles.foodDetail}>
-                        <View style={styles.foodImageWrapper}>
-                           <Image style={styles.foodImage} source={require('../assets/images/nutrition-personal-food.png')} />
-                        </View>
-                        <View style={styles.foodTexts}>
-                           <Text style={styles.foodTitle}>{item.title}</Text>
-                           <Text style={styles.foodDesc}>{`${item.cals} cals, ${item.grams}g`}</Text>
-                        </View>
-                     </View>
-                     <TouchableOpacity activeOpacity={.8}>
-                        <LinearGradient 
-                           style={styles.foodAddButton}
-                           colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-                           start={{ x: .5, y: 0 }}
-                           end={{ x: .5, y: 1 }}>
-                           <WhitePlusIcon width={hS(18)} height={vS(18)} />
-                        </LinearGradient>
-                     </TouchableOpacity>
-                  </View>
-               } 
-            />
+            <Pressable>
+               <WhiteScanIcon width={hS(20)} height={vS(20)} />
+            </Pressable>
          </View>
+         <View style={styles.search}>
+            <SearchIcon width={hS(18)} height={vS(18)} />
+            <TextInput placeholder='Search food' style={styles.searchInput} />
+         </View>
+         <FlatList 
+            style={styles.list} 
+            showsVerticalScrollIndicator={false}
+            data={addFoodList} 
+            keyExtractor={item => item.id.toString()} 
+            renderItem={({ item }) => 
+               <View style={styles.food}>
+                  <View style={styles.foodDetail}>
+                     <View style={styles.foodImageWrapper}>
+                        <Image style={styles.foodImage} source={require('../assets/images/nutrition-personal-food.png')} />
+                     </View>
+                     <View style={styles.foodTexts}>
+                        <Text style={styles.foodTitle}>{item.title}</Text>
+                        <Text style={styles.foodDesc}>{`${item.cals} cals, ${item.grams}g`}</Text>
+                     </View>
+                  </View>
+                  <TouchableOpacity activeOpacity={.8}>
+                     <LinearGradient 
+                        style={styles.foodAddButton}
+                        colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                        start={{ x: .5, y: 0 }}
+                        end={{ x: .5, y: 1 }}>
+                        <WhitePlusIcon width={hS(18)} height={vS(18)} />
+                     </LinearGradient>
+                  </TouchableOpacity>
+               </View>
+            } 
+         />
          <NutritionAddTotal title='Calories consumed' value={562} />
-      </Screen>
+      </View>
    )
 }
 
@@ -95,7 +92,7 @@ const styles = StyleSheet.create({
    }, 
 
    container: {
-      width: '100%',
+      flex: 1,
       paddingHorizontal: hS(22),
       alignItems: 'center'
    },

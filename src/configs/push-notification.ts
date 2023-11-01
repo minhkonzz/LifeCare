@@ -2,7 +2,7 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import { NOTIFICATION_CHANNEL_ID } from '@utils/constants/notification'
 
-export const configPushNotification: () => void = () => {
+export const configPushNotification = () => {
    PushNotification.configure({
       onRegister: function (token) {
          console.log('TOKEN:', token)

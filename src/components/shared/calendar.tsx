@@ -18,16 +18,8 @@ const calendarData = [
    { id: 'cld3', day: 10, dayWeek: 'Tue' },
    { id: 'cld4', day: 11, dayWeek: 'Wed' },
    { id: 'cld5', day: 12, dayWeek: 'Thurs' },
-   {
-      id: 'cld6', 
-      day: 13,
-      dayWeek: 'Fri'
-   },
-   {
-      id: 'cld7', 
-      day: 14,
-      dayWeek: 'Sat'
-   }
+   { id: 'cld6', day: 13, dayWeek: 'Fri' },
+   { id: 'cld7', day: 14, dayWeek: 'Sat' }
 ]
 
 interface CalendarProps {
@@ -74,7 +66,8 @@ export default ({ ableExpand }: CalendarProps): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      width: '100%'
+      width: hS(366), 
+      marginTop: vS(105)
    }, 
 
    date: {

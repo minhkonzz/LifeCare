@@ -1,9 +1,4 @@
-import { 
-   Text,
-   TouchableOpacity,
-   StyleSheet
-} from 'react-native'
-
+import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'

@@ -32,7 +32,7 @@ export default ({
    return (
       <View style={[styles.container, additionalStyles]}>
          <TextInput 
-            style={[styles.input, { textAlign: contentCentered && 'center' || 'left', paddingBottom }]}
+            style={{...styles.input, textAlign: contentCentered && 'center' || 'left', paddingBottom}}
             {...{ value, placeholder, onChangeText }} />
          <Text style={styles.symb}>{symb}</Text>         
       </View>

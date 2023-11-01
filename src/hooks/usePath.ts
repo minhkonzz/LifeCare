@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native'
 import { curveBasis, line } from 'd3-shape'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { parse } from 'react-native-redash'
-import { BOTTOMBAR_HEIGHT } from '@utils/constants/screen'
+import { BOTTOM_NAVIGATOR_HEIGHT } from '@utils/constants/screen'
 import { verticalScale as vS } from '@utils/responsive'
 
 const SCREEN_WIDTH: number = Dimensions.get('window').width
@@ -13,9 +13,9 @@ type GenerateTabShapePath = (
    adjustedHeight: number
 ) => string
 
-const NUM_TABS: number = 4
+const NUM_TABS: number = 5
 const SCALE: number = .7
-const TAB_BAR_HEIGHT: number = vS(BOTTOMBAR_HEIGHT)
+const TAB_BAR_HEIGHT: number = vS(BOTTOM_NAVIGATOR_HEIGHT)
 
 const generateTabShapePath: GenerateTabShapePath = (position, adjustedHeight) => {
     const adjustedWidth = SCREEN_WIDTH / NUM_TABS

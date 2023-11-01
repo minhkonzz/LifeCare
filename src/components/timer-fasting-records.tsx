@@ -1,3 +1,4 @@
+import { memo, useRef, useEffect } from 'react'
 import { View, Text, FlatList, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -7,12 +8,57 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 import fastingRecordsData from '@assets/data/timer-fasting-records.json'
 
-export default (): JSX.Element => {
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+
+export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+
+	useEffect(() => {
+		Animated.parallel([
+			Animated.timing(animateValue, {
+				toValue: isViewable && 1 || 0, 
+				duration: 1010, 
+				useNativeDriver: true
+			}), 
+			Animated.timing(progressAnimateValue, {
+				toValue: isViewable && 1 || 0, 
+				duration: 1010, 
+				delay: 500, 
+				useNativeDriver: false
+			})
+		]).start()
+	}, [isViewable])
+
 	return (
-		<View style={styles.container}>
+		isViewable && 
+		<Animated.View style={[styles.container, { opacity: animateValue }]}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Fasting records</Text>
-				<View style={[styles.hrz, { marginTop: vS(8) }]}>
+				<Animated.Text 
+					style={[
+						styles.title, 
+						{
+							opacity: animateValue, 
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [-50, 0]
+							}) }]
+						}
+					]}>
+					Fasting records
+				</Animated.Text>
+				<Animated.View style={[
+					styles.hrz, 
+					{ 
+						marginTop: vS(8), 
+						opacity: animateValue, 
+						transform: [{ translateY: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-30, 0]
+						}) }]
+					}
+				]}>
 					<View style={styles.hrz}>
 						<LinearGradient
 							style={styles.noteColor}
@@ -31,10 +77,10 @@ export default (): JSX.Element => {
 						/>
 						<Text style={styles.noteTitle}>Not completed</Text>
 					</View>
-				</View>
+				</Animated.View>
 			</View>
-			<FlatList
-				style={styles.records}
+			<Animated.FlatList
+				style={[styles.records, { opacity: animateValue }]}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				data={fastingRecordsData}
@@ -46,8 +92,16 @@ export default (): JSX.Element => {
 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}>
-							<LinearGradient
-								style={[styles.recProgValue, { height: `${item.hrs / 24 * 100}%` }]}
+							<AnimatedLinearGradient
+								style={[
+									styles.recProgValue, 
+									{ 
+										height: progressAnimateValue.interpolate({
+											inputRange: [0, 1], 
+											outputRange: ['0%', `${item.hrs / 24 * 100}%`]
+										}) 
+									}
+								]}
 								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 								start={{ x: .5, y: 0 }}
 								end={{ x: .5, y: 1 }} />
@@ -59,12 +113,12 @@ export default (): JSX.Element => {
 					</View>
 				)}
 			/>
-			<Pressable style={styles.timelineRef}>
+			<AnimatedPressable style={[styles.timelineRef, { opacity: animateValue }]}>
 				<Text style={styles.timelineText}>Timeline</Text>
-			</Pressable>
-		</View>
+			</AnimatedPressable>
+		</Animated.View> || <View style={styles.container} />
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {

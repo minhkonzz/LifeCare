@@ -13,7 +13,6 @@ import {
 } from 'react-native'
 import { PopupContext } from '../contexts/popup'
 import PopupProvider from '../contexts/popup'
-import PlanSelectionProvider from '../contexts/plan-selection'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
@@ -21,7 +20,6 @@ import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
 import plansData from '../assets/data/plans.json'
-import { PlanSelectionContext } from '../contexts/plan-selection'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -29,14 +27,12 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 type PlanCategorySectionProps = {
 	title: string,
 	description: string,
-	id: string,
 	items?: Array<any>
 }
 
 const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 	title,
 	description,
-	id,
 	items = []
 }) => {
 	return (
@@ -57,7 +53,7 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={item => item.id}
 				data={items}
-				renderItem={({ item }) => <DayPlanItem item={{ ...item, planCategoryId: id }} />} />
+				renderItem={({ item }) => <DayPlanItem {...{ item }} />} />
 		</View>
 	)
 }
@@ -66,7 +62,6 @@ const Plans = () => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
 	const [ tabIndexSelected, setTabIndexSelected ] = useState<number>(0)
 	const { popup: Popup, setPopup } = useContext(PopupContext)
-	const { planSelected, setPlanSelected } = useContext(PlanSelectionContext)
 
 	return (
 		<View style={[styles.container, { paddingBottom: bottomBarHeight }]}>
@@ -99,18 +94,15 @@ const Plans = () => {
 				<PlanCategorySection
 					title='Beginner'
 					description='Skip one meal each day'
-					id={plansData[0].id}
-					items={plansData[0].items.filter(e => e.group_name === 'Beginner')} />
+					items={plansData[0].items.filter(e => e.group_name === 'Beginner').map(e => ({ ...e, categoryName: plansData[0].name }))} />
 				<PlanCategorySection
 					title='Intermediate'
 					description='Eat only one meal each day'
-					id={plansData[0].id}
-					items={plansData[0].items.filter(e => e.group_name === 'Intermediate')} />
+					items={plansData[0].items.filter(e => e.group_name === 'Intermediate').map(e => ({ ...e, categoryName: plansData[0].name }))} />
 				<PlanCategorySection
 					title='Advance'
 					description='Keep fasting more than 20 hours'
-					id={plansData[0].id}
-					items={plansData[0].items.filter(e => e.group_name === 'Advance')} />
+					items={plansData[0].items.filter(e => e.group_name === 'Advance').map(e => ({ ...e, categoryName: plansData[0].name }))} />
 			</ScrollView>
 			{ Popup && <Popup setVisible={setPopup} /> }
 		</View>
@@ -119,11 +111,9 @@ const Plans = () => {
 
 export default (): JSX.Element => {
 	return (
-		<PlanSelectionProvider>
-			<PopupProvider>
-				<Plans />
-			</PopupProvider>
-		</PlanSelectionProvider>
+		<PopupProvider>
+			<Plans />
+		</PopupProvider>
 	)
 }
 

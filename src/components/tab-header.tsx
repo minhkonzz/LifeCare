@@ -10,7 +10,7 @@ interface TabHeaderProps {
 }
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
-	const navigation = useNavigation()
+	// const navigation = useNavigation()
 
 	return (
 		<View style={styles.container}>
@@ -26,7 +26,7 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 					tintColor='#91C8E4'
 					backgroundColor='#E3E3E3' />
 				<View style={styles.watercupInside}>
-					<Pressable onPress={() => navigation.navigate('water')}>
+					<Pressable>
 						<WaterCupIcon width={hS(14)} height={vS(19)} />
 					</Pressable>
 				</View>

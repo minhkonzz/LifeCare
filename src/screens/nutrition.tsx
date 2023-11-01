@@ -7,7 +7,6 @@ import {
 } from 'react-native' 
 import Screen from '@components/shared/screen'
 import Calendar from '@components/shared/calendar'
-import TabHeader from '@components/tab-header'
 import NutritionSwiper from '@components/nutrition-swiper'
 import NutritionEditor from '@components/nutrition-editor'
 import NutritionPersonalActivity from '@components/nutrition-personal-activity'
@@ -15,57 +14,62 @@ import NutritionPersonalMeal from '@components/nutrition-personal-meal'
 import nutritionPersonalActivityData from '@assets/data/nutrition-personal-activity.json'
 import LinearGradient from 'react-native-linear-gradient'
 import MealWarnSvg from '@assets/images/meal-warn.svg'
-
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import {  } from 'react-native-gesture-handler'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
+const Meals = () => {
+   return (
+      <NutritionEditor title='Meal' totalCalories={562} caloriesMethod='consumed'>
+         <NutritionPersonalMeal />
+         <LinearGradient 
+            style={styles.mealTips}
+            colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+            start={{ x: .5, y: 0 }}
+            end={{ x: .52, y: 1 }}>
+            <View>
+               <Text style={styles.mealTipsDesc}>Seem like pretty high on carb. Try to subtitute...</Text>
+               <TouchableOpacity
+                  style={styles.readMoreButton}
+                  activeOpacity={.8}
+                  onPress={() => {}}>
+                  <Text style={styles.readMoreButtonText}>Read more</Text>
+               </TouchableOpacity>
+            </View>
+            <MealWarnSvg style={styles.mealTipsSvg} width={hS(110)} height={vS(105)} />
+         </LinearGradient>
+      </NutritionEditor>
+   )
+}
+
+const Activities = () => {
+   return (
+      <NutritionEditor title='Activities' totalCalories={64} caloriesMethod='burned'>
+         <FlatList 
+            data={nutritionPersonalActivityData} 
+            showsVerticalScrollIndicator={false} 
+            keyExtractor={item => item.id.toString()} 
+            renderItem={({ item, index }) => 
+               <NutritionPersonalActivity 
+                  index={index}
+                  title={item.title}
+                  cals={item.calories} 
+                  METDesc={item.METDescription} 
+                  mins={item.mins} /> 
+            }/>
+      </NutritionEditor>
+   )
+}
+
 export default (): JSX.Element => {
    return (
-      <>
-         <Screen scroll paddingHorzContent>
-            <View style={styles.main}>
-               <Calendar />
-               <NutritionSwiper /> 
-               <NutritionEditor title='Meal' totalCalories={562} caloriesMethod='consumed'>
-                  <NutritionPersonalMeal />
-                  <LinearGradient 
-                     style={styles.mealTips}
-                     colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
-                     start={{ x: .5, y: 0 }}
-                     end={{ x: .52, y: 1 }}>
-                     <View>
-                        <Text style={styles.mealTipsDesc}>Seem like pretty high on carb. Try to subtitute...</Text>
-                        <TouchableOpacity
-                           style={styles.readMoreButton}
-                           activeOpacity={.8}
-                           onPress={() => {}}>
-                           <Text style={styles.readMoreButtonText}>Read more</Text>
-                        </TouchableOpacity>
-                     </View>
-                     <MealWarnSvg style={styles.mealTipsSvg} width={hS(110)} height={vS(105)} />
-                  </LinearGradient>
-               </NutritionEditor>
-               <NutritionEditor title='Activities' totalCalories={64} caloriesMethod='burned'>
-                  <FlatList 
-                     data={nutritionPersonalActivityData} 
-                     showsVerticalScrollIndicator={false} 
-                     keyExtractor={item => item.id.toString()} 
-                     renderItem={({ item, index }) => 
-                        <NutritionPersonalActivity 
-                           index={index}
-                           title={item.title}
-                           cals={item.calories} 
-                           METDesc={item.METDescription} 
-                           mins={item.mins} /> 
-                     }/>
-               </NutritionEditor>
-            </View>
-         </Screen>
-         <TabHeader title='Nutrition' />
-      </>
+      <Screen paddingHorzContent header='tab' title='Nutrition' content={[
+         Calendar, 
+         NutritionSwiper, 
+         Meals,
+         Activities
+      ]}/>
    )
 }
 

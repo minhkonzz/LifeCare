@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react
 import SettingIcon from '@assets/icons/setting.svg'
 import LogoutIcon from '@assets/icons/logout-red.svg'
 import ClockIcon from '@assets/icons/clock.svg'
+import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
@@ -54,7 +55,7 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 	return (
 		isViewable &&
 		<AnimatedLinearGradient
-			style={[styles.horz, styles.upgradePlan, { opacity: animateValue }]}
+			style={{...styles.horz, ...styles.upgradePlan, opacity: animateValue }}
 			colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
 			start={{ x: .5, y: 0 }}
 			end={{ x: .5, y: 1 }}>
@@ -85,6 +86,7 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 
 const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const navigation = useNavigation()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -96,22 +98,25 @@ const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 	return (
 		isViewable && 
-		<Animated.View style={{
-			opacity: animateValue,
-			transform: [{ translateX: animateValue.interpolate({
-				inputRange: [0, 1], 
-				outputRange: [-150, 0]
-			}) }]
-		}}>
+		<AnimatedTouchableOpacity 
+			style={{
+				opacity: animateValue,
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-100, 0]
+				}) }]
+			}}
+			onPress={() => navigation.navigate('timeline')}>
 			<ProfileRedirect title='Timeline'>
 				<ClockIcon width={hS(19)} height={vS(19)} />
 			</ProfileRedirect>
-		</Animated.View> || <View style={styles.redirect} />
+		</AnimatedTouchableOpacity> || <View style={styles.redirect} />
 	)
 })
 
 const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const navigation = useNavigation()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -124,17 +129,19 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 	return (
 		isViewable && 
-		<Animated.View style={{
-			opacity: animateValue,
-			transform: [{ translateX: animateValue.interpolate({
-				inputRange: [0, 1], 
-				outputRange: [-150, 0]
-			}) }]
-		}}>
+		<AnimatedTouchableOpacity 
+			style={{
+				opacity: animateValue,
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-100, 0]
+				}) }]
+			}}
+			onPress={() => navigation.navigate('setting')}>
 			<ProfileRedirect title='Setting'>
 				<SettingIcon width={hS(20)} height={vS(20)} />
 			</ProfileRedirect>
-		</Animated.View> || <View style={styles.redirect} />
+		</AnimatedTouchableOpacity> || <View style={styles.redirect} />
 	)
 })
 

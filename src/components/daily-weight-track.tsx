@@ -1,4 +1,12 @@
-import { memo, useEffect, useRef } from 'react'
+import { 
+   memo, 
+   ReactNode,
+   Dispatch, 
+   SetStateAction,
+   useEffect, 
+   useRef, 
+   useContext
+} from 'react'
 import {
    View, 
    Text,
@@ -10,6 +18,9 @@ import {
 import BackIcon from '@assets/icons/goback.svg'
 import EditIcon from '@assets/icons/edit.svg'
 import LinearGradient from 'react-native-linear-gradient'
+import UpdateWeightsPopup from '@components/shared/popup-content/weights'
+import { useNavigation } from '@react-navigation/native'
+import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
@@ -18,6 +29,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+   const { setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
+   const navigation = useNavigation()
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -81,7 +94,8 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                            outputRange: [100, 0]
                         }) }]
                      }
-                  ]}>
+                  ]}
+                  onPress={() => setPopup(UpdateWeightsPopup)}>
 						<EditIcon width={hS(16)} height={vS(16)} />
 					</AnimatedPressable>
 				</View>
@@ -132,7 +146,8 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         outputRange: [-150, 0]
                      }) }]
                   }
-               ]}>
+               ]}
+               onPress={() => navigation.navigate('body-measures')}>
 					<LinearGradient
 						style={styles.bodyMeasureRefWrapper}
 						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}

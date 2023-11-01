@@ -1,4 +1,12 @@
-import { memo, useEffect, useRef } from 'react'
+import { 
+	memo, 
+	ReactNode,
+	Dispatch, 
+	SetStateAction,  
+	useEffect, 
+	useRef, 
+	useContext 
+} from 'react'
 import {
 	View,
 	Text,
@@ -8,10 +16,11 @@ import {
 	Pressable,
 	TouchableOpacity
 } from 'react-native'
-
 import Screen from '@components/shared/screen'
 import LinearGradient from 'react-native-linear-gradient'
 import DailyFastingState from '@components/daily-fasting-state'
+import PopupProvider, { PopupContext } from '@contexts/popup'
+import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import MoonIcon from '@assets/icons/moon.svg'
@@ -91,6 +100,7 @@ const Header = memo(({ isViewable }: { isViewable: boolean }) => {
 
 const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const navigation = useNavigation()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -102,7 +112,9 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 
 	return (
 		isViewable && 
-		<AnimatedPressable style={[styles.chatbotAdvertise, { opacity: animateValue }]}>
+		<AnimatedPressable 
+			style={[styles.chatbotAdvertise, { opacity: animateValue }]}
+			onPress={() => navigation.navigate('fastai-overview')}>
 			<LinearGradient 
 				style={styles.chatbotAdvertiseBg}
 				colors={[lightHex, darkHex]}
@@ -138,7 +150,10 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 					</TouchableOpacity>
 				</View>
 				<View style={{ flexDirection: 'row' }}>
-					<Image source={require('../assets/lottie/FastAIBotInterface.gif')} style={styles.animatedChatbotInterface}/>
+					<Image 
+						source={require('../assets/lottie/FastAIBotInterface.gif')} 
+						style={styles.animatedChatbotInterface}
+					/>
 					<Text style={styles.gptRef}>Powered by GPT3.5</Text>
 				</View>
 			</LinearGradient>
@@ -156,18 +171,34 @@ const RowMetrics = ({ isViewable }: { isViewable: boolean }) => {
 	)
 }
 
+const Main = memo(() => {
+	const { popup: Popup, setPopup } = useContext(PopupContext)
+	return (
+		<>
+			<Screen paddingHorzContent content={[
+				Header,
+				DailyFastingState,
+				RowMetrics,
+				NutritionTrack,
+				WeightTrack,
+				ChatBotAdvertise
+			]} />
+			{ Popup && <Popup setVisible={setPopup} /> }
+		</>
+	)
+})
+
 export default (): JSX.Element => (
-	<Screen paddingHorzContent content={[
-		Header,
-		DailyFastingState,
-		RowMetrics,
-		NutritionTrack,
-		WeightTrack,
-		ChatBotAdvertise
-	]} />
+	<View style={styles.container}>
+		<PopupProvider>
+			<Main />
+		</PopupProvider>
+	</View>
 )
 
 const styles = StyleSheet.create({
+	container: { flex: 1 },
+
 	metricRow: {
 		width: hS(370),
 		height: vS(161),

@@ -8,10 +8,11 @@ import {
 } from 'react-native'
 import TabHeader from '@components/tab-header'
 import StackHeader from './stack-header'
-import { BOTTOMBAR_HEIGHT } from '@utils/constants/screen'
+import { BOTTOM_NAVIGATOR_HEIGHT } from '@utils/constants/screen'
+import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
-interface Props {
+interface PopupProps {
    content: Array<any>
    paddingHorzContent?: boolean
    full?: boolean
@@ -32,9 +33,9 @@ export default ({
    additionalStyles, 
    header,
    title
-}: Props): JSX.Element => {
+}: PopupProps): JSX.Element => {
    const [ visibleIndexes, setVisibleIndexes ] = useState<Array<number>>([])
-   const bottomIndicatorStyles = { marginBottom: vS(27) + (full ? 0 : BOTTOMBAR_HEIGHT) }
+   const bottomBarHeight: number = useDeviceBottomBarHeight()
 
    const onViewableItemsChanged = useCallback((info) => {
       const indexes = info.viewableItems.map(e => e.index)
@@ -47,7 +48,13 @@ export default ({
       <View style={styles.container}>
          <FlatList 
             style={styles.wrapper}
-            contentContainerStyle={[styles.content, additionalStyles]}
+            contentContainerStyle={[
+               styles.content, 
+               additionalStyles, 
+               { 
+                  paddingBottom: vS(27) + bottomBarHeight + (full ? 0 : vS(BOTTOM_NAVIGATOR_HEIGHT)) 
+               }
+            ]}
             {...{ onViewableItemsChanged }}
             data={Array.from({ length: content.length }).fill(1)} 
             showsVerticalScrollIndicator={false} 
@@ -55,7 +62,6 @@ export default ({
                const RenderItem = content[index]
                return <RenderItem {...{ isViewable: visibleIndexes.includes(index) }} />
             }}/>
-         <View style={bottomIndicatorStyles} />
          { Header && <Header title={title} /> }
       </View>
    )

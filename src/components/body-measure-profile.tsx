@@ -5,7 +5,7 @@ import {
    TouchableOpacity,
    StyleSheet
 } from 'react-native'
-
+import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
@@ -35,6 +35,7 @@ const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
 }
 
 export default (): JSX.Element => {
+   const navigation = useNavigation()
    return (
       <LinearGradient
          style={styles.container}
@@ -43,7 +44,10 @@ export default (): JSX.Element => {
          end={{ x: .52, y: .5 }}>
          <View style={[styles.horz, styles.header]}>
             <Text style={styles.title}>Body measurement</Text>
-            <TouchableOpacity style={styles.editButton} activeOpacity={.8} onPress={() => {}}>
+            <TouchableOpacity 
+               style={styles.editButton} 
+               activeOpacity={.8} 
+               onPress={() => navigation.navigate('body-measures')}>
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>

@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Text } from 'react-native'
+import { AnimatedNumberProps } from '@utils/interfaces'
 
-interface AnimatedNumberProps {
-   value: number, 
-   style?: any
-}
-
-export default ({ value, style }: AnimatedNumberProps) => {
+export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
    const [number, setNumber] = useState<number>(value > 1000 ? value - 50 : 0)
 
    useEffect(() => {
@@ -15,9 +11,7 @@ export default ({ value, style }: AnimatedNumberProps) => {
       }, .5)
   
       if (number === value) clearInterval(interval)
-  
-      return () => clearInterval(interval)
-    }, [number])
+    }, [number, value])
 
    return <Text {...{ style }}>{number}</Text>
 }

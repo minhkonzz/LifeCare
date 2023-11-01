@@ -1,4 +1,4 @@
-import { memo, ReactNode, SetStateAction, useRef, Dispatch, useContext } from 'react'
+import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
 import {
    View, 
    Text,
@@ -9,9 +9,8 @@ import {
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
-import { PlanSelectionContext } from '@contexts/plan-selection'
 import { useDispatch } from 'react-redux'
-import { updateNewPlan } from '../../../store/fasting'
+import { updateCurrentPlan, updateNewPlan } from '../../../store/fasting'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -21,7 +20,7 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
    const navigation = useNavigation()
    const dispatch = useDispatch()
-   const { planSelected } = useContext(PlanSelectionContext)
+
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = (isAllowed: boolean) => {
@@ -30,9 +29,14 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          duration: 300, 
          useNativeDriver: true
       }).start(({ finished }) => {
-         dispatch(updateNewPlan(planSelected))
-         navigation.navigate(isAllowed && 'day-plan' || 'main')
+         const targetRoute = isAllowed && 'day-plan' || 'main'
+         if (targetRoute === 'main') dispatch(updateCurrentPlan())
+         navigation.navigate(targetRoute)
       })
+   }
+
+   const onSelfClose = () => {
+      dispatch(updateNewPlan(null))
    }
 
    return (
@@ -41,7 +45,8 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          title: 'Confirm',
          width: hS(300), 
          animateValue, 
-         setVisible 
+         setVisible, 
+         onSelfClose
       }}>
          <Text style={styles.content}>Do you want to start fasting now with new plan?</Text>
          <View style={[styles.buttons, styles.horz]}>

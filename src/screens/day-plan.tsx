@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react'
+import { Dispatch, SetStateAction, useState, useEffect, useRef, memo } from 'react'
 import {
 	View,
 	Text,
@@ -9,12 +9,15 @@ import {
 	Animated,
 	ScrollView
 } from 'react-native'
-import { getTimeStamp } from '@utils/datetimes'
+import { useNavigation } from '@react-navigation/native'
+import { updateTimes, updateCurrentPlan, resetTimes } from '../store/fasting'
+import { toDateTimeV1, getCurrentTimestamp } from '@utils/datetimes'
 import { AppState } from '../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import DateTimePopup from '@components/shared/popup-content/datetime'
 import DayPlanItem from '@components/day-plan-item'
 import Button from '@components/shared/button/Button'
 import BackIcon from '@assets/icons/goback.svg'
@@ -24,38 +27,52 @@ import RestaurantIcon from '@assets/icons/restaurant.svg'
 import ElectroIcon from '@assets/icons/electro.svg'
 import LightIcon from '@assets/icons/light.svg'
 import LinearGradient from 'react-native-linear-gradient'
-import plansData from '@assets/data/plans.json'
-import { updateStartTime } from 'src/store/fasting'
 
 const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-const TimeSetting = () => {
+const TimeSetting = ({ 
+	setVisible, 
+	startTime, 
+	endTime,
+	hrsFast,
+	hrsEat
+}: { 
+	setVisible: Dispatch<SetStateAction<boolean>>, 
+	startTime: string, 
+	endTime: string,
+	hrsFast: number,
+	hrsEat: number
+}) => {
+
+	useEffect(() => {
+		console.log('render TimeSetting Firsttime')
+	}, [])
+
 	return (
 		<View style={styles.fastingTimes}>
-			<View style={{
-				marginBottom: vS(22),
-				alignSelf: 'flex-start'
-			}}>
+			<View style={styles.fastingTimesHeader}>
 				<View style={styles.horz}>
 					<ElectroIcon width={hS(10)} height={vS(12.5)} />
-					<Text style={styles.hrsDesc}>14 hours fasting</Text>
+					<Text style={styles.hrsDesc}>{`${hrsFast} hours for fasting`}</Text>
 				</View>
 				<View style={[styles.horz, { marginTop: vS(12) }]}>
 					<RestaurantIcon width={hS(11)} height={vS(11)} />
-					<Text style={styles.hrsDesc}>10 hours eating period</Text>
+					<Text style={styles.hrsDesc}>{`${hrsEat} hours for eating`}</Text>
 				</View>
 			</View>
-			<View style={{ width: '100%' }}>
+			<View style={styles.wfull}>
 				<View style={[styles.horz, styles.timeSetting]}>
 					<View style={styles.horz}>
 						<View style={[styles.timeSettingDecor, { backgroundColor: primaryHex }]} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
 					<View style={styles.horz}>
-						<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
-						<EditPrimary width={hS(16)} height={vS(16)} />
+						<Text style={styles.timeSettingValueText}>{startTime}</Text>
+						<Pressable onPress={() => setVisible(true)}>
+							<EditPrimary width={hS(16)} height={vS(16)} />
+						</Pressable>
 					</View>
 				</View>
 				<View style={[styles.horz, styles.timeSetting, { marginTop: vS(28) }]}>
@@ -64,7 +81,7 @@ const TimeSetting = () => {
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
 					<View style={styles.horz}>
-						<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
+						<Text style={styles.timeSettingValueText}>{endTime}</Text>
 						<EditPrimary width={hS(16)} height={vS(16)} />
 					</View>
 				</View>
@@ -74,11 +91,33 @@ const TimeSetting = () => {
 	)
 }
 
-const Content = memo(() => {
+const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
+	console.log('render Content component')
 	const dispatch = useDispatch()
-	const { planCategoryId, planId } = useSelector((state: AppState) => state.fasting)
+	const navigation = useNavigation()
+	const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
+	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
+	const { hrsFast, hrsEat } = newPlan
+	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
+	const endTimeStamp = _startTimeStamp + hrsFast * 60 * 60 * 1000
+
+	useEffect(() => {
+		dispatch(resetTimes())
+		setIsFirstRender(false)
+	}, [])
+
+	const onStartFasting = () => {
+		dispatch(updateCurrentPlan())
+		// dispatch(updateTimes({ 
+		// 	_start: startTimeStamp,
+		// 	_end: endTimeStamp
+		// }))
+		// navigation.navigate('main')
+		console.log(toDateTimeV1(startTimeStamp), toDateTimeV1(endTimeStamp))
+	}
 
 	return (
+		!isFirstRender &&
 		<View style={styles.main}>
 			<LinearGradient
 				style={styles.primeDecor}
@@ -87,8 +126,14 @@ const Content = memo(() => {
 				end={{ x: .5, y: 1 }}
 			/>
 			<View style={styles.mainContent}>
-				<Text style={styles.planNameTitle}>14-10</Text>
-				<TimeSetting />
+				<Text style={styles.planNameTitle}>{newPlan.name}</Text>
+				<TimeSetting {...{ 
+					setVisible, 
+					startTime: toDateTimeV1(_startTimeStamp), 
+					endTime: toDateTimeV1(endTimeStamp),
+					hrsFast, 
+					hrsEat
+				}} />
 				<LinearGradient
 					style={styles.notes}
 					colors={[`rgba(${lightRgb.join(', ')}, .3)`, lightHex]}
@@ -96,7 +141,7 @@ const Content = memo(() => {
 					end={{ x: .52, y: .5 }}>
 					<View style={[styles.horz, { marginBottom: vS(5) }]}>
 						<LightIcon width={hS(12)} height={vS(16.5)} />
-						<Text style={styles.notesTitle}>BEFORE FASTING</Text>
+						<Text style={styles.notesTitle}>PREPARE FOR FASTING</Text>
 					</View>
 					{
 						[
@@ -116,15 +161,17 @@ const Content = memo(() => {
 					title='Start fasting' 
 					bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
 					size='large' 
-					onPress={() => dispatch(updateStartTime(getTimeStamp()))} />
+					onPress={onStartFasting} />
 			</View>
-		</View>
+		</View> || <></>
 	)
 })
 
 export default (): JSX.Element => {
+	const dispatch = useDispatch()
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
 	const [headerStyles, setHeaderStyles] = useState<string>('')
+	const [ visible, setVisible ] = useState<boolean>(false)
 	const headerColor = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	useEffect(() => {
@@ -139,7 +186,7 @@ export default (): JSX.Element => {
 		}).start()
 	}
 
-	const handleScroll = event => {
+	const handleScroll = (event: any) => {
 		const scrolledY = event.nativeEvent.contentOffset.y
 		if (scrolledY > 0) {
 			setHeaderStyles(JSON.stringify({
@@ -151,6 +198,14 @@ export default (): JSX.Element => {
 		setHeaderStyles('')
 	}
 
+	const onConfirm = (timestamp: number) => {
+		dispatch(updateTimes({
+			_start: timestamp, 
+			_end: 0
+		}))
+		setVisible(false)
+	}
+
 	const GoBackIcon = headerStyles && BackIcon || WhiteBackIcon
 
 	return (
@@ -158,7 +213,7 @@ export default (): JSX.Element => {
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				onScroll={handleScroll}>
-				<Content />
+				<Content {...{ setVisible }} />
 			</ScrollView>
 			<Animated.View
 				style={[
@@ -178,6 +233,7 @@ export default (): JSX.Element => {
 				<Text style={[styles.headerTitle, { color: headerStyles && darkHex || '#fff' }]}>1 day plan</Text>
 				<View />
 			</Animated.View>
+			{ visible && <DateTimePopup {...{ setVisible, onConfirm }} /> }
 		</View>
 	)
 }
@@ -187,6 +243,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#fff',
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
+	},
+
+	wfull: {
+		width: '100%'
 	},
 
 	horz: {
@@ -212,7 +272,6 @@ const styles = StyleSheet.create({
 
 	main: {
 		paddingTop: vS(64),
-		height: 600,
 		alignItems: 'center'
 	},
 
@@ -244,7 +303,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: hS(20),
 		paddingVertical: vS(12),
 		borderRadius: hS(32),
-		marginTop: vS(32),
+		marginTop: vS(32), 
+		marginBottom: vS(32),
 		alignItems: 'center'
 	},
 
@@ -290,6 +350,11 @@ const styles = StyleSheet.create({
 		elevation: 4,
 		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
 		borderRadius: hS(32)
+	},
+
+	fastingTimesHeader: {
+		marginBottom: vS(22),
+		alignSelf: 'flex-start'
 	},
 
 	planName: {

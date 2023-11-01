@@ -1,19 +1,21 @@
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import {
 	Animated,
 	ListRenderItemInfo,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	StyleSheet,
-	Text,
-	View,
+	Text
 } from 'react-native'
 
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS } from '@utils/responsive'
 import { WheelPickerProps } from '@utils/interfaces'
 
-export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Element => {
+let valueScrolledTo: string | number = -1
+
+export default memo(({ items, itemHeight, fs, onIndexChange }: WheelPickerProps): JSX.Element => {
+
 	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	const momentumScrollEnd = (
@@ -21,8 +23,12 @@ export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Ele
 	) => {
 		const y = event.nativeEvent.contentOffset.y
 		const index = Math.round(y / itemHeight)
-		console.log('item:', items[index])
-		if (onIndexChange) onIndexChange(index)
+		const value = items[index]
+		if (onIndexChange && valueScrolledTo !== value) {
+			valueScrolledTo = value
+			onIndexChange(index)
+			console.log('value scrolled to:', valueScrolledTo)
+		}
 	}
 
 	function WheelPickerItem({ item, index }: ListRenderItemInfo<string>) {
@@ -57,15 +63,15 @@ export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Ele
 					styles.pickerItem,
 					{ opacity, height: itemHeight, transform: [{ scale }, { rotateX }] }
 				]}>
-				<Text style={styles.pickerItemText}>{item}</Text>
+				<Text style={[styles.pickerItemText, { fontSize: fs }]}>{item}</Text>
 			</Animated.View>
 		)
 	}
 
 	return (
 		<Animated.FlatList
-			style={styles.container}
-			data={['', '', ...items, '']}
+			style={[styles.container, { height: itemHeight * 5 }]}
+			data={['', '', ...items, '', '']}
 			renderItem={({ item, index }) => <WheelPickerItem {...{ item, index }} />}
 			showsVerticalScrollIndicator={false}
 			snapToInterval={itemHeight}
@@ -73,7 +79,7 @@ export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Ele
 			scrollEventThrottle={16}
 			onScroll={Animated.event(
 				[{ nativeEvent: { contentOffset: { y: scrollY } } }],
-				{ useNativeDriver: false },
+				{ useNativeDriver: true },
 			)}
 			getItemLayout={(_, index) => ({
 				length: itemHeight,
@@ -82,12 +88,11 @@ export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Ele
 			})}
 		/>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {
 		width: '100%',
-		height: '100%',
 		position: 'absolute'
 	}, 
 
@@ -97,7 +102,6 @@ const styles = StyleSheet.create({
 	},
 
 	pickerItemText: {
-		fontSize: hS(36),
 		fontFamily: 'Poppins-Medium',
 		textAlign: 'center',
 		textAlignVertical: 'center',

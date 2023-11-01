@@ -1,17 +1,19 @@
-import { useEffect, useState, useRef } from 'react'
+import { ReactNode, Dispatch, SetStateAction, useEffect, useState, useRef, useContext } from 'react'
 import { 
    View, 
    Text, 
+	Pressable,
    StyleSheet, 
 	Animated
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
+import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
+import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 export default (): JSX.Element => {
@@ -19,6 +21,7 @@ export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const titleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const rangeAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
 
 	useEffect(() => {
 		Animated.parallel([
@@ -41,57 +44,59 @@ export default (): JSX.Element => {
 	}, [])
 
    return (
-      <AnimatedLinearGradient
-         style={[styles.container, { opacity: animateValue }]}
-         colors={[`rgb(229, 244, 231)`, `rgba(229, 244, 231, .4)`]}
-         start={{ x: .5, y: 0 }}
-			end={{ x: .5, y: 1 }}>
-         <Animated.Text style={[
-				styles.title, 
+		<Pressable onPress={() => setPopup(UpdateBMIPopup)}>
+			<AnimatedLinearGradient
+				style={[styles.container, { opacity: animateValue }]}
+				colors={[`rgb(229, 244, 231)`, `rgba(229, 244, 231, .4)`]}
+				start={{ x: .5, y: 0 }}
+				end={{ x: .5, y: 1 }}>
+				<Animated.Text style={[
+					styles.title, 
+					{
+						transform: [{ translateX: titleAnimateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-100, 0]
+						}) }]
+					}
+				]}>
+					Lastest BMI
+				</Animated.Text>
+				<Animated.View style={{ opacity: rangeAnimateValue }}>
+					<View style={styles.value}>
+						<Text style={styles.valueNumber}>{bmiValue}</Text>
+						<Text style={styles.valueSymbol}>kg/m2</Text>
+					</View>
+					<Text style={styles.status}>Overweight</Text>
+				</Animated.View>
+				<Animated.View style={[
+					styles.rangeColors, 
+					{ 
+						height: rangeAnimateValue.interpolate({
+							inputRange: [0, 1] ,
+							outputRange: [0, vS(48)]
+						})	
+					}
+				]}>
 				{
-					transform: [{ translateX: titleAnimateValue.interpolate({
-						inputRange: [0, 1], 
-						outputRange: [-100, 0]
-					}) }]
+					bmiRangesData.map((e, i) => {
+						return (
+							<LinearGradient
+								key={`${e.id}-${i}`}
+								style={{
+									width: `${(e.max - e.min + (i > 2 ? -0.5 : i === 1 ? 1.8 : 1)) / 24 * 87}%`,
+									height: (bmiValue <= e.max && bmiValue >= e.min ? vS(48) : vS(11)),
+									borderRadius: 100
+								}}
+								colors={e.color}
+								start={{ x: .5, y: 0 }}
+								end={{ x: .5, y: 1 }}
+							/>
+						)
+					})
 				}
-			]}>
-				Lastest BMI
-			</Animated.Text>
-         <Animated.View style={{ opacity: rangeAnimateValue }}>
-            <View style={styles.value}>
-               <Text style={styles.valueNumber}>{bmiValue}</Text>
-               <Text style={styles.valueSymbol}>kg/m2</Text>
-            </View>
-            <Text style={styles.status}>Overweight</Text>
-         </Animated.View>
-         <Animated.View style={[
-				styles.rangeColors, 
-				{ 
-					height: rangeAnimateValue.interpolate({
-						inputRange: [0, 1] ,
-						outputRange: [0, vS(48)]
-					})	
-				}
-			]}>
-			{
-				bmiRangesData.map((e, i) => {
-					return (
-						<LinearGradient
-							key={`${e.id}-${i}`}
-							style={{
-								width: `${(e.max - e.min + (i > 2 ? -0.5 : i === 1 ? 1.8 : 1)) / 24 * 87}%`,
-								height: (bmiValue <= e.max && bmiValue >= e.min ? vS(48) : vS(11)),
-								borderRadius: 100
-							}}
-							colors={e.color}
-							start={{ x: .5, y: 0 }}
-							end={{ x: .5, y: 1 }}
-						/>
-					)
-				})
-			}
-			</Animated.View>
-      </AnimatedLinearGradient>
+				</Animated.View>
+			</AnimatedLinearGradient>
+		</Pressable>
    )
 }
 

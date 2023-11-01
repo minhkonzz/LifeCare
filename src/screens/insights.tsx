@@ -1,14 +1,45 @@
+import { View, StyleSheet, FlatList, Platform, StatusBar } from 'react-native'
+import { verticalScale as vS } from '@utils/responsive'
+import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import { BOTTOM_NAVIGATOR_HEIGHT } from '@utils/constants/screen'
+import TabHeader from '@components/tab-header'
 import InsightCategory from '@components/insight-category'
 import FeedBackReference from '@components/feedback-reference'
-import TabHeader from '@components/tab-header'
-import Screen from '@components/shared/screen'
+import { insights } from '@assets/data/insights'
 
 export default (): JSX.Element => {
+   const bottomBarHeight: number = useDeviceBottomBarHeight()
+
    return (
-      <Screen paddingHorzContent>
-         <InsightCategory />
-         <FeedBackReference />
+      <View style={styles.container}>
+         <FlatList 
+            data={[]}
+            contentContainerStyle={{ 
+               paddingTop: vS(105),
+               paddingBottom: vS(27) + bottomBarHeight + vS(BOTTOM_NAVIGATOR_HEIGHT) 
+            }}
+            showsVerticalScrollIndicator={false}
+            renderItem={null} 
+            ListHeaderComponent={
+               <> 
+                  { 
+                     insights.map((e, i) => 
+                        <InsightCategory key={`${e.id}-${i}`} {...{ item: e, index: i }} />
+                     ) 
+                  }
+                  <FeedBackReference />
+               </>
+            } />
          <TabHeader title='Insights for you' />
-      </Screen>
+      </View>
    )
 }
+
+const styles = StyleSheet.create({
+   container: {
+      flex: 1,
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
+   }
+})
