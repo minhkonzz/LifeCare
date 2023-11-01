@@ -1,4 +1,14 @@
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import StackHeader from '@components/shared/stack-header'
+import SettingRow from '@components/setting-row'
+import settingLayoutData from '@assets/data/setting-layout.json'
+import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
+import GenderPopup from '@components/shared/popup-content/radio-options'
+import LanguagePopup from '@components/shared/popup-content/radio-options'
+
 import {
 	View,
 	Text,
@@ -8,28 +18,35 @@ import {
 	Animated
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import StackHeader from '@components/shared/stack-header'
-import SettingRow from '@components/setting-row'
-import settingLayoutData from '@assets/data/setting-layout.json'
-
-const darkPrimary: any = {
-	hex: Colors.darkPrimary.hex,
-	rgb: `${Colors.darkPrimary.rgb.join(', ')}`
-}
-
+const { hex: darkHex } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
+const settingRowCallbacks = {}
 
 export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const navigation = useNavigation()
+	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
+	const [ genderPopupVisible, setGenderPopupVisible ] = useState<boolean>(false)
+	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1, 
-			duration: 1000, 
+			duration: 920, 
 			useNativeDriver: true
-		}).start()
+		}).start(({ finished }) => {
+			settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
+			settingRowCallbacks['meal-time'] = () => {}
+			settingRowCallbacks['notification'] = () => {}
+			settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
+			settingRowCallbacks['widgets'] = () => {}
+			settingRowCallbacks['language'] = () => { setLangPopupVisible(true) }
+			settingRowCallbacks['dark-mode'] = () => {}
+			settingRowCallbacks['sync-google-fit'] = () => {}
+			settingRowCallbacks['privacy-policy'] = () => {}
+			settingRowCallbacks['rate-us'] = () => {}
+			settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
+		})
 	}, [])
 
 	return (
@@ -57,7 +74,13 @@ export default (): JSX.Element => {
 							showsVerticalScrollIndicator={false}
 							data={settingLayoutData[e]}
 							keyExtractor={item => item.id}
-							renderItem={({ item, index }) => <SettingRow title={item.title} type={item.type} value={item.value ?? false} />}
+							renderItem={({ item, index }) => 
+								<SettingRow 
+									title={item.title} 
+									type={item.type} 
+									value={item.value ?? false} 
+									onPress={settingRowCallbacks[index]} />
+							}
 						/>
 					</View>
 				))
@@ -92,6 +115,9 @@ export default (): JSX.Element => {
 					<Text style={styles.rewipeDataButtonText}>Rewipe all data</Text>
 				</AnimatedTouchableOpacity>
 			</View>
+			{ rewipeDataPopupVisible && <RewipeDataWarnPopup setVisible={setRewipeDataPopupVisible} /> }
+			{ genderPopupVisible && <GenderPopup setVisible={setGenderPopupVisible} options={['Male', 'Female']} /> }
+			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)
 }
@@ -109,20 +135,18 @@ const styles = StyleSheet.create({
 	settingSectionTitle: {
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(16),
-		color: darkPrimary
+		color: darkHex
 	},
 
 	versionText: {
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
-		color: darkPrimary,
+		color: darkHex,
 		letterSpacing: .2,
 		marginBottom: vS(8)
 	},
 
-	bottom: {
-		alignItems: 'center'
-	},
+	bottom: { alignItems: 'center' },
 
 	rewipeDataButton: {
 		width: hS(365),

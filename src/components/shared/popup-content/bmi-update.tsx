@@ -7,7 +7,6 @@ import {
    SetStateAction 
 } from 'react'
 import {
-   View, 
    Text,
    TouchableOpacity,
    Animated,

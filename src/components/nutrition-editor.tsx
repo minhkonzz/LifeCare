@@ -41,7 +41,7 @@ export default ({ title, totalCalories, caloriesMethod, children }: NutritionEdi
                   <Text style={styles.caloriesMethod}>{caloriesMethod}</Text>
                </View>  
             </View>
-            <TouchableOpacity activeOpacity={.7} onPress={() => {}}>
+            <TouchableOpacity activeOpacity={.7} onPress={onAdd}>
                <LinearGradient
                   style={styles.addButton}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
