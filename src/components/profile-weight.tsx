@@ -1,21 +1,18 @@
-import { memo, useEffect, useRef } from 'react'
-import {
-   View, 
-   Text, 
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
-
+import { memo, useContext } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { PopupContext } from '@contexts/popup'
+import UpdateWeightsPopup from '@components/shared/popup-content/weights'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback.svg'
 import EditIcon from '@assets/icons/edit.svg'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+   const { setPopup } = useContext<any>(PopupContext)
+
    return (
       isViewable && 
       <LinearGradient
@@ -28,13 +25,15 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                <Text style={styles.title}>Weight</Text>
                <TouchableOpacity
                   activeOpacity={.8} 
-                  style={[styles.horz, styles.symb]}
-                  onPress={() => {}}>
+                  style={[styles.horz, styles.symb]}>
                   <Text style={styles.symbTitle}>lb</Text>
                   <BackIcon style={styles.symbIndicator} width={hS(5)} height={vS(8.5)} />
                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.editButton} activeOpacity={.8} onPress={() => {}}>
+            <TouchableOpacity 
+               style={styles.editButton} 
+               activeOpacity={.8} 
+               onPress={() => setPopup(UpdateWeightsPopup)}>
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>

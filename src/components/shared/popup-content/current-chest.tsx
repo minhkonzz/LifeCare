@@ -1,7 +1,6 @@
 import { 
    memo, 
    useState, 
-   ReactNode, 
    Dispatch, 
    useRef, 
    SetStateAction 
@@ -21,10 +20,8 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }) => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const [ currentWeight, setCurrentWeight ] = useState<number>(0)
-   const [ goalWeight, setGoalWeight ] = useState<number>(0)
+const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
+   const [ currentChest, setCurrentChest ] = useState<number>(0)
 
    const onSave = () => {
       Animated.timing(animateValue, {
@@ -35,22 +32,14 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
    }
 
    return (
-      <Popup {...{
-         type: 'centered', 
-         with: hS(315),
-         title: 'Weight', 
-         animateValue,
-         setVisible
-      }}>
+      <>
          <PrimaryToggleValue />
          <MeasureInput 
-            symb='kg' 
-            value={currentWeight}
-            placeholder='Current weight' />
-         <MeasureInput 
-            symb='kg' 
-            value={goalWeight} 
-            placeholder='Goal weight' />
+            contentCentered
+            symb='cm' 
+            value={currentChest} 
+            onChangeText={t => setCurrentChest(+t)} 
+            additionalStyles={styles.input} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}
@@ -63,6 +52,22 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
                <Text style={styles.buttonText}>Save</Text>
             </LinearGradient>
          </TouchableOpacity>
+      </>
+   )
+}
+
+export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+
+   return (
+      <Popup {...{
+         type: 'centered', 
+         width: hS(315),
+         title: 'Current chest', 
+         animateValue,
+         setVisible
+      }}>
+         <Main {...{ animateValue }} />
       </Popup>
    )
 })
@@ -88,5 +93,10 @@ const styles = StyleSheet.create({
       fontSize: hS(14), 
       color: '#fff', 
       letterSpacing: .2
+   },
+
+   input: { 
+      marginTop: vS(22), 
+      marginLeft: hS(28) 
    }
 })

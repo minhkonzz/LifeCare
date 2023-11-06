@@ -1,28 +1,38 @@
+import { Dispatch, SetStateAction } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
-export default (): JSX.Element => {
+interface TimeInputProps {
+	hours: number 
+	mins: number
+	setMins: Dispatch<SetStateAction<number>>
+	setHours: Dispatch<SetStateAction<number>>
+}
+
+export default ({ hours, mins, setMins, setHours }: TimeInputProps): JSX.Element => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.numberInput}>
 				<TextInput 
-					caretHidden 
 					style={styles.input} 
 					keyboardType='numeric' 
 					maxLength={2} 
+					value={hours && hours + '' || ''}
+					onChangeText={t => setHours(Number(t))}
 				/>
 			</View>
 			<Text style={styles.timeAbbrevia}>h</Text>
 			<Text style={styles.colon}>:</Text>
 			<View style={styles.numberInput}>
 				<TextInput 
-					caretHidden 
 					style={styles.input} 
 					keyboardType='numeric' 
 					maxLength={2} 
+					value={mins && mins + '' || ''}
+					onChangeText={t => setMins(Number(t))}
 				/>
 			</View>
 			<Text style={styles.timeAbbrevia}>m</Text>
@@ -43,12 +53,12 @@ const styles = StyleSheet.create({
 
 	numberInput: {
 		borderBottomWidth: 1,
-		borderBottomColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .3)`
+		borderBottomColor: `rgba(${darkRgb.join(', ')}, .3)`
 	},
 
 	input: {
 		marginBottom: vS(-32),
-		color: darkPrimary,
+		color: darkHex,
 		width: hS(82),
 		fontSize: hS(42),
 		fontFamily: 'Poppins-Regular',
@@ -60,13 +70,13 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(14),
 		marginBottom: vS(-9),
-		color: darkPrimary
+		color: darkHex
 	},
 
 	colon: {
 		fontSize: hS(22),
 		fontFamily: 'Poppins-Bold',
-		color: darkPrimary,
+		color: darkHex,
 		marginBottom: vS(-12)
 	}
 })

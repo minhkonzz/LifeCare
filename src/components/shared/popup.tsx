@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: hS(24),
 		alignItems: 'center',
 		paddingHorizontal: hS(24),
-		paddingBottom: vS(27)
+		paddingVertical: vS(16)
 	},
 
 	popupCenter: {

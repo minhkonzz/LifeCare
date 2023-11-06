@@ -38,6 +38,11 @@ export interface NutritionEditorProps {
    children?: ReactNode
 }
 
+export interface RadioOptionsPopupProps {
+   options: Array<string> 
+   setVisible: Dispatch<SetStateAction<boolean>>
+}
+
 export interface NetworkState {
    isOnline: boolean
 }
@@ -52,4 +57,30 @@ export interface SurveyState {
    currentHeight: number
    currentWeight: number
    goalWeight: number  
+}
+
+export interface InitialPersonalData {
+   gender: string
+   age: number
+   currentHeight: number
+   currentWeight: number
+   startWeight: number 
+   goalWeight: number
+   exercisePerformance: string
+   fastingFamiliar: string
+   goal: string[],
+   isSurveyed: boolean
+}
+
+export interface PersonalData extends InitialPersonalData {
+   chestMeasure: number
+   thighMeasure: number
+   waistMeasure: number
+   hipsMeasure: number 
+   dailyWater: number 
+   dailyCarbs: number 
+   dailyFat: number
+   dailyProtein: number
+   name: string 
+   email: string 
 }

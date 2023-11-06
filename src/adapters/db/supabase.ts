@@ -2,6 +2,7 @@ import { DatabaseAdapter } from './base'
 import { getBMI } from '@utils/fomular'
 import { WaterRecordsPayload } from '@utils/types'
 import { autoId } from '@utils/helpers'
+import { PersonalData } from '@utils/interfaces'
 
 export class SupabaseAdapter extends DatabaseAdapter<any> {
    private supabase: any
@@ -17,6 +18,16 @@ export class SupabaseAdapter extends DatabaseAdapter<any> {
 
    async signUp(email: string, password: string) {
       return await this.supabase.auth.signUp({ email, password })
+   }
+
+   async getPersonalData(userId: string): Promise<PersonalData> {
+      const { data, error } = await this.supabase.from('users').select('*').eq('id', userId)
+      if (error) {
+         console.log(error)
+         throw new Error('Something went wrong when get personal data')
+      }
+      const result: PersonalData = data[0]
+      return result
    }
 
    async getLatestBMI(userId: string): Promise<number> {

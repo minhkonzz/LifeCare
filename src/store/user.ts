@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-   session: null
+   session: null,
+   metadata: null
 }
 
 export const userSlice = createSlice({
@@ -10,9 +11,13 @@ export const userSlice = createSlice({
    reducers: {
       updateSession: (state, action) => {
          state.session = action.payload
+      }, 
+
+      updateMetadata: (state, action) => {
+         state.metadata = action.payload
       }
    }
 })
 
-export const { updateSession } = userSlice.actions
+export const { updateSession, updateMetadata } = userSlice.actions
 export default userSlice.reducer

@@ -20,9 +20,10 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface PrimaryToggleValue {
    onChangeOption?: () => void
+   additionalStyles?: any
 }
 
-export default ({ onChangeOption }: PrimaryToggleValue): JSX.Element => {
+export default ({ onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.Element => {
    const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
@@ -38,7 +39,7 @@ export default ({ onChangeOption }: PrimaryToggleValue): JSX.Element => {
    }
 
    return (
-      <View style={styles.container}>
+      <View style={additionalStyles && {...styles.container, ...additionalStyles} || styles.container}>
          <AnimatedLinearGradient
             style={[styles.toggleButton, { transform: [{ translateX }] }]}
             colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
@@ -54,7 +55,7 @@ export default ({ onChangeOption }: PrimaryToggleValue): JSX.Element => {
                      styles.optionText, 
                      {  
                         fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
-                        color: i === selectedIndex && '#fff' || `rgba(${primaryRgb.join(', ')}, .8)`
+                        color: i === selectedIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
                      }
                   ]}>
                      {e}

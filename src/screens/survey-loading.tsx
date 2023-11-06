@@ -19,14 +19,15 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
       const userId = session.user.id
       const { status } = await UserService.initPersonalData(userId, {
          gender: survey.gender,
-         current_height: survey.currentHeight,
-         current_weight: survey.currentWeight, 
-         start_weight: survey.currentWeight,
-         target_weight: survey.goalWeight,
+         currentHeight: survey.currentHeight,
+         currentWeight: survey.currentWeight, 
+         startWeight: survey.currentWeight,
+         goalWeight: survey.goalWeight,
          age: survey.age, 
-         exercise_performance: survey.exercisePerformance,
-         fasting_familiar: survey.fastingFamiliar,
-         is_surveyed: true
+         exercisePerformance: survey.exercisePerformance,
+         fastingFamiliar: survey.fastingFamiliar,
+         goal: survey.goal,
+         isSurveyed: true
       })
       if (status === 204) navigation.navigate('main')
    }

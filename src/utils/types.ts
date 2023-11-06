@@ -30,6 +30,12 @@ export type FastingState = {
    isFasting: boolean
 }
 
+export type Message = {
+   id: number, 
+   sender: string,
+   text: string
+}
+
 export type SettingState = {
    notification: boolean, 
    darkmode: boolean, 
@@ -39,7 +45,7 @@ export type SettingState = {
       beforeStartFast: number
       beforeEndFast: number, 
       repeatWeight: {
-         days: number[], 
+         days: string[], 
          h: number, 
          m: number
       }, 
@@ -62,17 +68,5 @@ export type WaterRecordsPayload = {
    goal: number, 
    drinked: number,
    changes: Array<{ liquid: number, time: string }>
-}
-
-export type InitialPersonalData = {
-   gender: string, 
-   current_height: number, 
-   current_weight: number,
-   start_weight: number, 
-   target_weight: number, 
-   age: number,
-   exercise_performance: string,
-   fasting_familiar: string,
-   is_surveyed: boolean
 }
 

@@ -1,5 +1,6 @@
 import { supabase } from "@configs/supabase"
-import { InitialPersonalData, WaterRecordsPayload } from "@utils/types"
+import { WaterRecordsPayload } from "@utils/types"
+import { InitialPersonalData } from "@utils/interfaces"
 import { SupabaseAdapter } from "../adapters/db/supabase"
 import { WatermelonDBAdapter } from "../adapters/db/watermelon"
 
@@ -21,6 +22,11 @@ export default {
       } catch (err) {
          console.error(err)
       }
+   },
+
+   getPersonalData: async (adapter: SupabaseAdapter | WatermelonDBAdapter, payload: { userId: string }) => {
+      const { userId } = payload
+      return await adapter.getPersonalData(userId)
    },
 
    initPersonalData: async (userId: number, payload: InitialPersonalData) => {

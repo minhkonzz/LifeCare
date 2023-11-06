@@ -1,7 +1,6 @@
 import { 
    memo, 
    useState, 
-   ReactNode, 
    Dispatch, 
    useRef, 
    SetStateAction 
@@ -12,7 +11,7 @@ import {
    Animated,
    StyleSheet
 } from 'react-native'
-import PrimaryToggleValue from '../primary-toggle-value'
+// import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
@@ -21,10 +20,9 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }) => {
+export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const [ currentWeight, setCurrentWeight ] = useState<number>(0)
-   const [ goalWeight, setGoalWeight ] = useState<number>(0)
+   const [ height, setHeight ] = useState<number>(0)
 
    const onSave = () => {
       Animated.timing(animateValue, {
@@ -37,20 +35,15 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
    return (
       <Popup {...{
          type: 'centered', 
-         with: hS(315),
-         title: 'Weight', 
+         width: hS(300),
+         title: 'Height', 
          animateValue,
          setVisible
       }}>
-         <PrimaryToggleValue />
+         {/* <PrimaryToggleValue /> */}
          <MeasureInput 
-            symb='kg' 
-            value={currentWeight}
-            placeholder='Current weight' />
-         <MeasureInput 
-            symb='kg' 
-            value={goalWeight} 
-            placeholder='Goal weight' />
+            symb='cm' 
+            value={height} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}

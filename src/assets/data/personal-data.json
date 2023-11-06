@@ -3,34 +3,34 @@
 		{
 			"id": "r1",
 			"title": "Gender",
-			"value": "Male"
+			"key": "gender"
 		},
 		{
 			"id": "r2",
 			"title": "Age",
-			"value": 22
+			"key": "age"
 		}
 	],
 	"personal-data-02": [
 		{
 			"id": "r3",
 			"title": "Height",
-			"value": "180cm"
+			"key": "height"
 		},
 		{
 			"id": "r4",
 			"title": "Current weight",
-			"value": "57kg"
+			"key": "current-weight"
 		},
 		{
 			"id": "r5",
 			"title": "Target weight",
-			"value": "52kg"
+			"key": "target-weight"
 		},
 		{
 			"id": "r6",
 			"title": "Your goal",
-			"value": "Lose weight / Improve health"
+			"key": "goal"
 		}
 	]
 }

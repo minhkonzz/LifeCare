@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect, useRef, useContext } from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import SettingIcon from '@assets/icons/setting.svg'
 import LogoutIcon from '@assets/icons/logout-red.svg'
@@ -15,6 +15,8 @@ import Weight from '@components/profile-weight'
 import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
+import PopupProvider, { PopupContext } from '@contexts/popup'
+import LogoutPopup from '@components/shared/popup-content/logout'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
@@ -23,6 +25,8 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
 const ProfileUser = memo(({ isViewable }: { isViewable: boolean }) => {
+	const { setPopup } = useContext<any>(PopupContext)
+
 	return (
 		isViewable && 
 		<View style={[styles.profileUser, styles.horz]}>
@@ -33,7 +37,10 @@ const ProfileUser = memo(({ isViewable }: { isViewable: boolean }) => {
 					<Text style={styles.email}>minhphm37@gmail.com</Text>
 				</View>
 			</View>
-			<TouchableOpacity style={styles.logout} activeOpacity={.8}>
+			<TouchableOpacity 
+				style={styles.logout} 
+				activeOpacity={.7}
+				onPress={() => setPopup(LogoutPopup)}>
 				<LogoutIcon width={hS(18)} height={vS(20)} />
 				<Text style={styles.logoutText}>Logout</Text>
 			</TouchableOpacity>
@@ -86,7 +93,7 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 
 const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -116,7 +123,7 @@ const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -145,24 +152,40 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-export default (): JSX.Element => {
+const Main = () => {
+	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
 	return (
-		<Screen paddingHorzContent header='tab' title='Me' content={[
-			ProfileUser, 
-			Backup, 
-			PlanUpgrade, 
-			LatestBMI, 
-			FastingRecords, 
-			Weight, 
-			HydrateRecords, 
-			BodyMeasure,
-			TimelineRef, 
-			SettingRef
-		]} />
+		<>
+			<Screen paddingHorzContent header='tab' title='Me' content={[
+				ProfileUser, 
+				Backup, 
+				PlanUpgrade, 
+				LatestBMI, 
+				FastingRecords, 
+				Weight, 
+				HydrateRecords, 
+				BodyMeasure,
+				TimelineRef, 
+				SettingRef
+			]} />
+			{ Popup && <Popup setVisible={setPopup} /> }
+		</>
 	)
 }
 
-const styles = StyleSheet.create({
+export default (): JSX.Element => {
+	return (
+		<View style={styles.container}>
+			<PopupProvider>
+				<Main />
+			</PopupProvider>
+		</View>
+	)
+}
+
+const styles = StyleSheet.create({	
+	container: { flex: 1 },
+
 	horz: {
 		flexDirection: 'row',
 		alignItems: 'center'

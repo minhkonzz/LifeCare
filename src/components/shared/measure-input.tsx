@@ -12,11 +12,11 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 interface MeasureInputProps {
    symb: string, 
-   value: string
-   placeholder?: string, 
-   paddingBottom?: number, 
-   contentCentered?: boolean,
-   additionalStyles?: any,
+   value: string | number
+   placeholder?: string
+   paddingBottom?: number 
+   contentCentered?: boolean
+   additionalStyles?: any
    onChangeText?: (input: string) => void
 }
 
@@ -32,8 +32,9 @@ export default ({
    return (
       <View style={[styles.container, additionalStyles]}>
          <TextInput 
+            keyboardType='numeric'
             style={{...styles.input, textAlign: contentCentered && 'center' || 'left', paddingBottom}}
-            {...{ value, placeholder, onChangeText }} />
+            {...{ value: value && value + '' || '', placeholder, onChangeText }} />
          <Text style={styles.symb}>{symb}</Text>         
       </View>
    )

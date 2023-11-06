@@ -1,30 +1,48 @@
 import { useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { updateNetworkOnline } from '../store/network'
-import { updateSession } from '../store/user'
-import { AppState } from '../store'
+import { updateSession, updateMetadata } from '../store/user'
 import { supabase } from '@configs/supabase'
+import { convertObjectKeysToCamelCase } from '@utils/helpers'
 import Stack from './stack'
 import NetInfo from '@react-native-community/netinfo'
 
 export default (): JSX.Element => {
-   // const dispatch = useDispatch()
-   // const { session } = useSelector((state: AppState) => state.user)
+   const dispatch = useDispatch()
 
-   // useEffect(() => {
-   //    const netInfoUnsubscribe = NetInfo.addEventListener(state => {
-   //       dispatch(updateNetworkOnline(state.isConnected))
-   //    })
-   //    const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
-   //       dispatch(updateSession(session))
-   //    })
+   useEffect(() => {
+      let changes: any
 
-   //    return () => {
-   //       netInfoUnsubscribe()
-   //       supabaseAuthListener.subscription.unsubscribe()
-   //    }
-   // }, [])
+      const netInfoUnsubscribe = NetInfo.addEventListener(state => {
+         dispatch(updateNetworkOnline(state.isConnected))
+      })
+
+      const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
+         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            let _session: any
+            if (event === 'SIGNED_IN') {
+               
+            }
+            dispatch(updateSession(session))
+         }
+         if (!changes) {
+            changes = supabase.channel('schema-db-changes')
+            .on('postgres_changes', {
+               event: 'UPDATE',
+               schema: 'public',
+               table: 'users'
+            }, (payload: any) => { 
+               dispatch(updateMetadata(convertObjectKeysToCamelCase(payload.new)))
+            }).subscribe()
+         }
+      })
+
+      return () => {
+         netInfoUnsubscribe()
+         supabaseAuthListener.subscription.unsubscribe()
+      }
+   }, [])
 
    return (
       <NavigationContainer>

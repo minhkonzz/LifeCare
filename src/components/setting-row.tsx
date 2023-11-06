@@ -7,7 +7,6 @@ import {
     Easing,
     Pressable
 } from 'react-native'
-
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import SettingToggle from '@components/shared/setting-toggle'
@@ -16,8 +15,10 @@ import BackIcon from '@assets/icons/goback.svg'
 interface SettingRowProps {
     title: string,
     type: 'redirect' | 'value' | 'toggle' | 'toggleValue',
-    value?: string | number | [string, string],
-    onPress?: () => void
+    boldTitle?: boolean,
+    value?: string | number | boolean | [string, string],
+    onPress?: () => void, 
+    additionalStyles?: any
 }
 
 const SettingRedirect: FC<{ onPress: () => void }> = ({ onPress }) => (
@@ -69,7 +70,7 @@ const settingTypes: any = {
     toggleValue: SettingToggleValue
 }
 
-export default ({ title, type, value, onPress }: SettingRowProps): JSX.Element => {
+export default ({ title, type, value, boldTitle, onPress, additionalStyles }: SettingRowProps): JSX.Element => {
     const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
     useEffect(() => {
@@ -83,19 +84,18 @@ export default ({ title, type, value, onPress }: SettingRowProps): JSX.Element =
 
     const TargetView = settingTypes[type]
     return (
-        <View style={styles.container}>
+        <View style={{...styles.container, ...additionalStyles}}>
             <Animated.Text 
-                style={[
-                    styles.text, 
-                    styles.title,
-                    {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [-150, 0]
-                        }) }]
-                    }
-                ]}>
+                style={{
+                    ...styles.text, 
+                    ...styles.title,
+                    fontFamily: `Poppins-${boldTitle && 'SemiBold' || 'Regular'}`,
+                    opacity: animateValue, 
+                    transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-150, 0]
+                    }) }]
+                }}>
                 {title}
             </Animated.Text>
             <Animated.View style={{

@@ -7,10 +7,10 @@ const initialState: SettingState = {
    syncGoogleFit: false,
    lang: '', 
    reminders: {
-      beforeStartFast: 0, 
-      beforeEndFast: 0, 
+      beforeStartFast: 10, 
+      beforeEndFast: 5, 
       repeatWeight: {
-         days: [], 
+         days: ['Mon', 'Tue', 'Thurs'], 
          h: 0, 
          m: 0
       }, 

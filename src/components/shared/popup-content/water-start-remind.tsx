@@ -1,43 +1,43 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
-import PrimaryToggleValue from '../primary-toggle-value'
-import MeasureInput from '../measure-input'
+import { memo, useState, Dispatch, SetStateAction, useRef } from 'react'
+import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'
+import { updateStartWaterRemind } from '../../../store/setting'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
 import Popup from '@components/shared/popup'
-import LinearGradient from 'react-native-linear-gradient'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import LinearGradient from 'react-native-linear-gradient'
+import TimeInput from '@components/time-input'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
-   const [ currentWeight, setCurrentWeight ] = useState<number>(0)
+const Main = ({
+   animateValue,
+   setVisible
+}: {
+   animateValue: Animated.Value,
+   setVisible: Dispatch<SetStateAction<boolean>>
+}) => {
+   const { h, m } = useSelector((state: AppState) => state.setting.reminders.startWater)
+   const [ hours, setHours ] = useState<number>(h)
+   const [ mins, setMins ] = useState<number>(m)
+   const dispatch = useDispatch()
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start()
+      }).start(({ finished }) => {
+         // missing validate input
+         setVisible(false)
+         dispatch(updateStartWaterRemind({ h: hours, m: mins }))
+      })
    }
 
    return (
       <>
-         <PrimaryToggleValue />
-         <MeasureInput 
-            symb='kg' 
-            value={currentWeight} 
-            onChangeText={t => setCurrentWeight(+t)} />
+         <TimeInput {...{ hours, setHours, mins, setMins }} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}
@@ -54,18 +54,18 @@ const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
    )
 }
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
+export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    return (
       <Popup {...{
-         type: 'centered', 
-         width: hS(300),
-         title: 'Current weight', 
-         animateValue,
+         type: 'centered',
+         title: 'Start water reminder', 
+         width: hS(315),
+         animateValue, 
          setVisible
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

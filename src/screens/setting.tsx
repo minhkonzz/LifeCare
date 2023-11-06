@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
 import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
-import GenderPopup from '@components/shared/popup-content/radio-options'
-import LanguagePopup from '@components/shared/popup-content/radio-options'
+import LanguagePopup from '@components/shared/popup-content/gender'
+import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
 
 import {
 	View,
@@ -21,38 +23,53 @@ import {
 const { hex: darkHex } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const settingRowCallbacks = {}
+const settingRowValues = {}
 
 export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const navigation = useNavigation()
 	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
-	const [ genderPopupVisible, setGenderPopupVisible ] = useState<boolean>(false)
 	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
+
+	const { 
+		notification,  
+		darkmode,
+		syncGoogleFit,
+		lang
+	} = useSelector((state: AppState) => state.setting)
+	
+	const dispatch = useDispatch()
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1, 
-			duration: 920, 
+			duration: 840, 
 			useNativeDriver: true
-		}).start(({ finished }) => {
-			settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
-			settingRowCallbacks['meal-time'] = () => {}
-			settingRowCallbacks['notification'] = () => {}
-			settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
-			settingRowCallbacks['widgets'] = () => {}
-			settingRowCallbacks['language'] = () => { setLangPopupVisible(true) }
-			settingRowCallbacks['dark-mode'] = () => {}
-			settingRowCallbacks['sync-google-fit'] = () => {}
-			settingRowCallbacks['privacy-policy'] = () => {}
-			settingRowCallbacks['rate-us'] = () => {}
-			settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
-		})
+		}).start()
 	}, [])
+
+	if (Object.keys(settingRowCallbacks).length === 0) {
+		settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
+		settingRowCallbacks['meal-time'] = () => {}
+		settingRowCallbacks['notification'] = () => { dispatch(updateNotififcation()) }
+		settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
+		settingRowCallbacks['widgets'] = () => {}
+		settingRowCallbacks['language'] = () => { setLangPopupVisible(true) }
+		settingRowCallbacks['dark-mode'] = () => { dispatch(updateDarkMode()) }
+		settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
+		settingRowCallbacks['privacy-policy'] = () => {}
+		settingRowCallbacks['rate-us'] = () => {}
+		settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
+	}
+
+	settingRowValues['notification'] = notification
+	settingRowValues['dark-mode'] = darkmode
+	settingRowValues['sync-google-fit'] = syncGoogleFit
+	settingRowValues['language'] = lang
 
 	return (
 		<View style={styles.container}>
 			<StackHeader title='Setting' />
-			<View>
 			{
 				['About me', 'General', 'Contact us'].map((e, i) => (
 					<View key={i} style={{ marginTop: vS(i > 0 ? 24 : 0) }}>
@@ -74,18 +91,17 @@ export default (): JSX.Element => {
 							showsVerticalScrollIndicator={false}
 							data={settingLayoutData[e]}
 							keyExtractor={item => item.id}
-							renderItem={({ item, index }) => 
+							renderItem={({ item }) => 
 								<SettingRow 
 									title={item.title} 
 									type={item.type} 
-									value={item.value ?? false} 
-									onPress={settingRowCallbacks[index]} />
+									onPress={settingRowCallbacks[item.cbkey]} 
+									{...{ value: settingRowValues[item.cbkey] ?? false }} />
 							}
 						/>
 					</View>
 				))
 			}
-			</View>
 			<View style={styles.bottom}>
 				<Animated.Text 
 					style={[
@@ -101,22 +117,20 @@ export default (): JSX.Element => {
 					Version 1.0.0
 				</Animated.Text>
 				<AnimatedTouchableOpacity 
+					onPress={() => setRewipeDataPopupVisible(true)}
 					activeOpacity={.7}
-					style={[
-						styles.rewipeDataButton, 
-						{
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-100, 0]
-							}) }]
-						}
-					]}>
+					style={{
+						...styles.rewipeDataButton, 
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-100, 0]
+						}) }]
+					}}>
 					<Text style={styles.rewipeDataButtonText}>Rewipe all data</Text>
 				</AnimatedTouchableOpacity>
 			</View>
 			{ rewipeDataPopupVisible && <RewipeDataWarnPopup setVisible={setRewipeDataPopupVisible} /> }
-			{ genderPopupVisible && <GenderPopup setVisible={setGenderPopupVisible} options={['Male', 'Female']} /> }
 			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)

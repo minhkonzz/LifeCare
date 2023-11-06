@@ -6,6 +6,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Circle } from 'react-native-svg'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import { formatNum } from '@utils/helpers'
 import FireColorIcon from '@assets/icons/fire-color.svg'
 
 const { rgb: primaryRgb } = Colors.primary
@@ -30,9 +31,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	}, [])
 
 	const formatTime = (time: number) => {
-		const s = isFasting ? Math.floor((time / 1000) % 60).toString().padStart(2, '0') : '00'
-		const m = isFasting ? Math.floor((time / 1000 / 60) % 60).toString().padStart(2, '0') : '00'
-		const h = isFasting ? Math.floor((time / 1000 / 60 / 60) % 24).toString().padStart(2, '0') : '00'
+		const s = isFasting ? formatNum(Math.floor((time / 1000) % 60)) : '00'
+		const m = isFasting ? formatNum(Math.floor((time / 1000 / 60) % 60)) : '00'
+		const h = isFasting ? formatNum(Math.floor((time / 1000 / 60 / 60) % 24)) : '00'
 		return `${h}:${m}:${s}`
 	}
 

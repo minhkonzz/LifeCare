@@ -1,39 +1,40 @@
 {
-    "Start fasting": [
-	{
-	    "title": "Remind before", 
-	    "value": "15 mins" 
-	}
-    ], 
-
-    "End fasting": [
-	{
-	    "title": "Remind before", 
-	    "value": "5 mins"
-	}
-    ], 
-
-    "Current weight": [
-	{
-	    "title": "Repeat", 
-	    "value": "T.7"
-	}
-    ],
-
-    "Drink water": [
-	{
-	    "title": "Start", 
-	    "value": "08:00"
-	}, 
-
-	{
-	    "title": "End", 
-	    "value": "22:30"
-	},
-
-	{
-	    "title": "Interval", 
-	    "value": "4 hrs"
-	}
-    ]
+	"Start fasting": [
+		{
+			"title": "Remind before",
+			"value": "15 mins", 
+			"key": "start-fast-remind"
+		}
+	],
+	"End fasting": [
+		{
+			"title": "Remind before",
+			"value": "5 mins", 
+			"key": "end-fast-remind"
+		}
+	],
+	"Current weight": [
+		{
+			"title": "Repeat",
+			"value": "T.7", 
+			"key": "repeat-weight"
+		}
+	],
+	"Drink water": [
+		{
+			"title": "Start",
+			"value": "08:00",
+			"key": "water-start-remind"
+		},
+		{
+			"title": "End",
+			"value": "22:30", 
+			"key": "water-end-remind"
+		},
+		{
+			"title": "Interval",
+			"value": "4 hrs", 
+			"key": "water-interval-remind"
+		}
+	]
 }

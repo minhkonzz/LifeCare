@@ -1,43 +1,40 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
+import { memo, Dispatch, SetStateAction, useRef } from 'react'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import Popup from '../popup'
+import LinearGradient from 'react-native-linear-gradient'
+import WheelPicker from '../wheel-picker'
 import {
    Text,
    TouchableOpacity,
-   Animated,
-   StyleSheet
+   StyleSheet,
+   Animated
 } from 'react-native'
-import PrimaryToggleValue from '../primary-toggle-value'
-import MeasureInput from '../measure-input'
-import Popup from '@components/shared/popup'
-import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const ageNumbers: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
-   const [ currentWeight, setCurrentWeight ] = useState<number>(0)
+const Main = ({
+   animateValue, 
+   setVisible
+}: {
+   animateValue: Animated.Value,
+   setVisible: Dispatch<SetStateAction<boolean>>
+}) => {
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start()
+      }).start(({ finished }) => {
+         setVisible(false)
+      })
    }
 
    return (
       <>
-         <PrimaryToggleValue />
-         <MeasureInput 
-            symb='kg' 
-            value={currentWeight} 
-            onChangeText={t => setCurrentWeight(+t)} />
+         <WheelPicker items={ageNumbers} itemHeight={vS(72)} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}
@@ -59,13 +56,13 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
 
    return (
       <Popup {...{
-         type: 'centered', 
-         width: hS(300),
-         title: 'Current weight', 
+         type: 'centered',
+         title: 'Age',
+         width: hS(332),
          animateValue,
-         setVisible
+         setVisible         
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })
