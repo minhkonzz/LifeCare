@@ -1,5 +1,6 @@
 import { FC, useState, useRef } from 'react'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { View, StyleSheet, Animated, Easing } from 'react-native'
 import { AppState } from '../store'
 import { useSelector } from 'react-redux'
 import { formatNum } from '@utils/helpers'
@@ -12,7 +13,7 @@ import RemindEndFastPopup from '@components/shared/popup-content/end-fast-remind
 import WaterStartRemindPopup from '@components/shared/popup-content/water-start-remind'
 import WaterEndRemindPopup from '@components/shared/popup-content/water-end-remind'
 import WaterRemindIntervalPopup from '@components/shared/popup-content/water-interval-remind'
-import { View, StyleSheet, Animated, Easing } from 'react-native'
+import withSync from '@hocs/withSync'
 
 interface ReminderSectionProps {
 	title: string,
@@ -66,13 +67,14 @@ const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) 
 	)
 }
 
-export default (): JSX.Element => {
+export default withSync((): JSX.Element => {
 	const [ repeatWeightPopupVisible, setRepeatWeightPopupVisible ] = useState<boolean>(false)
 	const [ remindStartFastPopupVisible, setRemindStartFastPopupVisible ] = useState<boolean>(false)
 	const [ remindEndFastPopupVisible, setRemindEndFastPopupVisible ] = useState<boolean>(false)
 	const [ waterStartRemindPopupVisible, setWaterStartRemindPopupVisible ] = useState<boolean>(false)
 	const [ waterEndRemindPopupVisible, setWaterEndRemindPopupVisible ] = useState<boolean>(false)
 	const [ waterRemindIntervalPopupVisible, setWaterRemindIntervalPopupVisible ] = useState<boolean>(false)
+	console.log('render Reminder')
 	
 	const {
 		beforeStartFast,
@@ -129,7 +131,7 @@ export default (): JSX.Element => {
 			{ waterRemindIntervalPopupVisible && <WaterRemindIntervalPopup setVisible={setWaterRemindIntervalPopupVisible} /> }
 		</View>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {

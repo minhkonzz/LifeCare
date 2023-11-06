@@ -4,12 +4,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
 import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
 import LanguagePopup from '@components/shared/popup-content/gender'
-import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
+import withSync from '@hocs/withSync'
 
 import {
 	View,
@@ -25,10 +26,11 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 const settingRowCallbacks = {}
 const settingRowValues = {}
 
-export default (): JSX.Element => {
+export default withSync((): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
 	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
+	console.log('render Setting')
 
 	const { 
 		notification,  
@@ -134,7 +136,7 @@ export default (): JSX.Element => {
 			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	container: {

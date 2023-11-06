@@ -1,8 +1,8 @@
 import { supabase } from "@configs/supabase"
 import { WaterRecordsPayload } from "@utils/types"
 import { InitialPersonalData } from "@utils/interfaces"
-import { SupabaseAdapter } from "../adapters/db/supabase"
-import { WatermelonDBAdapter } from "../adapters/db/watermelon"
+import { PersonalData } from "@utils/interfaces"
+import { autoId } from "@utils/helpers"
 
 export default {
    signInPassword: async (email: string, password: string) => {
@@ -24,23 +24,41 @@ export default {
       }
    },
 
-   getPersonalData: async (adapter: SupabaseAdapter | WatermelonDBAdapter, payload: { userId: string }) => {
-      const { userId } = payload
-      return await adapter.getPersonalData(userId)
+   getPersonalData: async (userId: string) => {
+      const { data, error } = await supabase.from('users').select('*').eq('id', userId)
+      if (error) {
+         console.log(error)
+         throw new Error('Something went wrong when get personal data')
+      }
+      const result: PersonalData = data[0]
+      return result
    },
 
    initPersonalData: async (userId: number, payload: InitialPersonalData) => {
       return await supabase.from('users').update(payload).eq('id', userId)
    },
 
-   getDailyWater: async (adapter: SupabaseAdapter | WatermelonDBAdapter, payload: { userId: string }) => {
-      const { userId } = payload
-      const dailyWater = await adapter.getDailyWater(userId)
-      return dailyWater
-   },
+   savePrevWaterRecords: async (payload: WaterRecordsPayload): Promise<void> => {
+      const { userId, drinked, goal, changes } = payload
+      const { data: d1, error: err1 } = await supabase.from('water_records')
+         .insert({ 
+            id: autoId('wr'),
+            user_id: userId,  
+            value: drinked,
+            goal: goal
+         })
+         .select('id')
 
-   savePrevWaterRecords: async (adapter: SupabaseAdapter | WatermelonDBAdapter, payload: { userId: string, bundled: WaterRecordsPayload }) => {
-      const { userId, bundled } = payload
-      await adapter.savePrevWaterRecords(userId, bundled)
+      if (err1) throw new Error('Something went wrong when create new water record')
+      const waterRecordId = d1[0].id
+      const { error: err2 } = await supabase.from('water_record_times')
+         .insert(changes.map(e => ({
+            id: autoId('wrc'),
+            water_record_id: waterRecordId,
+            value: e.liquid,
+            time_created: e.time
+         })))
+      
+      if (err2) throw new Error('Something went wrong when create new water record time')
    }
 }

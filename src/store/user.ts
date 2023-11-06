@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-   session: null,
-   metadata: null
+   session: null, 
+   metadata: null,
+   changes: null
 }
 
 export const userSlice = createSlice({

@@ -65,6 +65,7 @@ export type SettingState = {
 }
 
 export type WaterRecordsPayload = {
+   userId: string,
    goal: number, 
    drinked: number,
    changes: Array<{ liquid: number, time: string }>
