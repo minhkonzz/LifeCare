@@ -1,6 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { SettingState } from '@utils/types'
-import { configPushNotification } from '@configs/push-notification'
+
+import { 
+   configPushNotification,
+   configPushWeightNotification,
+   configPushStartFastNotification,
+   configPushEndFastNotification,
+   configPushWaterDrinkNotification
+} from '@configs/push-notification'
 
 const initialState: SettingState = {
    notification: false, 
@@ -50,19 +57,21 @@ const SettingSlice = createSlice({
          state.lang = action.payload 
       }, 
 
-      updateReminders: (state, action) => {
-         const bundledConfig = action.payload
-         configPushNotification(bundledConfig)
-         state.reminders = bundledConfig.reminders
-      }
+      initReminders: (state, action) => {
+         configPushNotification(action.payload)
+      },
 
-      // updateStartFastRemind: (state, action) => {
-      //    state.reminders.beforeStartFast = action.payload
-      // },
+      updateStartFastRemind: (state, action) => {
+         const { startFast, beforeStartFast } = action.payload
+         configPushStartFastNotification({ startFast, beforeStartFast })
+         state.reminders.beforeStartFast = beforeStartFast
+      },
 
-      // updateEndFastRemind: (state, action) => {
-      //    state.reminders.beforeEndFast = action.payload
-      // },
+      updateEndFastRemind: (state, action) => {
+         const { endFast, beforeEndFast } = action.payload
+         configPushEndFastNotification({ endFast, beforeEndFast })
+         state.reminders.beforeEndFast = action.payload
+      },
 
       // updateWeightRemind: (state, action) => {
       //    const { days, h, m } = action.payload
@@ -96,7 +105,9 @@ export const {
    updateLang, 
    updateNotififcation,
    updateSyncGoogleFit,
-   updateReminders
+   initReminders,
+   updateStartFastRemind, 
+   updateEndFastRemind
 } = SettingSlice.actions
 
 export default SettingSlice.reducer

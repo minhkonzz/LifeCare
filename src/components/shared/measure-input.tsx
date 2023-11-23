@@ -12,6 +12,7 @@ interface MeasureInputProps {
    contentCentered?: boolean
    additionalStyles?: any
    onChangeText?: (input: string) => void
+   isError?: boolean
 }
 
 export default ({ 
@@ -21,15 +22,20 @@ export default ({
    paddingBottom = 2, 
    contentCentered, 
    additionalStyles, 
-   onChangeText 
+   onChangeText, 
+   isError
 }: MeasureInputProps): JSX.Element => {
    return (
       <View style={[styles.container, additionalStyles]}>
          <TextInput 
             keyboardType='numeric'
-            style={{...styles.input, textAlign: contentCentered && 'center' || 'left', paddingBottom}}
+            style={{
+               ...(isError && {...styles.input, borderBottomColor: 'red' } || styles.input), 
+               textAlign: contentCentered && 'center' || 'left', 
+               paddingBottom
+            }}
             {...{ value: value && value + '' || '', placeholder, onChangeText }} />
-         <Text style={styles.symb}>{symb}</Text>         
+         <Text style={isError && {...styles.symb, color: 'red'} || styles.symb}>{symb}</Text>         
       </View>
    )
 }

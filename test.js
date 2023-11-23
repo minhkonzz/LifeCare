@@ -29,6 +29,5 @@
 
 // console.log(handle(1700014550000, 1700190950000))
 
-const d1 = new Date('20:00')
-const d2 = new Date('22:00')
-console.log(d2 - d1)
+const d = new Date('2023-11-23 11:40:21')
+console.log(d.getHours())
