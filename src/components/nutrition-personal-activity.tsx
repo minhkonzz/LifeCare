@@ -53,14 +53,14 @@ const styles = StyleSheet.create({
 
    title: {
       fontFamily: 'Poppins-Medium', 
-      fontSize: hS(14), 
+      fontSize: hS(17), 
       color: darkHex, 
       letterSpacing: .2
    },
 
    desc: {
       fontFamily: 'Poppins-Regular', 
-      fontSize: hS(10), 
+      fontSize: hS(11), 
       color: darkHex, 
       letterSpacing: .2,
       marginTop: vS(5)

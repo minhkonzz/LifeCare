@@ -1,11 +1,7 @@
 import { 
 	memo, 
-	ReactNode,
-	Dispatch, 
-	SetStateAction,  
 	useEffect, 
-	useRef, 
-	useContext 
+	useRef
 } from 'react'
 import {
 	View,
@@ -19,11 +15,9 @@ import {
 import Screen from '@components/shared/screen'
 import LinearGradient from 'react-native-linear-gradient'
 import DailyFastingState from '@components/daily-fasting-state'
-import PopupProvider, { PopupContext } from '@contexts/popup'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import MoonIcon from '@assets/icons/moon.svg'
 import WeightTrack from '@components/daily-weight-track'
 import BMITrack from '@components/daily-bmi-track'
 import WaterTrack from '@components/daily-water-track'
@@ -35,64 +29,48 @@ const { hex: lightHex } = Colors.lightPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const Header = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const titleGreetAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: 1, 
-				duration: 800, 
-				useNativeDriver: true
-			}),
-			Animated.timing(titleGreetAnimateValue, {
-				toValue: 1, 
-				duration: 800,
-				delay: 120,
-				useNativeDriver: true
-			})
-		]).start()
-	}, [])
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0, 
+			duration: 800, 
+			useNativeDriver: true
+		}).start()
+	}, [isViewable])
 
 	return (
 		isViewable && 
 		<View style={styles.header}>
 			<View style={styles.background}>
-				<Animated.View style={[styles.gray, { transform: [{ scale: animateValue }] }]} />
-				<Animated.View style={[styles.lightBlue, { transform: [{ scale: animateValue }] }]} />
+				<Animated.View style={{...styles.gray, transform: [{ scale: animateValue }] }} />
+				<Animated.View style={{...styles.lightBlue, transform: [{ scale: animateValue }] }} />
 			</View>
-			<Pressable style={styles.darkModeButton}>
-				<MoonIcon width={hS(16)} height={vS(16.5)} />
-			</Pressable>
 			<View style={styles.userGreet}>
 				<View>
-					<Animated.Text style={[
-						styles.nameGreet, 
-						{
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-200, 0]
-							}) }]
-						}
-					]}>
-						Hi, Pham!
+					<Animated.Text style={{
+						...styles.nameGreet, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-50, 0]
+						}) }]
+					}}>
+						Hi, Pham
 					</Animated.Text>
-					<Animated.Text style={[
-						styles.titleGreet, 
-						{
-							transform: [{ translateX: titleGreetAnimateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-200, 0]
-							}) }]
-						}
-					]}>
-						Welcome back
+					<Animated.Text style={{
+						...styles.titleGreet, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-150, 0]
+						}) }]
+					}}>
+						Welcome back!
 					</Animated.Text>
 				</View>
-				<Animated.Image 
-					style={[styles.userAvatar, { transform: [{ scale: animateValue }] }]} 
+				{/* <Animated.Image 
+					style={{...styles.userAvatar, transform: [{ scale: animateValue }] }} 
 					source={require('../assets/images/UserAvatar.png')} 
-				/>
+				/> */}
 			</View>
 		</View> || <View style={styles.header} />
 	)
@@ -100,12 +78,12 @@ const Header = memo(({ isViewable }: { isViewable: boolean }) => {
 
 const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0, 
-			duration: 1010, 
+			duration: 920, 
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])
@@ -113,7 +91,7 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 	return (
 		isViewable && 
 		<AnimatedPressable 
-			style={[styles.chatbotAdvertise, { opacity: animateValue }]}
+			style={{...styles.chatbotAdvertise, opacity: animateValue }}
 			onPress={() => navigation.navigate('fastai-overview')}>
 			<LinearGradient 
 				style={styles.chatbotAdvertiseBg}
@@ -121,28 +99,24 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 				start={{ x: 1, y: 0 }}
 				end={{ x: .65, y: 1 }}>  
 				<View style={styles.chatbotAdvertiseMain}>
-					<Animated.Text style={[
-						styles.chatbotAdvertiseTitle, 
-						{
-							opacity: animateValue, 
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-150, 0]
-							}) }]
-						}
-					]}>
+					<Animated.Text style={{
+						...styles.chatbotAdvertiseTitle, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-50, 0]
+						}) }]
+					}}>
 						Try our FastAI Chatbot
 					</Animated.Text>
-					<Animated.Text style={[
-						styles.chatbotAdvertiseDesc, 
-						{
-							opacity: animateValue, 
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-150, 0]
-							}) }]
-						}
-					]}>
+					<Animated.Text style={{
+						...styles.chatbotAdvertiseDesc, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-50, 0]
+						}) }]
+					}}>
 						Lorem Ipsum is simply dummy text of the printing and typesetting industry
 					</Animated.Text>
 					<TouchableOpacity style={styles.chatbotAdvertiseButton} activeOpacity={.8}>
@@ -167,38 +141,22 @@ const RowMetrics = ({ isViewable }: { isViewable: boolean }) => {
 		<View style={styles.metricRow}>
 			<BMITrack />
 			<WaterTrack />
-		</View> || <View style={styles.metricRow}></View>
+		</View> || <View style={styles.metricRow} />
 	)
 }
 
-const Main = memo(() => {
-	const { popup: Popup, setPopup } = useContext(PopupContext)
-	return (
-		<>
-			<Screen paddingHorzContent content={[
-				Header,
-				DailyFastingState,
-				RowMetrics,
-				NutritionTrack,
-				WeightTrack,
-				ChatBotAdvertise
-			]} />
-			{ Popup && <Popup setVisible={setPopup} /> }
-		</>
-	)
-})
-
 export default (): JSX.Element => (
-	<View style={styles.container}>
-		<PopupProvider>
-			<Main />
-		</PopupProvider>
-	</View>
+	<Screen paddingHorzContent content={[
+		Header,
+		DailyFastingState,
+		RowMetrics,
+		NutritionTrack,
+		WeightTrack,
+		ChatBotAdvertise
+	]} />
 )
 
 const styles = StyleSheet.create({
-	container: { flex: 1 },
-
 	metricRow: {
 		width: hS(370),
 		height: vS(161),
@@ -210,14 +168,14 @@ const styles = StyleSheet.create({
 
 	background: {
 		position: 'absolute',
-		top: vS(-20),
+		top: vS(-12),
 		right: hS(-50),
-		alignItems: 'flex-end'
+		alignItems: 'flex-end',
 	},
 
 	gray: {
-		width: hS(300),
-		height: vS(300),
+		width: hS(320),
+		height: vS(320),
 		backgroundColor: `rgba(${darkRgb.join(', ')}, .04)`,
 		borderRadius: 1000
 	},
@@ -232,19 +190,10 @@ const styles = StyleSheet.create({
 		borderRadius: 1000
 	},
 
-	darkModeButton: {
-		width: hS(40),
-		height: vS(40),
-		borderRadius: 200,
-		backgroundColor: `rgba(${darkRgb.join(', ')}, .18)`,
-		justifyContent: 'center',
-		alignItems: 'center',
-		alignSelf: 'flex-end'
-	},
-
 	header: {
 		width: hS(370),
-		height: vS(180)
+		height: vS(120), 
+		marginTop: vS(22)
 	},
 
 	userGreet: {
@@ -308,7 +257,7 @@ const styles = StyleSheet.create({
       fontSize: hS(9),
       color: '#fff',
       marginTop: vS(-22), 
-      lineHeight: vS(16)
+      lineHeight: vS(17)
    },    
 
    chatbotAdvertiseButton: {

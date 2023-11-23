@@ -42,9 +42,7 @@ const styles = StyleSheet.create({
       marginTop: vS(24), // delete
       borderRadius: hS(24),
       paddingHorizontal: hS(16), 
-      paddingVertical: vS(16),
-      elevation: 5, 
-      shadowColor: darkPrimary
+      paddingVertical: vS(16)
    }, 
 
    title: {

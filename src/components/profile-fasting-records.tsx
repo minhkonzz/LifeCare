@@ -1,9 +1,8 @@
 import { memo, useRef, useEffect } from 'react'
-import { View, StyleSheet, Text, Animated, FlatList } from 'react-native'
+import { View, StyleSheet, Text, Animated, Pressable, FlatList } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import fastingRecordsData from '@assets/data/timer-fasting-records.json'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -11,105 +10,138 @@ const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
+const Record = ({ item, index }) => {
+	const startTime = item.startTime
+	const [ s1, s2 ] = startTime.split(" ")
+	const [ hours, mins ] = s1.split(":").map(Number)
+	const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
+
+	return (
+		<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
+			<Text style={styles.recText}>Nov</Text>
+			<View style={styles.recProg}>
+				<AnimatedLinearGradient
+					style={{
+						...styles.recProgValue, 
+						height: `${item.totalHours / 24 * 100}%`,
+						top: `${Math.floor(hoursPassed / 24 * 100)}%`
+					}}
+					colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
+					start={{ x: .5, y: 0 }}
+					end={{ x: .5, y: 1 }} 
+				/>
+			</View>
+			<Text style={styles.recText}>29</Text>
+		</Pressable>
+	)
+}
+
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: isViewable && 1 || 0,
-				duration: 1010,
-				useNativeDriver: true
-			}), 
-			Animated.timing(progressAnimateValue, {
-				toValue: isViewable && 1 || 0, 
-				duration: 1010, 
-				delay: 500, 
-				useNativeDriver: false
-			})
-		]).start()
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0,
+			duration: 1010,
+			useNativeDriver: true
+		}).start()
 	}, [isViewable])
 
 	return (
 		isViewable && 
-		<Animated.View style={{ opacity: animateValue }}>
-			<LinearGradient
-				style={styles.container}
-				colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
-				start={{ x: .5, y: 0 }}
-				end={{ x: .5, y: 1 }}>
-				<Animated.View style={{ 
-					opacity: animateValue,
-					transform: [{ translateX: animateValue.interpolate({
-						inputRange: [0, 1], 
-						outputRange: [-150, 0]
-					}) }]
-				}}>
-					<Text style={styles.headerMainText}>Recent Fasting</Text>
-					<View style={styles.headerNotes}>
-						<View style={styles.headerNotePart}>
-							<LinearGradient
-								style={styles.headerNoteCircle}
-								colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-								start={{ x: .5, y: 0 }}
-								end={{ x: .5, y: 1 }} />
-							<Text style={styles.headerNoteText}>Completed</Text>
-						</View>
-						<View style={[styles.headerNotePart, { marginLeft: hS(38) }]}>
-							<View style={[styles.headerNoteCircle, { backgroundColor: `rgba(${darkRgb.join(', ')}, .28)` }]} />
-							<Text style={styles.headerNoteText}>24 hours</Text>
-						</View>
+		<AnimatedLinearGradient
+			style={{...styles.container, opacity: animateValue }}
+			colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
+			start={{ x: .5, y: 0 }}
+			end={{ x: .5, y: 1 }}>
+			<Animated.View style={{ 
+				...styles.header,
+				opacity: animateValue,
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-50, 0]
+				}) }]
+			}}>
+				<Text style={styles.headerMainText}>Recent Fasting</Text>
+				<View style={styles.headerNotes}>
+					<View style={styles.headerNotePart}>
+						<LinearGradient
+							style={styles.headerNoteCircle}
+							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }} />
+						<Text style={styles.headerNoteText}>Fasting</Text>
 					</View>
-				</Animated.View>
-				<Animated.FlatList
-					style={[styles.records, { opacity: animateValue }]}
+					<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
+						<View style={{...styles.headerNoteCircle, backgroundColor: `rgba(${darkRgb.join(', ')}, .28)` }} />
+						<Text style={styles.headerNoteText}>Eating</Text>
+					</View>
+				</View>
+			</Animated.View>
+			<View style={styles.main}>
+				<View style={styles.dayHours}>
+				{
+					['00:00 AM', '06:00 AM', '12:00 PM', '06:00 PM', '00:00 AM']
+					.map((e, i) => <Text key={i} style={{...styles.dayHour, marginTop: i > 0 ? vS(24) : 0}}>{e}</Text>)
+				}
+				</View>
+				<FlatList 
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					data={fastingRecordsData}
-					renderItem={({ item, index }) => (
-						<View key={index} style={[styles.rec, { marginLeft: (index > 0 ? hS(15) : 0) }]}>
-							<Text style={[styles.recText, { height: vS(22) }]}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
-							<LinearGradient
-								style={styles.recProg}
-								colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
-								start={{ x: .5, y: 0 }}
-								end={{ x: .5, y: 1 }}>
-								<AnimatedLinearGradient
-									style={[
-										styles.recProgValue, 
-										{ 
-											height: progressAnimateValue.interpolate({
-												inputRange: [0, 1], 
-												outputRange: ['0%', `${item.hrs / 24 * 100}%`]
-											})
-										}
-									]}
-									colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
-									start={{ x: .5, y: 0 }}
-									end={{ x: .5, y: 1 }} />
-							</LinearGradient>
-							<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-								<Text style={styles.recText}>{item.day}</Text>
-								<Text style={[styles.recText, { marginTop: vS(-2) }]}>{item.month}</Text>
-							</View>
-						</View>
-					)}
-				/>
-				<Animated.Text style={[styles.lastUpdatedText, { opacity: animateValue }]}>Last updated 3 minutes</Animated.Text>
-			</LinearGradient>
-		</Animated.View> || <View style={styles.container} />
+					data={[
+						{
+							startTime: '2:00 AM',
+							endTime: '06:00 AM',
+							totalHours: Math.round(4) 
+						}, 
+						{
+							startTime: '12:00 AM',
+							endTime: '12:00 AM',
+							totalHours: 24
+						},
+						{
+							startTime: '12:00 AM',
+							endTime: '3:15 AM',
+							totalHours: Math.round(3.263888888888889)
+						}
+					]} 
+					renderItem={({ item, index }) => <Record {...{ item, index }} />} />
+			</View>
+			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
+		</AnimatedLinearGradient> || <View style={styles.container} />
 	)
 })
 
 const styles = StyleSheet.create({
-	container: {
-		marginTop: vS(24),
-		width: hS(370),
-		height: vS(350),
-		paddingHorizontal: hS(18),
-		paddingVertical: vS(16),
-		borderRadius: hS(24)
+	dayHours: {
+		alignItems: 'flex-end',
+		marginRight: hS(14)
+	},
+
+	dayHour: {
+		fontFamily: 'Poppins-Medium',
+		fontSize: hS(10),
+		color: darkHex
+	},
+
+	main: {
+		width: '100%',
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+
+	lastUpdatedText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(11),
+		color: darkHex,
+		letterSpacing: .2,
+		alignSelf: 'center'
+	},
+
+	headerNoteCircle: {
+		width: hS(10),
+		height: vS(10),
+		borderRadius: 50
 	},
 
 	headerMainText: {
@@ -139,24 +171,50 @@ const styles = StyleSheet.create({
 		marginTop: vS(4)
 	},
 
-	headerNoteCircle: {
+	container: {
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		width: hS(369),
+		height: vS(400),
+		borderRadius: hS(32),
+		paddingHorizontal: hS(18),
+		paddingTop: vS(18),
+		paddingBottom: vS(8),
+		marginTop: vS(27)
+	},
+
+	header: {
+		width: '100%'
+	},
+
+	title: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(15),
+		color: darkHex
+	},
+
+	hrz: {
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+
+	noteColor: {
 		width: hS(10),
 		height: vS(10),
-		borderRadius: 50
+		borderRadius: 25
+	},
+
+	noteTitle: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(12),
+		color: darkHex,
+		letterSpacing: .2,
+		marginLeft: hS(8)
 	},
 
 	records: {
 		width: '100%',
 		marginTop: vS(20)
-	},
-
-	lastUpdatedText: {
-		fontFamily: 'Poppins-Regular', 
-		fontSize: hS(11), 
-		color: darkHex,
-		letterSpacing: .2,
-		marginTop: vS(18), 
-		alignSelf: 'center'
 	},
 
 	rec: {
@@ -170,16 +228,11 @@ const styles = StyleSheet.create({
 		letterSpacing: .4
 	},
 
-	recProg: {
-		width: hS(54),
-		height: vS(121),
-		borderRadius: 200,
-		justifyContent: 'flex-end',
-		overflow: 'hidden'
-	},
+	recProg: { width: 20, height: vS(180), borderRadius: 100, backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, marginVertical: vS(10) },
 
 	recProgValue: {
 		width: '100%',
-		borderRadius: 200
+		borderRadius: 100,
+		position: 'absolute'
 	}
 })

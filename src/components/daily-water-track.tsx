@@ -1,4 +1,13 @@
 import { useEffect, useRef } from 'react'
+import { Colors } from '@utils/constants/colors'
+import { useNavigation } from '@react-navigation/native'
+import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'  
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { BluePlusIcon, WatercupIcon } from '@assets/icons'
+import LinearGradient from 'react-native-linear-gradient'
+import WaterWave from '@components/water-wave'
+
 import {
    View, 
    Text,
@@ -6,13 +15,6 @@ import {
    StyleSheet,
    Animated
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
-import { useNavigation } from '@react-navigation/native'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'  
-import BluePlusIcon from '@assets/icons/blue_plus.svg'
-import WatercupIcon from '@assets/icons/watercup.svg'
-import Wave from './wave'
 
 const { rgb: lightRgb } = Colors.lightPrimary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -22,76 +24,67 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 
 export default (): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const reportAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const navigation = useNavigation()
+   const drinked = useSelector((state: AppState) => state.water.drinked)
+   const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+   const navigation = useNavigation<any>()
 
    useEffect(() => {
-      Animated.parallel([
-         Animated.timing(animateValue, {
-            toValue: 1, 
-            duration: 1010, 
-            useNativeDriver: true
-         }),
-         Animated.timing(reportAnimateValue, {
-            toValue: 1, 
-            delay: 100,
-            duration: 1010, 
-            useNativeDriver: true
-         })
-      ]).start()
+      Animated.timing(animateValue, {
+         toValue: 1, 
+         duration: 840, 
+         useNativeDriver: true
+      }).start()
    }, [])
 
    return (
       <AnimatedLinearGradient 
-         style={[styles.container, { opacity: animateValue }]}
+         style={{...styles.container, opacity: animateValue }}
          colors={[`rgba(${lightRgb.join(', ')}, .6)`, `rgb(177, 234, 238)`]}
          start={{ x: .5, y: 0 }}
          end={{ x: .5, y: 1 }}>
-         <Animated.View style={[
-            styles.waves, 
-            {
-               opacity: animateValue, 
-               transform: [{ translateX: animateValue.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [-50, 0]
-               }) }]
-            }
-         ]}>
-            <Wave w={hS(58)} h={vS(56)} />
+         <Animated.View style={{
+            ...styles.waves, 
+            opacity: animateValue, 
+            transform: [{ translateX: animateValue.interpolate({
+               inputRange: [0, 1], 
+               outputRange: [-50, 0]
+            }) }]
+         }}>
+            <WaterWave />
          </Animated.View>
          <View style={styles.main}>
-            <Animated.View 
-               style={[
-                  styles.horz, 
-                  styles.header, 
-                  {
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [100, 0] 
-                     }) }]
-                  }
-               ]}>
+            <Animated.View style={{
+               ...styles.horz, 
+               ...styles.header, 
+               transform: [{ translateX: animateValue.interpolate({
+                  inputRange: [0, 1], 
+                  outputRange: [50, 0] 
+               }) }]
+            }}>
                <Text style={styles.headerText}>Drink water</Text>
 					<WatercupIcon width={hS(12)} height={vS(14)} />
             </Animated.View>
-            <Animated.View 
-               style={[
-                  styles.value, 
-                  {
-                     transform: [{ translateX: reportAnimateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [150, 0]
-                     }) }]
-                  }
-               ]}>
-               <Text style={styles.currentValueText}>1650 / </Text>
+            <Animated.View style={{
+               ...styles.value, 
+               transform: [{ translateX: animateValue.interpolate({
+                  inputRange: [0, 1], 
+                  outputRange: [50, 0]
+               }) }]
+            }}>
+               <Text style={styles.currentValueText}>{`${drinked} / `}</Text>
                <View style={styles.horz}>
-                  <Text style={styles.currentValue}>3000</Text>
+                  <Text style={styles.currentValue}>{dailyWater}</Text>
                   <Text style={styles.symbolText}>ml</Text>
                </View>
             </Animated.View>
             <AnimatedTouchableOpacity 
-               style={[styles.updateButton, { transform: [{ scale: animateValue }] }]} 
+               style={{
+                  ...styles.updateButton, 
+                  transform: [{ translateY: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [50, 0]
+                  }) }] 
+               }} 
                activeOpacity={.7}
                onPress={() => navigation.navigate('water')}>
 					<BluePlusIcon width={hS(15)} height={vS(14)} />
@@ -138,7 +131,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'flex-end',
 		elevation: 7,
 		marginBottom: vS(-8),
-		shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .5)`
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
    }, 
 
    main: {

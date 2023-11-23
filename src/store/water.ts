@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-   goal: 0,
-   date: '',
+   date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric' }),
    drinked: 0,
    initCupsize: 200,
-   cupsize: 0,
+   cupsize: 250,
    changes: []
 }
 
@@ -16,17 +15,20 @@ const WaterSlice = createSlice({
       updateLiquid: (state, action) => {
          const type = action.payload
          state.drinked += state.cupsize * (type && 1 || -1) 
-         state.changes = type && state.changes.slice(0, -1) || [
+         state.changes = type && [
             ...state.changes, 
             { 
                liquid: state.cupsize, 
-               time: new Intl.DateTimeFormat('en-US', {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true
+               time: new Intl.DateTimeFormat('en', {
+                  year: '2-digit',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
                }).format(new Date())
             }
-         ]
+         ] || state.changes.slice(0, -1)
       },
       
       updateCupsize: (state, action) => {
@@ -34,12 +36,9 @@ const WaterSlice = createSlice({
       },
 
       resetDailyWater: (state, action) => {
-         const now = action.payload
-         if (now !== state.date) {
-            state.date = now
-            state.drinked = 0, 
-            state.changes = []
-         }
+         state.date = action.payload
+         state.drinked = 0, 
+         state.changes = []
       }
    }
 })

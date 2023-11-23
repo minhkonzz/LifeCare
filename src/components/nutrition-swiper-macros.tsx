@@ -69,9 +69,11 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
+      width: hS(366),
       flexDirection: 'row', 
       alignItems: 'center', 
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      paddingHorizontal: hS(14),
    },
 
    item: {

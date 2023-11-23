@@ -19,8 +19,11 @@ import WheelPicker from '../wheel-picker'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { toTimestampV1, getDatesRange } from '@utils/datetimes'
+import { updateTimes } from '../../../store/fasting'
+import { AppState } from '../../../store'
+import { useSelector, useDispatch } from 'react-redux'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const dateOpts = getDatesRange(8)
@@ -36,7 +39,6 @@ const Picker = memo(({
    onIndexChange?: (index: number) => void, 
    styles?: { width: number } 
 }) => {
-   console.log('render Picker component')
    return (
       <View style={styles}>
          <WheelPicker {...{
@@ -50,15 +52,19 @@ const Picker = memo(({
 })
 
 const Main = ({ 
-   animateValue, 
-   onConfirm
+   animateValue,
+   setVisible
 }: { 
    animateValue: Animated.Value, 
-   onConfirm?: (timestamp: number) => void
-}) => {
+   setVisible: Dispatch<SetStateAction<any>>
+}): JSX.Element => {
    const [ date, setDate ] = useState<string>('')
    const [ hours, setHours ] = useState<number>(0)
    const [ mins, setMins ] = useState<number>(0)
+
+   const currentPlan = useSelector((state: AppState) => state.fasting.currentPlan)
+	const { hrsFast } = currentPlan
+   const dispatch = useDispatch()
 
    const onPressConfirm = () => {
       Animated.timing(animateValue, {
@@ -67,7 +73,11 @@ const Main = ({
          useNativeDriver: true
       }).start(({ finished }) => {
          const timestamp = toTimestampV1(date, hours, mins)
-         if (onConfirm) onConfirm(timestamp)
+         dispatch(updateTimes({
+            _start: timestamp,
+            _end: timestamp + hrsFast * 60 * 60 * 1000
+         }))
+         setVisible(false)
       })
    }
 
@@ -83,14 +93,26 @@ const Main = ({
       setMins(minsOpts[index])
    }, [])
 
+   const WheelPickers = useCallback(memo(() => {
+      console.log('run this again')
+      return (
+         <>
+            <Picker items={dateOpts.map(e => e.title)} styles={styles.dateWheelPicker} onIndexChange={setNewDate} />
+            <Picker items={hoursOpts} styles={styles.hoursWheelPicker} onIndexChange={setNewHours} />
+            <Picker items={minsOpts} styles={styles.minsWheelPicker} onIndexChange={setNewMins} />
+         </>
+      )
+   }), [])
+
    return (
       <>
          <View style={styles.main}>
             <View style={styles.indicator} />
             <View style={styles.wheelpickers}>
-               <Picker items={dateOpts.map(e => e.title)} styles={styles.dateWheelPicker} onIndexChange={setNewDate} />
+               {/* <Picker items={dateOpts.map(e => e.title)} styles={styles.dateWheelPicker} onIndexChange={setNewDate} />
                <Picker items={hoursOpts} styles={styles.hoursWheelPicker} onIndexChange={setNewHours} />
-               <Picker items={minsOpts} styles={styles.minsWheelPicker} onIndexChange={setNewMins} />
+               <Picker items={minsOpts} styles={styles.minsWheelPicker} onIndexChange={setNewMins} /> */}
+               <WheelPickers />
             </View>
          </View>
          <TouchableOpacity
@@ -109,13 +131,7 @@ const Main = ({
    )
 }
 
-export default memo(({ 
-   setVisible, 
-   onConfirm 
-}: { 
-   setVisible: Dispatch<SetStateAction<boolean>> , 
-   onConfirm?: (timestamp: number) => void
-}): JSX.Element => {
+export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    return (
@@ -126,7 +142,7 @@ export default memo(({
          setVisible, 
          animateValue
       }}>
-         <Main {...{ animateValue, onConfirm }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

@@ -15,29 +15,45 @@ import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
+import UserService from '@services/user'
+import { useSelector } from 'react-redux'
+import { AppState } from '../../../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
-   const [ currentWeight, setCurrentWeight ] = useState<number>(0)
+const Main = ({ 
+   animateValue, 
+   setVisible 
+}: { 
+   animateValue: Animated.Value,
+   setVisible: Dispatch<SetStateAction<any>> 
+}) => {
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session && session.user.id || null
+   const { currentWeight } = metadata
+   const [ weight, setWeight ] = useState<number>(currentWeight)
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start()
+      }).start(async({ finished }) => {
+         await UserService.updatePersonalData(userId, { currentWeight: weight })
+         setVisible(false)
+      })
    }
 
    return (
       <>
          <PrimaryToggleValue />
          <MeasureInput 
+            contentCentered
             symb='kg' 
-            value={currentWeight} 
-            onChangeText={t => setCurrentWeight(+t)} />
+            value={weight} 
+            onChangeText={t => setWeight(+t)} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}
@@ -65,7 +81,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

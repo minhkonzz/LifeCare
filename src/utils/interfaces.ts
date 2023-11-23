@@ -8,7 +8,8 @@ export interface WaterWaveProps {
 }
 
 export interface LoginComponentProps {
-   setIsLogin: Dispatch<SetStateAction<boolean>>,
+   setIsLogin: Dispatch<SetStateAction<boolean>>
+   invokeAuthMessage: (message: string, type: string) => void
    navigation: NavigationProp<any>
 }
 
@@ -60,27 +61,52 @@ export interface SurveyState {
 }
 
 export interface InitialPersonalData {
-   gender: string
-   age: number
-   currentHeight: number
-   currentWeight: number
-   startWeight: number 
-   goalWeight: number
-   exercisePerformance: string
-   fastingFamiliar: string
-   goal: string[],
-   isSurveyed: boolean
+   gender?: string
+   age?: number
+   currentHeight?: number
+   currentWeight?: number
+   startWeight?: number 
+   goalWeight?: number
+   exercisePerformance?: string
+   fastingFamiliar?: string
+   goal?: string[],
+   isSurveyed?: boolean
 }
 
 export interface PersonalData extends InitialPersonalData {
-   chestMeasure: number
-   thighMeasure: number
-   waistMeasure: number
-   hipsMeasure: number 
-   dailyWater: number 
-   dailyCarbs: number 
-   dailyFat: number
-   dailyProtein: number
-   name: string 
-   email: string 
+   chestMeasure?: number
+   thighMeasure?: number
+   waistMeasure?: number
+   hipsMeasure?: number 
+   dailyWater?: number 
+   dailyCarbs?: number 
+   dailyFat?: number
+   dailyProtein?: number
+   name?: string 
+   email?: string
+   waterRecords?: Array<{
+      id: string,
+      value: number, 
+      goal: number, 
+      createdAt: string, 
+      times: Array<{
+         id: string, 
+         value: number, 
+         createdAt: string
+      }>
+   }>
+   fastingRecords: Array<{
+      id: string, 
+      planName: string, 
+      startTimeStamp: number,
+      endTimeStamp: number, 
+      notes: string, 
+      createdAt: string
+   }>
+   weightRecords: Array<{
+      id: string, 
+      value: number, 
+      createdAt: string,
+      updatedAt: string
+   }>
 }

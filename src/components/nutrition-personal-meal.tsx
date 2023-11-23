@@ -1,10 +1,4 @@
-import { 
-   View,
-   Text,
-   StyleSheet,
-   FlatList
-} from 'react-native'
-
+import { View, Text, StyleSheet, FlatList } from 'react-native'
 import NutritionPersonalFood from './nutrition-personal-food'
 import LinearGradient from 'react-native-linear-gradient'
 import { Colors } from '@utils/constants/colors'
@@ -27,7 +21,7 @@ export default (): JSX.Element => {
             data={Array.from({ length: 4 }).fill(1)} 
             showsVerticalScrollIndicator={false} 
             keyExtractor={(item, index) => index.toString()} 
-            renderItem={({ item, index }) => <NutritionPersonalFood />}
+            renderItem={({ item, index }) => <NutritionPersonalFood {...{ item, index }} />}
          />
       </View>
    )

@@ -86,7 +86,18 @@ export default memo(({
 				<PopupContent />
 			</Animated.View> ||
 			<Animated.View 
-				style={[styles.popupCenter, { width, transform: [{ scale: animateValue }] }]}>
+				style={{
+					...styles.popupCenter, 
+					width, 
+					opacity: animateValue.interpolate({
+						inputRange: [0, .2, 1], 
+						outputRange: [0, 1, 1]
+					}),
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					})}] 
+				}}>
 				<PopupContent />
 			</Animated.View>
 		}

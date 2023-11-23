@@ -10,20 +10,17 @@ import {
 
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { WhiteBackIcon, SearchIcon, WhitePlusIcon } from '@assets/icons' 
 import LinearGradient from 'react-native-linear-gradient'
-import WhiteBackIcon from '@assets/icons/goback-white.svg'
-import SearchIcon from '@assets/icons/search.svg'
 import NutritionAddTotal from '@components/nutrition-add-total'
 import nutritionActivitiesData from '@assets/data/nutrition-personal-activity.json'
-import WhitePlusIcon from '@assets/icons/white_plus.svg'
-import Screen from '@components/shared/screen'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    return (
-      <Screen>
+      <View style={styles.root}>
          <LinearGradient 
             style={styles.decor}
             colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
@@ -66,11 +63,17 @@ export default (): JSX.Element => {
             />
          </View>
          <NutritionAddTotal title='Calories burned' value={60} />
-      </Screen>
+      </View>
    )
 }
 
 const styles = StyleSheet.create({
+   root: {
+      flex: 1, 
+      backgroundColor: '#fff',
+      alignItems: 'center'
+   },
+
    decor: {
       position: 'absolute',
       top: vS(-120),

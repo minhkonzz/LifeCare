@@ -1,4 +1,10 @@
 import { FC, useState, useEffect, useRef } from 'react'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import SettingToggle from '@components/shared/setting-toggle'
+import SettingToggleValue from './shared/setting-toggle-value'
+import BackIcon from '@assets/icons/goback.svg'
+
 import {
     View,
     Text,
@@ -7,10 +13,8 @@ import {
     Easing,
     Pressable
 } from 'react-native'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import SettingToggle from '@components/shared/setting-toggle'
-import BackIcon from '@assets/icons/goback.svg'
+
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 interface SettingRowProps {
     title: string,
@@ -21,47 +25,18 @@ interface SettingRowProps {
     additionalStyles?: any
 }
 
-const SettingRedirect: FC<{ onPress: () => void }> = ({ onPress }) => (
+const SettingRedirect: FC<{ onPress?: () => void }> = ({ onPress }) => (
     <Pressable style={styles.redirectWrapper} {...{ onPress }}>
         <BackIcon style={{ transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
     </Pressable>
 )
 
-const SettingValue: FC<{ value: string | number, onPress: () => void }> = ({ value, onPress }) => (
+const SettingValue: FC<{ value: string | number, onPress?: () => void }> = ({ value, onPress }) => (
     <Pressable style={styles.settingValue} {...{ onPress }}>
         <Text style={[styles.text, styles.valueTitle]}>{value}</Text>
         <BackIcon style={{ marginTop: -1, transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
     </Pressable>
 )
-
-const SettingToggleValue: FC<{ value: [string, string], onPress: () => void }> = ({ value, onPress }) => {
-    const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const [ enabled, setEnabled ] = useState<boolean>(false)
-
-	useEffect(() => {
-		Animated.timing(translateX, {
-			duration: 150,
-			toValue: enabled ? hS(54) : 0,
-			easing: Easing.bezier(1, 0, 0, 1),
-			useNativeDriver: true
-		}).start()
-	}, [enabled])
-
-    const onTogglePressed = () => {
-        onPress()
-        setEnabled(!enabled)
-    }
-
-	return (
-		<Pressable style={styles.toggle} onPress={onTogglePressed}>
-			<Animated.View style={[styles.toggleButton, { transform: [{ translateX }] }]} />
-			<View style={styles.toggleBg}>
-				<Text style={styles.toggleText}>{value[0].toUpperCase()}</Text>
-				<Text style={styles.toggleText}>{value[1].toUpperCase()}</Text>
-			</View>
-		</Pressable>
-	)
-}
 
 const settingTypes: any = {
     redirect: SettingRedirect,
@@ -127,7 +102,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: Colors.darkPrimary.hex
+        color: darkHex
     },
 
     settingValue: {
@@ -137,38 +112,8 @@ const styles = StyleSheet.create({
 
     valueTitle: {
         marginRight: hS(12),
-        color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`
+        color: `rgba(${darkRgb.join(', ')}, .6)`
     },
-
-    toggle: {
-		width: hS(120),
-		height: vS(28),
-		backgroundColor: Colors.lightPrimary.hex,
-		borderRadius: hS(12),
-		justifyContent: 'center'
-	},
-
-	toggleButton: {
-		position: 'absolute',
-		height: '80%',
-		width: '50%',
-		backgroundColor: '#fff',
-		borderRadius: hS(12),
-		left: hS(2),
-		right: hS(2)
-	},
-
-    toggleBg: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingHorizontal: hS(18),
-		marginTop: vS(2)
-	},
-
-	toggleText: {
-		fontSize: hS(13),
-		fontFamily: 'Poppins-Medium'
-	},
 
     redirectWrapper: {
         width: '40%', 

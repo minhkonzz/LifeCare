@@ -19,12 +19,12 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		Animated.parallel([
 			Animated.timing(animateValue, {
 				toValue: isViewable && 1 || 0, 
-				duration: 1010, 
+				duration: 840, 
 				useNativeDriver: true
 			}), 
 			Animated.timing(progressAnimateValue, {
 				toValue: isViewable && 1 || 0, 
-				duration: 1010, 
+				duration: 840, 
 				delay: 500, 
 				useNativeDriver: false
 			})
@@ -33,32 +33,28 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 
 	return (
 		isViewable && 
-		<Animated.View style={[styles.container, { opacity: animateValue }]}>
+		<Animated.View style={{...styles.container, opacity: animateValue }}>
 			<View style={styles.header}>
 				<Animated.Text 
-					style={[
-						styles.title, 
-						{
-							opacity: animateValue, 
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-50, 0]
-							}) }]
-						}
-					]}>
+					style={{
+						...styles.title, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-50, 0]
+						}) }]
+					}}>
 					Fasting records
 				</Animated.Text>
-				<Animated.View style={[
-					styles.hrz, 
-					{ 
-						marginTop: vS(8), 
-						opacity: animateValue, 
-						transform: [{ translateY: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-30, 0]
-						}) }]
-					}
-				]}>
+				<Animated.View style={{
+					...styles.hrz, 
+					marginTop: vS(8), 
+					opacity: animateValue, 
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-30, 0]
+					}) }]
+				}}>
 					<View style={styles.hrz}>
 						<LinearGradient
 							style={styles.noteColor}
@@ -68,7 +64,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 						/>
 						<Text style={styles.noteTitle}>Completed</Text>
 					</View>
-					<View style={[styles.hrz, { marginLeft: hS(38) }]}>
+					<View style={{...styles.hrz, marginLeft: hS(38) }}>
 						<LinearGradient
 							style={styles.noteColor}
 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
@@ -80,28 +76,26 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				</Animated.View>
 			</View>
 			<Animated.FlatList
-				style={[styles.records, { opacity: animateValue }]}
+				style={{...styles.records, opacity: animateValue }}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				data={fastingRecordsData}
 				renderItem={({ item, index }) => (
-					<View key={index} style={[styles.rec, { marginLeft: (index > 0 ? hS(15) : 0) }]}>
-						<Text style={[styles.recText, { height: vS(22) }]}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
+					<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
+						<Text style={{...styles.recText, height: vS(22) }}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
 						<LinearGradient
 							style={styles.recProg}
 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}>
 							<AnimatedLinearGradient
-								style={[
-									styles.recProgValue, 
-									{ 
-										height: progressAnimateValue.interpolate({
-											inputRange: [0, 1], 
-											outputRange: ['0%', `${item.hrs / 24 * 100}%`]
-										}) 
-									}
-								]}
+								style={{
+									...styles.recProgValue, 
+									height: progressAnimateValue.interpolate({
+										inputRange: [0, 1], 
+										outputRange: ['0%', `${item.hrs / 24 * 100}%`]
+									}) 
+								}}
 								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 								start={{ x: .5, y: 0 }}
 								end={{ x: .5, y: 1 }} />
@@ -113,7 +107,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					</View>
 				)}
 			/>
-			<AnimatedPressable style={[styles.timelineRef, { opacity: animateValue }]}>
+			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
 				<Text style={styles.timelineText}>Timeline</Text>
 			</AnimatedPressable>
 		</Animated.View> || <View style={styles.container} />

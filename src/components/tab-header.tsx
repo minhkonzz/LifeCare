@@ -3,31 +3,37 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
-import WaterCupIcon from '@assets/icons/watercup.svg'
+import { WatercupIcon } from '@assets/icons'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+
+const { hex: darkHex } = Colors.darkPrimary
 
 interface TabHeaderProps {
 	title?: string
 }
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
-	// const navigation = useNavigation()
+	const navigation = useNavigation<any>()
+	const drinked: number = useSelector((state: AppState) => state.water.drinked)
+	const dailyWater: number = useSelector((state: AppState) => state.user.metadata.dailyWater)
 
 	return (
 		<View style={styles.container}>
-			<View style={{ width: hS(52), height: vS(40) }} />
+			<View style={styles.temp} />
 			<Text style={styles.title}>{title}</Text>
 			<View style={styles.watercupWrapper}>
 				<AnimatedCircularProgress
 					lineCap='round'
-					width={hS(4.5)}
+					width={hS(4)}
 					size={hS(45)}
 					rotation={360}
-					fill={80}
+					fill={Math.floor(drinked / dailyWater * 100)}
 					tintColor='#91C8E4'
 					backgroundColor='#E3E3E3' />
 				<View style={styles.watercupInside}>
-					<Pressable>
-						<WaterCupIcon width={hS(14)} height={vS(19)} />
+					<Pressable onPress={() => navigation.navigate('water')}>
+						<WatercupIcon width={hS(14)} height={vS(19)} />
 					</Pressable>
 				</View>
 			</View>
@@ -36,6 +42,11 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 }
 
 const styles = StyleSheet.create({
+	temp: {
+		width: hS(52),
+		height: vS(40)
+	},
+
 	container: {
 		position: 'absolute',
 		backgroundColor: '#fff',
@@ -47,13 +58,13 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: hS(25),
 		borderBottomRightRadius: hS(25),
 		elevation: 10,
-		shadowColor: Colors.darkPrimary.hex
+		shadowColor: darkHex
 	},
 
 	title: {
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(18),
-		color: Colors.darkPrimary.hex,
+		color: darkHex,
 		letterSpacing: .5, 
 		marginTop: vS(-32)
 	},

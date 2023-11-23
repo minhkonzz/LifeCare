@@ -1,4 +1,23 @@
 import { Dispatch, SetStateAction, useState, useEffect, useRef, memo } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { updateTimes, updateCurrentPlan, resetTimes } from '../store/fasting'
+import { toDateTimeV1, getCurrentTimestamp } from '@utils/datetimes'
+import { AppState } from '../store'
+import { useSelector, useDispatch } from 'react-redux'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import DateTimePopup from '@components/shared/popup-content/start-fasting'
+import DayPlanItem from '@components/day-plan-item'
+import Button from '@components/shared/button/Button'
+import BackIcon from '@assets/icons/goback.svg'
+import WhiteBackIcon from '@assets/icons/goback-white.svg'
+import EditPrimary from '@assets/icons/edit-primary.svg'
+import RestaurantIcon from '@assets/icons/restaurant.svg'
+import ElectroIcon from '@assets/icons/electro.svg'
+import LightIcon from '@assets/icons/light.svg'
+import LinearGradient from 'react-native-linear-gradient'
+
 import {
 	View,
 	Text,
@@ -9,24 +28,6 @@ import {
 	Animated,
 	ScrollView
 } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import { updateTimes, updateCurrentPlan, resetTimes } from '../store/fasting'
-import { toDateTimeV1, getCurrentTimestamp } from '@utils/datetimes'
-import { AppState } from '../store'
-import { useSelector, useDispatch } from 'react-redux'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import DateTimePopup from '@components/shared/popup-content/datetime'
-import DayPlanItem from '@components/day-plan-item'
-import Button from '@components/shared/button/Button'
-import BackIcon from '@assets/icons/goback.svg'
-import WhiteBackIcon from '@assets/icons/goback-white.svg'
-import EditPrimary from '@assets/icons/edit-primary.svg'
-import RestaurantIcon from '@assets/icons/restaurant.svg'
-import ElectroIcon from '@assets/icons/electro.svg'
-import LightIcon from '@assets/icons/light.svg'
-import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -45,11 +46,6 @@ const TimeSetting = ({
 	hrsFast: number,
 	hrsEat: number
 }) => {
-
-	useEffect(() => {
-		console.log('render TimeSetting Firsttime')
-	}, [])
-
 	return (
 		<View style={styles.fastingTimes}>
 			<View style={styles.fastingTimesHeader}>
@@ -92,9 +88,8 @@ const TimeSetting = ({
 }
 
 const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
-	console.log('render Content component')
 	const dispatch = useDispatch()
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 	const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const { hrsFast, hrsEat } = newPlan
@@ -107,13 +102,9 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 	}, [])
 
 	const onStartFasting = () => {
+		navigation.navigate('main')
+		dispatch(updateTimes({ _start: _startTimeStamp, _end: endTimeStamp }))
 		dispatch(updateCurrentPlan())
-		// dispatch(updateTimes({ 
-		// 	_start: startTimeStamp,
-		// 	_end: endTimeStamp
-		// }))
-		// navigation.navigate('main')
-		console.log(toDateTimeV1(startTimeStamp), toDateTimeV1(endTimeStamp))
 	}
 
 	return (
@@ -209,7 +200,7 @@ export default (): JSX.Element => {
 	const GoBackIcon = headerStyles && BackIcon || WhiteBackIcon
 
 	return (
-		<View style={[styles.container, { paddingBottom: bottomBarHeight }]}>
+		<View style={{...styles.container, paddingBottom: bottomBarHeight}}>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				onScroll={handleScroll}>
@@ -230,7 +221,7 @@ export default (): JSX.Element => {
 				<Pressable onPress={() => { }}>
 					<GoBackIcon width={hS(9.2)} height={vS(16)} />
 				</Pressable>
-				<Text style={[styles.headerTitle, { color: headerStyles && darkHex || '#fff' }]}>1 day plan</Text>
+				<Text style={{...styles.headerTitle, color: headerStyles && darkHex || '#fff' }}>1 day plan</Text>
 				<View />
 			</Animated.View>
 			{ visible && <DateTimePopup {...{ setVisible, onConfirm }} /> }

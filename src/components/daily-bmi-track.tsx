@@ -1,4 +1,15 @@
-import { ReactNode, Dispatch, SetStateAction, useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useRef, useContext } from 'react'
+import LinearGradient from 'react-native-linear-gradient'
+import { PopupContext } from '@contexts/popup'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { getBMI } from '@utils/fomular'
+import { getBMIStatus } from '@utils/helpers'
+import bmiRangesData from '@assets/data/bmi-range-data.json'
+import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
+
 import { 
    View, 
    Text, 
@@ -6,41 +17,22 @@ import {
    StyleSheet, 
 	Animated
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
-import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import bmiRangesData from '@assets/data/bmi-range-data.json'
-import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 export default (): JSX.Element => {
-   const [ bmiValue, setBMIValue ] = useState<number>(28.25)
+	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
+	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const titleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const rangeAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
+	const { setPopup } = useContext<any>(PopupContext)
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: 1, 
-				duration: 720, 
-				useNativeDriver: true
-			}),
-			Animated.timing(titleAnimateValue, {
-				toValue: 1, 
-				duration: 920, 
-				useNativeDriver: true
-			}),
-			Animated.timing(rangeAnimateValue, {
-				toValue: 1, 
-				duration: 1010, 
-				useNativeDriver: false
-			})
-		]).start()
+		Animated.timing(animateValue, {
+			toValue: 1, 
+			duration: 840, 
+			useNativeDriver: false
+		}).start()
 	}, [])
 
    return (
@@ -50,33 +42,29 @@ export default (): JSX.Element => {
 				colors={[`rgb(229, 244, 231)`, `rgba(229, 244, 231, .4)`]}
 				start={{ x: .5, y: 0 }}
 				end={{ x: .5, y: 1 }}>
-				<Animated.Text style={[
-					styles.title, 
-					{
-						transform: [{ translateX: titleAnimateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-100, 0]
-						}) }]
-					}
-				]}>
+				<Animated.Text style={{
+					...styles.title, 
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-50, 0]
+					}) }]
+				}}>
 					Lastest BMI
 				</Animated.Text>
-				<Animated.View style={{ opacity: rangeAnimateValue }}>
+				<Animated.View style={{ opacity: animateValue }}>
 					<View style={styles.value}>
 						<Text style={styles.valueNumber}>{bmiValue}</Text>
 						<Text style={styles.valueSymbol}>kg/m2</Text>
 					</View>
-					<Text style={styles.status}>Overweight</Text>
+					<Text style={styles.status}>{getBMIStatus(bmiValue)}</Text>
 				</Animated.View>
-				<Animated.View style={[
-					styles.rangeColors, 
-					{ 
-						height: rangeAnimateValue.interpolate({
-							inputRange: [0, 1] ,
-							outputRange: [0, vS(48)]
-						})	
-					}
-				]}>
+				<Animated.View style={{
+					...styles.rangeColors, 
+					height: animateValue.interpolate({
+						inputRange: [0, 1] ,
+						outputRange: [0, vS(48)]
+					})	
+				}}>
 				{
 					bmiRangesData.map((e, i) => {
 						return (
@@ -85,7 +73,7 @@ export default (): JSX.Element => {
 								style={{
 									width: `${(e.max - e.min + (i > 2 ? -0.5 : i === 1 ? 1.8 : 1)) / 24 * 87}%`,
 									height: (bmiValue <= e.max && bmiValue >= e.min ? vS(48) : vS(11)),
-									borderRadius: 100
+									borderRadius: hS(10)
 								}}
 								colors={e.color}
 								start={{ x: .5, y: 0 }}

@@ -1,8 +1,6 @@
 import { memo, useEffect, useRef, useContext } from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native'
-import SettingIcon from '@assets/icons/setting.svg'
-import LogoutIcon from '@assets/icons/logout-red.svg'
-import ClockIcon from '@assets/icons/clock.svg'
+import { ClockIcon, LogoutIcon, SettingIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
@@ -15,7 +13,7 @@ import Weight from '@components/profile-weight'
 import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
-import PopupProvider, { PopupContext } from '@contexts/popup'
+import { PopupContext } from '@contexts/popup'
 import LogoutPopup from '@components/shared/popup-content/logout'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -70,7 +68,7 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 				opacity: animateValue, 
 				transform: [{ translateX: animateValue.interpolate({
 					inputRange: [0, 1], 
-					outputRange: [-100, 0]
+					outputRange: [-50, 0]
 				}) }]
 			}}>
 				<Text style={styles.upgradePlanShortDesc}>Upgrade to Pro</Text>
@@ -81,7 +79,7 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 					opacity: animateValue, 
 					transform: [{ translateX: animateValue.interpolate({
 						inputRange: [0, 1], 
-						outputRange: [100, 0]
+						outputRange: [50, 0]
 					}) }]
 				}]} 
 				activeOpacity={.7}>
@@ -110,7 +108,7 @@ const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 				opacity: animateValue,
 				transform: [{ translateX: animateValue.interpolate({
 					inputRange: [0, 1], 
-					outputRange: [-100, 0]
+					outputRange: [-50, 0]
 				}) }]
 			}}
 			onPress={() => navigation.navigate('timeline')}>
@@ -128,7 +126,7 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0, 
-			duration: 1010, 
+			duration: 840, 
 			delay: 100, 
 			useNativeDriver: true
 		}).start()
@@ -141,7 +139,7 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 				opacity: animateValue,
 				transform: [{ translateX: animateValue.interpolate({
 					inputRange: [0, 1], 
-					outputRange: [-100, 0]
+					outputRange: [-50, 0]
 				}) }]
 			}}
 			onPress={() => navigation.navigate('setting')}>
@@ -152,36 +150,20 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-const Main = () => {
-	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-	return (
-		<>
-			<Screen paddingHorzContent header='tab' title='Me' content={[
-				ProfileUser, 
-				Backup, 
-				PlanUpgrade, 
-				LatestBMI, 
-				FastingRecords, 
-				Weight, 
-				HydrateRecords, 
-				BodyMeasure,
-				TimelineRef, 
-				SettingRef
-			]} />
-			{ Popup && <Popup setVisible={setPopup} /> }
-		</>
-	)
-}
-
-export default (): JSX.Element => {
-	return (
-		<View style={styles.container}>
-			<PopupProvider>
-				<Main />
-			</PopupProvider>
-		</View>
-	)
-}
+export default (): JSX.Element => (
+	<Screen paddingHorzContent header='tab' title='Me' content={[
+		ProfileUser, 
+		Backup, 
+		PlanUpgrade, 
+		LatestBMI, 
+		FastingRecords, 
+		Weight, 
+		HydrateRecords, 
+		BodyMeasure,
+		TimelineRef, 
+		SettingRef
+	]} />
+)
 
 const styles = StyleSheet.create({	
 	container: { flex: 1 },
@@ -254,7 +236,7 @@ const styles = StyleSheet.create({
 
 	upgradePlanLongDesc: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: hS(10),
+		fontSize: hS(9),
 		color: darkHex,
 		marginTop: vS(2)
 	},

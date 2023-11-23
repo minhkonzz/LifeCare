@@ -1,29 +1,22 @@
-import { ReactNode } from 'react'
 import { View, Text, StyleSheet } from 'react-native' 
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import LinearGradient from 'react-native-linear-gradient'
 import RingIndicator from './shared/ring-indicator'
 
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+
 interface FastingStageProps {
-   title: string, 
-   index: number,
-   fromHrs: number, 
-   toHrs: number, 
-   content: string,
-   active?: boolean, 
-   icon?: ReactNode
+   item: any, 
+   index: number, 
+   elapsedHours: number
 }
 
-export default ({ 
-   title, 
-   index,
-   fromHrs, 
-   toHrs, 
-   content, 
-   active,
-   icon 
-}: FastingStageProps): JSX.Element => {
+export default ({ item, index, elapsedHours }: FastingStageProps): JSX.Element => {
+   const { title, from, to, content, icon } = item
+   const MainIcon = icon
+   const active = elapsedHours >= from && elapsedHours <= to
    return (
       <View style={styles.container}>
          <View style={styles.alignCenter}>
@@ -36,15 +29,31 @@ export default ({
             <Text style={styles.stageNumber}>{`STAGE ${index + 1}`}</Text>
             <LinearGradient 
                style={styles.mainContent}
-               colors={[`rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`, Colors.darkPrimary.hex]}
+               colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
                start={{ x: .5, y: 0 }}
                end={{ x: .52, y: .5 }}>
                <View style={styles.header}>
-                  <View style={styles.stageCircle} />
-                  <View style={{ marginLeft: hS(15) }}>
+                  <LinearGradient
+							style={styles.stageIcBg}
+							colors={['#000', 'rgba(0, 0, 0, 0)']}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<AnimatedCircularProgress
+								lineCap='round'
+								style={{ position: 'absolute' }}
+								width={hS(7)}
+								size={hS(80)}
+								rotation={360}
+								fill={elapsedHours > to ? 100 : (elapsedHours - from) / (to - from) * 100}
+								tintColor='#30E3CA'
+								backgroundColor='#fff'
+							/>
+							<MainIcon width={hS(36)} height={vS(36)} />
+						</LinearGradient>
+                  <View>
                      <Text style={styles.title}>{title}</Text>   
                      <View style={styles.hrsRange}>
-                        <Text style={styles.hrsRangeText}>{`${fromHrs} - ${toHrs} hours`}</Text>
+                        <Text style={styles.hrsRangeText}>{`${from} - ${to} hours`}</Text>
                      </View>
                   </View>            
                </View>
@@ -56,17 +65,9 @@ export default ({
 }
 
 const styles = StyleSheet.create({
-   alignCenter: {
-      alignItems: 'center'
-   },
-
-   container: {
-      flexDirection: 'row'
-   },
-
-   main: {
-      marginLeft: hS(14)
-   },
+   alignCenter: { alignItems: 'center' },
+   container: { flexDirection: 'row' },
+   main: { marginLeft: hS(14) },
 
    mainContent: {
       width: hS(322),  
@@ -82,34 +83,35 @@ const styles = StyleSheet.create({
       borderRadius: hS(12), 
       justifyContent: 'center', 
       alignItems: 'center', 
-      borderColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`
+      borderColor: `rgba(${darkRgb.join(', ')}, .12)`
    }, 
 
    lineIndicator: {
       height: vS(320), 
       width: hS(2.5), 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`
    }, 
 
    stageNumber: {
       fontFamily: 'Poppins-Medium', 
       fontSize: hS(12), 
-      color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`,
+      color: `rgba(${darkRgb.join(', ')}, .6)`,
       letterSpacing: .2, 
       marginBottom: vS(12)
+   },
+
+   stageIcBg: {
+      marginTop: -0.5,
+		width: hS(78),
+		height: vS(78),
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: 500
    },
 
    header: {
       flexDirection: 'row',
       alignItems: 'center'
-   }, 
-
-   stageCircle: {
-      width: hS(80),  
-      height: vS(80),
-      borderRadius: hS(200), 
-      borderWidth: 1, 
-      borderColor: '#fff'
    }, 
 
    title: {

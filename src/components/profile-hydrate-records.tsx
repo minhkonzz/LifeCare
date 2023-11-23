@@ -1,5 +1,5 @@
 import { memo, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import BluePlusIcon from '@assets/icons/blue_plus.svg'
@@ -11,97 +11,99 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
+const Record = ({ item, index }) => {
+	return (
+		<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', justifyContent: 'center' }}>
+			<Text style={styles.recText}>Nov</Text>
+			<View style={styles.recProg}>
+				<AnimatedLinearGradient
+					style={{
+						...styles.recProgValue, 
+						height: `${item.value / item.goal * 100}%`
+					}}
+					colors={['rgba(120, 193, 243, .36)', '#78C1F3']}
+					start={{ x: .5, y: 0 }}
+					end={{ x: .5, y: 1 }} 
+				/>
+			</View>
+			<Text style={styles.recText}>29</Text>
+		</Pressable>
+	)
+}
+
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: isViewable && 1 || 0,
-				duration: 1010,
-				useNativeDriver: true
-			}),
-			Animated.timing(progressAnimateValue, {
-				toValue: isViewable && 1 || 0, 
-				duration: 1010, 
-				delay: 500, 
-				useNativeDriver: false
-			})
-		]).start()
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0,
+			duration: 920,
+			useNativeDriver: true
+		}).start()
 	}, [isViewable])
 
 	return (
 		isViewable && 
-		<Animated.View style={{ opacity: animateValue }}>
-			<LinearGradient
-				style={styles.container}
-				colors={['rgba(154, 197, 244, .24)', '#9AC5F4']}
-				start={{ x: .5, y: 0 }}
-				end={{ x: .5, y: 1 }}>
-				<View style={styles.header}>
-					<Animated.View style={{ 
-						opacity: animateValue, 
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1],
-							outputRange: [-100, 0]
-						}) }]
-					}}>
-						<Text style={styles.headerMainText}>Keep hydrate records</Text>
-						<View style={styles.headerNotes}>
-							<View style={styles.headerNotePart}>
-								<LinearGradient
-									style={styles.headerNoteCircle}
-									colors={[`rgba(${[120, 193, 243].join(', ')}, .6)`, '#78C1F3']}
-									start={{ x: .5, y: 0 }}
-									end={{ x: .5, y: 1 }} />
-								<Text style={styles.headerNoteText}>Completed</Text>
-							</View>
-							<View style={[styles.headerNotePart, { marginLeft: hS(38) }]}>
-								<View style={[styles.headerNoteCircle, { backgroundColor: '#fafafa' }]} />
-								<Text style={styles.headerNoteText}>Goal</Text>
-							</View>
+		<AnimatedLinearGradient
+			style={{...styles.container, opacity: animateValue }}
+			colors={['rgba(154, 197, 244, .24)', 'rgba(154, 197, 244, .7)']}
+			start={{ x: .5, y: 0 }}
+			end={{ x: .5, y: 1 }}>
+			<View style={styles.header}>
+				<Animated.View style={{ 
+					opacity: animateValue, 
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					}) }]
+				}}>
+					<Text style={styles.headerMainText}>Keep hydrate records</Text>
+					<View style={styles.headerNotes}>
+						<View style={styles.headerNotePart}>
+							<LinearGradient
+								style={styles.headerNoteCircle}
+								colors={[`rgba(${[120, 193, 243].join(', ')}, .6)`, '#78C1F3']}
+								start={{ x: .5, y: 0 }}
+								end={{ x: .5, y: 1 }} />
+							<Text style={styles.headerNoteText}>Completed</Text>
 						</View>
-					</Animated.View>
-					<AnimatedTouchableOpacity 
-						style={[styles.hydrateRecsUpdateButton, { transform: [{ scale: animateValue }] }]} 
-						activeOpacity={.8}>
-						<BluePlusIcon width={hS(14)} height={vS(15.3)} />
-					</AnimatedTouchableOpacity>
-				</View>
-				<Animated.FlatList
-					style={[styles.records, { opacity: animateValue }]}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					data={hyrdrateRecords}
-					renderItem={({ item, index }) => (
-						<View key={index} style={[styles.rec, { marginLeft: (index > 0 ? hS(15) : 0) }]}>
-							<Text style={[styles.recText, { height: vS(22) }]}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
-							<View style={styles.recProg}>
-								<AnimatedLinearGradient
-									style={[
-										styles.recProgValue, 
-										{ 
-											height: progressAnimateValue.interpolate({
-												inputRange: [0, 1], 
-												outputRange: ['0%', `${item.hrs / 24 * 100}%`]
-											})
-										}
-									]}
-									colors={['rgba(120, 193, 243, .36)', '#78C1F3']}
-									start={{ x: .5, y: 0 }}
-									end={{ x: .5, y: 1 }} />
-							</View>
-							<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-								<Text style={styles.recText}>{item.day}</Text>
-								<Text style={[styles.recText, { marginTop: vS(-2) }]}>{item.month}</Text>
-							</View>
+						<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
+							<View style={[styles.headerNoteCircle, { backgroundColor: '#fafafa' }]} />
+							<Text style={styles.headerNoteText}>Goal</Text>
 						</View>
-					)}
-				/>
-				<Animated.Text style={[styles.lastUpdatedText, { opacity: animateValue }]}>Last updated 3 minutes</Animated.Text>
-			</LinearGradient>
-		</Animated.View> || <View style={styles.container} />
+					</View>
+				</Animated.View>
+				<AnimatedTouchableOpacity 
+					style={{...styles.hydrateRecsUpdateButton, transform: [{ scale: animateValue }] }} 
+					activeOpacity={.8}>
+					<BluePlusIcon width={hS(14)} height={vS(15.3)} />
+				</AnimatedTouchableOpacity>
+			</View>
+			<FlatList 
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				keyExtractor={item => item.id}
+				data={[
+					{
+						id: 'wr1',
+						value: 500, 
+						goal: 2500
+					}, 
+					{
+						id: 'wr2',
+						value: 1250, 
+						goal: 2500
+					},
+					{
+						id: 'wr3',
+						value: 1800, 
+						goal: 2500
+					}
+				]} 
+				renderItem={({ item, index }) => <Record {...{ item, index }} />} 
+			/>
+			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
+		</AnimatedLinearGradient> || <View style={styles.container} />
 	)
 })
 
@@ -109,7 +111,8 @@ const styles = StyleSheet.create({
 	container: {
 		marginTop: vS(24),
 		width: hS(370),
-		height: vS(350),
+		height: vS(400),
+		justifyContent: 'space-between',
 		paddingVertical: vS(16),
 		paddingHorizontal: hS(18),
 		borderRadius: hS(24)
@@ -163,8 +166,7 @@ const styles = StyleSheet.create({
 	},
 
 	records: {
-		width: '100%',
-		marginTop: vS(20)
+		width: '100%'
 	},
 
 	lastUpdatedText: {
@@ -172,7 +174,6 @@ const styles = StyleSheet.create({
 		fontSize: hS(11), 
 		color: darkHex,
 		letterSpacing: .2,
-		marginTop: vS(18), 
 		alignSelf: 'center'
 	},
 
@@ -188,12 +189,12 @@ const styles = StyleSheet.create({
 	},
 
 	recProg: {
-		width: hS(54),
-		height: vS(121),
-		borderRadius: 200,
-		justifyContent: 'flex-end',
-		backgroundColor: '#fff',
-		overflow: 'hidden'
+		width: hS(20), 
+		height: vS(180), 
+		borderRadius: 100, 
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .08)`,
+		marginVertical: vS(10), 
+		justifyContent: 'flex-end'
 	},
 
 	recProgValue: {

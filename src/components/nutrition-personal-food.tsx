@@ -11,9 +11,9 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
-export default (): JSX.Element => {
+export default ({ item, index }: { item: any, index: number }): JSX.Element => {
    return (
-      <View style={styles.container}>
+      <View style={{...styles.container, marginTop: index > 0 ? hS(16) : 0 }}>
          <View style={styles.detail}>
             <View style={styles.imageWrapper}>
                <Image style={styles.image} source={require('../assets/images/nutrition-personal-food.png')} />

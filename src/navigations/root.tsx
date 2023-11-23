@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { updateNetworkOnline } from '../store/network'
-import { updateSession, updateMetadata } from '../store/user'
+import { updateMetadata, updateSession } from '../store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
 import { PersonalData } from '@utils/interfaces'
@@ -13,7 +13,15 @@ import NetInfo from '@react-native-community/netinfo'
 
 export default (): JSX.Element => {
    const dispatch = useDispatch()
-   const _session: any = useSelector((state: AppState) => state.user.session)
+   const [ initialized, setInitialized ] = useState<boolean>(false)
+   const prevSession = useSelector((state: AppState) => state.user.session)
+
+   const initializePersonalData = async (userId: string): Promise<void> => {
+      const isSurveyed = await UserService.checkUserSurveyed(userId)
+      if (!isSurveyed) return 
+      const response: PersonalData = await UserService.getPersonalData(userId)
+      dispatch(updateMetadata(convertObjectKeysToCamelCase(response)))
+   }
 
    useEffect(() => {
       let channel: any
@@ -23,13 +31,16 @@ export default (): JSX.Element => {
       })
 
       const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
-         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') dispatch(updateSession(session))
-         if (_session) {
-            const userId: string = _session.user.id
-            const response: PersonalData = await UserService.getPersonalData(userId)
-            dispatch(updateMetadata(convertObjectKeysToCamelCase(response)))
+         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            const userId: string = session?.user?.id
+            await initializePersonalData(userId)
+            dispatch(updateSession(session))
          }
-         if (!channel) {
+         if (prevSession) {
+            const userId: string = prevSession?.user?.id 
+            await initializePersonalData(userId)
+         }
+         if ((prevSession || session) && !channel) {
             channel = supabase.channel('schema-db-changes')
             .on('postgres_changes', {
                event: 'UPDATE',
@@ -39,6 +50,7 @@ export default (): JSX.Element => {
                dispatch(updateMetadata(convertObjectKeysToCamelCase(payload.new)))
             }).subscribe()
          }
+         setInitialized(true)
       })
 
       return () => {
@@ -46,6 +58,9 @@ export default (): JSX.Element => {
          supabaseAuthListener.subscription.unsubscribe()
       }
    }, [])
+
+   if (!initialized) return <></>
+   console.log('render Stack')
 
    return (
       <NavigationContainer>

@@ -1,8 +1,5 @@
 import { 
    memo, 
-   ReactNode,
-   Dispatch, 
-   SetStateAction,
    useEffect, 
    useRef, 
    useContext
@@ -23,14 +20,19 @@ import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { kilogramsToPounds } from '@utils/fomular'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-   const { setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
-   const navigation = useNavigation()
+   const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+   const change: number = kilogramsToPounds(currentWeight - startWeight)
+   const { setPopup } = useContext<any>(PopupContext)
+   const navigation = useNavigation<any>()
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -50,16 +52,14 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				end={{ x: .52, y: .5 }}>
             <View style={[styles.header, styles.horz]}>
                <Animated.Text 
-                  style={[
-                     styles.title, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-150, 0]
-                        }) }]
-                     }
-                  ]}>
+                  style={{
+                     ...styles.title, 
+                     opacity: animateValue, 
+                     transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-50, 0]
+                     }) }]
+                  }}>
                   Weight
                </Animated.Text>
                <BackIcon style={styles.backIc} width={hS(6.5)} height={vS(10)} />
@@ -72,15 +72,15 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         opacity: animateValue, 
                         transform: [{ translateX: animateValue.interpolate({
                            inputRange: [0, 1], 
-                           outputRange: [-150, 0]
+                           outputRange: [-50, 0]
                         }) }]
                      }
                   ]}>
-						<Text style={styles.current3}>72.52</Text>
+						<Text style={styles.current3}>{`${kilogramsToPounds(currentWeight)}`}</Text>
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
 							<View style={styles.current6}>
-								<Text style={styles.current7}>15.09 lb</Text>
+								<Text style={styles.current7}>{`${change}`}</Text>
 							</View>
 						</View>
 					</Animated.View>
@@ -91,7 +91,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         opacity: animateValue,
                         transform: [{ translateX: animateValue.interpolate({
                            inputRange: [0, 1], 
-                           outputRange: [100, 0]
+                           outputRange: [50, 0]
                         }) }]
                      }
                   ]}
@@ -100,7 +100,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					</AnimatedPressable>
 				</View>
             <View style={styles.progressBar}>
-               <Text style={styles.progressText}>52%</Text>
+               <Text style={styles.progressText}>{`${(currentWeight - startWeight) / (goalWeight - startWeight) * 100}%`}</Text>
                <LinearGradient
 						style={styles.activeBar}
 						colors={['#ffb72b', `rgba(255, 183, 43, .6)`]}
@@ -116,11 +116,11 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         opacity: animateValue, 
                         transform: [{ translateX: animateValue.interpolate({
                            inputRange: [0, 1], 
-                           outputRange: [-150, 0]
+                           outputRange: [-50, 0]
                         }) }]
                      }
                   ]}>
-                  Starting: 87.61 lb
+                  {`Starting: ${kilogramsToPounds(startWeight)} lb`}
                </Animated.Text>
 					<Animated.Text 
                   style={[
@@ -129,11 +129,11 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         opacity: animateValue, 
                         transform: [{ translateX: animateValue.interpolate({
                            inputRange: [0, 1], 
-                           outputRange: [150, 0]
+                           outputRange: [50, 0]
                         }) }]
                      }
                   ]}>
-                  Goal: 62.5 lb
+                  {`Goal: ${kilogramsToPounds(goalWeight)} lb`}
                </Animated.Text>
 				</View>
             <AnimatedPressable 
@@ -143,7 +143,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                      opacity: animateValue, 
                      transform: [{ translateX: animateValue.interpolate({
                         inputRange: [0, 1], 
-                        outputRange: [-150, 0]
+                        outputRange: [50, 0]
                      }) }]
                   }
                ]}

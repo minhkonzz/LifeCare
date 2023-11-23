@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable, Platform, StatusBar } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import StackHeader from '@components/shared/stack-header'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store' 
+import UserService from '@services/user'
+import StackHeader from '@components/shared/stack-header'
 import Button from '@components/shared/button/Button'
 import CheckmarkIcon from '@assets/icons/checkmark.svg'
 
@@ -13,9 +17,13 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const goals = ['Lose weight', 'Live longer', 'Be\nenergetic', 'Improve Health']
 
 export default (): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const navigation = useNavigation<any>()
    const bottomBarHeight: number = useDeviceBottomBarHeight()
-   const [ selectedGoal, setSelectedGoal ] = useState<string[]>([])
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session && session?.user.id || null
+   const { goal } = metadata
+   const [ selectedGoal, setSelectedGoal ] = useState<string[]>(goal)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -27,6 +35,11 @@ export default (): JSX.Element => {
 
    const onSelectGoal = (goal: string) => {
       setSelectedGoal(selectedGoal.includes(goal) ? selectedGoal.filter(e => e !== goal) : [...selectedGoal, goal])
+   }
+
+   const onSave = async () => {
+      await UserService.updatePersonalData(userId, { goal })
+      navigation.goBack()
    }
 
    return (
@@ -54,7 +67,11 @@ export default (): JSX.Element => {
             }
             </View>
          </View>
-         <Button title='Save' bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} size='large' />
+         <Button 
+            title='Save' 
+            bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
+            size='large' 
+            onPress={onSave}/>
       </View>
    )
 }

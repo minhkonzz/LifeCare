@@ -1,10 +1,21 @@
-export const autoId = (prefix: string) => {
+export const getBMIStatus = (value: number): string => {
+   return (
+      value < 16 && 'Severe Thinness' ||
+      value >= 16 && value < 17 && 'Moderate thinness' ||
+      value >= 17 && value < 18.5 && 'Mild thinness' || 
+      value >= 18.5 && value < 25 && 'Normal' ||
+      value >= 25 && value < 30 && 'Overweight' ||
+      value >= 30 && value < 35 && 'Obese class 1' || 'Obese class 2'
+   )
+}
+
+export const autoId = (prefix: string): string => {
    const timestamp = Date.now().toString(36)
    const random = Math.random().toString(36).slice(2, 8)
    return prefix + timestamp + random
 }
 
-export const formatNum = (value: number) => {
+export const formatNum = (value: number): string => {
    return value.toString().padStart(2, '0')
 }
 

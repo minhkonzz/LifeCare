@@ -26,8 +26,7 @@ export type FastingState = {
    newPlan: any,
    currentPlan: any, 
    startTimeStamp: number, 
-   endTimeStamp: number,
-   isFasting: boolean
+   endTimeStamp: number
 }
 
 export type Message = {
@@ -64,10 +63,16 @@ export type SettingState = {
    }
 }
 
+export type UserState = {
+   session: any,
+   metadata: any,
+   changes: any
+}
+
 export type WaterRecordsPayload = {
    userId: string,
    goal: number, 
-   drinked: number,
+   value: number,
    changes: Array<{ liquid: number, time: string }>
 }
 

@@ -10,15 +10,11 @@ import {
    Text,
    Pressable,   
    StyleSheet, 
-   Animated,
-   Alert
+   Animated
 } from 'react-native'
 import Button from '@components/shared/button/Button'
-import UserFieldIcon from '@assets/icons/user_field.svg'
-import LockIcon from '@assets/icons/lock.svg'
-import AtIcon from '@assets/icons/at.svg'
+import { UserFieldIcon, LockIcon, AtIcon, BackIcon } from '@assets/icons'
 import AuthInput from './auth-input'
-import BackIcon from '@assets/icons/goback.svg'
 import { useSelector } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
@@ -29,6 +25,7 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
+   console.log('render SignUp component')
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    useEffect(() => {
@@ -66,18 +63,16 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
 
    return (
       <View style={styles.container}>
-         <Animated.Image style={[styles.storyset, { transform: [{ scale: animateValue }] }]} source={require('../assets/images/storyset/signup.gif')} />
-         <Animated.View style={[
-            styles.titleWrapper,
-            styles.horz, 
-            {
-               opacity: animateValue,
-               transform: [{ translateX: animateValue.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-200, 0]
-               }) }]   
-            }
-         ]}>
+         <Animated.Image style={{...styles.storyset, transform: [{ scale: animateValue }] }} source={require('../assets/images/storyset/signup.gif')} />
+         <Animated.View style={{
+            ...styles.titleWrapper,
+            ...styles.horz, 
+            opacity: animateValue,
+            transform: [{ translateX: animateValue.interpolate({
+               inputRange: [0, 1],
+               outputRange: [-200, 0]
+            }) }]   
+         }}>
             <Pressable onPress={changeToSignIn}><BackIcon width={hS(18)} height={vS(18)} /></Pressable>
             <Text style={styles.title}>Sign up</Text>
          </Animated.View>
@@ -104,7 +99,7 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
                <UserFieldIcon width={hS(20)} height={vS(20)} />
             </AuthInput>
          </Animated.View>
-         <Animated.View style={[styles.termsRef, { opacity: animateValue }]}>
+         <Animated.View style={{...styles.termsRef, opacity: animateValue }}>
             <Animated.Text style={styles.termsRefTitle}>By signing up, you're agree with our</Animated.Text>
             <Animated.Text style={styles.termsRefHl}>Terms & conditions and Privacy policy</Animated.Text>
          </Animated.View>

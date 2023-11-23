@@ -1,19 +1,10 @@
-import { 
-	memo, 
-	ReactNode, 
-	useEffect, 
-	useRef, 
-	useContext, 
-	Dispatch, 
-	SetStateAction 
-} from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { AppState } from '../store'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import PopupProvider, { PopupContext } from '@contexts/popup'
 import BackIcon from '@assets/icons/goback.svg'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
@@ -25,12 +16,12 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0, 
-			duration: 1010, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])
@@ -38,30 +29,26 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	return (
 		isViewable && 
 		<View style={styles.mainTop}>
-			<Animated.Text style={[
-				styles.mainTopTitle, 
-				{
-					opacity: animateValue, 
-					transform: [{ translateX: animateValue.interpolate({
-						inputRange: [0, 1], 
-						outputRange: [-100, 0]
-					}) }]
-				}
-			]}>
+			<Animated.Text style={{
+				...styles.mainTopTitle, 
+				opacity: animateValue, 
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-50, 0]
+				}) }]
+			}}>
 				{ startTimeStamp && endTimeStamp && "You're fasting now" || "You're in eating period" }
 			</Animated.Text>
-			<Animated.View style={[
-				styles.plans, 
-				{
-					opacity: animateValue, 
-					transform: [{ translateX: animateValue.interpolate({ 
-						inputRange: [0, 1], 
-						outputRange: [-100, 0]
-					}) }]
-				}
-			]}>
+			<Animated.View style={{
+				...styles.plans, 
+				opacity: animateValue, 
+				transform: [{ translateX: animateValue.interpolate({ 
+					inputRange: [0, 1], 
+					outputRange: [-50, 0]
+				}) }]
+			}}>
 				<Pressable style={styles.plansBox} onPress={() => navigation.navigate('plans')}>
-					<Text style={styles.plansBoxText}>{currentPlan && `${currentPlan.name} Intermittent Fasting plan` || 'Select plan'}</Text>
+					<Text style={styles.plansBoxText}>{currentPlan && `${currentPlan.name} Intermittent Fasting plan` || 'Choose fasting plan'}</Text>
 					<BackIcon
 						style={styles.backIc}
 						width={hS(5)}
@@ -76,34 +63,16 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-const Main = memo(() => {
-	const { popup: Popup, setPopup } = useContext<{ popup: ReactNode, setPopup: Dispatch<SetStateAction<ReactNode>> }>(PopupContext)
-	return (
-		<>
-			<Screen header='tab' title='Timer' paddingHorzContent content={[
-				MainTop,
-				FastingClock,
-				FastingActivator,
-				FastingRecords
-			]} />
-			{ Popup && <Popup setVisible={setPopup} /> }
-		</>
-	)
-})
-
-export default (): JSX.Element => {
-	return (
-		<View style={styles.container}>
-			<PopupProvider>
-				<Main />
-			</PopupProvider>
-		</View>
-	)
-}
+export default (): JSX.Element => (
+	<Screen header='tab' title='Timer' paddingHorzContent content={[
+		MainTop,
+		FastingClock,
+		FastingActivator,
+		FastingRecords
+	]} />
+)
 
 const styles = StyleSheet.create({
-	container: { flex: 1 },
-
 	mainTop: {
 		height: vS(120),
 		alignItems: 'center',
@@ -131,10 +100,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: vS(12),
-		paddingHorizontal: hS(13),
+		paddingVertical: vS(10),
+		paddingHorizontal: hS(14),
 		elevation: 14,
-		shadowColor: `rgba(${darkRgb.join(', ')}, .3)`
+		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
 	},
 
 	plansBoxText: {

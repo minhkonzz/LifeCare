@@ -1,11 +1,4 @@
 import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
-import {
-   View, 
-   Text,
-   StyleSheet, 
-   TouchableOpacity,
-   Animated
-} from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
@@ -14,13 +7,20 @@ import { updateCurrentPlan, updateNewPlan } from '../../../store/fasting'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 
+import {
+   View, 
+   Text,
+   StyleSheet, 
+   TouchableOpacity,
+   Animated
+} from 'react-native'
+
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
-   const navigation = useNavigation()
+   const navigation = useNavigation<any>()
    const dispatch = useDispatch()
-
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = (isAllowed: boolean) => {

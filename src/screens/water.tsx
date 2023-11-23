@@ -3,23 +3,22 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { NavigationProp } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS, SCREEN_HEIGHT } from '@utils/responsive'
+import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
 import { updateLiquid } from '../store/water'
 import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback.svg'
-import SettingIcon from '@assets/icons/setting.svg'
-import WhitePlusIcon from '@assets/icons/white_plus.svg'
-import StrongBlueMinusIcon from '@assets/icons/strong_blue_minus.svg'
-import WaterWave from '@components/wave'
+import { BackIcon, SettingIcon, WhitePlusIcon, StrongBlueMinusIcon } from '@assets/icons'
+import StrongWaveSvg from '@assets/images/strong_wave.svg'
 import AnimatedNumber from '@components/shared/animated-text'
+
 import {
    View,
    Text,
    StyleSheet,
    Animated,
    TouchableOpacity, 
-   Pressable
+   Pressable, 
+   Easing
 } from 'react-native'
 
 const darkPrimary: string = Colors.darkPrimary.hex
@@ -27,9 +26,11 @@ const lightBlue: string = Colors.lightBlue.hex
 const strongBlue: string = Colors.strongBlue.hex
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   // const waterHeight: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const liquidDrinked = useSelector((state: AppState) => state.water.drinked)
+   const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const { drinked: liquidDrinked, cupsize } = useSelector((state: AppState) => state.water)
+   const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
    const dispatch = useDispatch()
 
    useEffect(() => {
@@ -38,31 +39,46 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          duration: 920, 
          useNativeDriver: true
       }).start()
+
+      Animated.loop(
+         Animated.timing(waveAnimateValue, {
+            toValue: 1, 
+            duration: 1010, 
+            useNativeDriver: true,
+            easing: Easing.linear
+         })
+      ).start()
    }, [])
 
+   useEffect(() => {
+      Animated.timing(waterTranslateY, {
+         toValue: vS(SCREEN_HEIGHT - SCREEN_HEIGHT * liquidDrinked / dailyWater - 20),
+         duration: 1500,
+         useNativeDriver: true
+      }).start()
+   }, [liquidDrinked])
+
    const increaseLiquid = () => {
-      // Animated.timing(waterHeight, {
-      //    toValue: waterHeight._value + vS(200) * SCREEN_WIDTH / total, 
-      //    duration: 500, 
-      //    useNativeDriver: false
-      // }).start()
       dispatch(updateLiquid(INCREASE))
    }
 
    const decreaseLiquid = () => {
-      // Animated.timing(waterHeight, {
-      //    toValue: waterHeight._value - vS(200) * SCREEN_WIDTH / total, 
-      //    duration: 500, 
-      //    useNativeDriver: false
-      // }).start()
+      if (!liquidDrinked) return
       dispatch(updateLiquid(DECREASE))
    }
 
    return (
       <View style={styles.container}>
-         <View style={styles.waveContainer}>
-            <WaterWave w={SCREEN_HEIGHT - 300} h={SCREEN_HEIGHT - 300} />
-         </View>
+         <Animated.View style={{
+            ...styles.waveContainer,
+            opacity: animateValue,
+            transform: [
+               { translateX: waveAnimateValue.interpolate({ inputRange: [0, 1], outputRange: [0, hS(-378)] }) },
+               { translateY: waterTranslateY }
+            ]
+         }}>
+            <StrongWaveSvg width={hS(792)} height='100%' />
+         </Animated.View>
          <View style={styles.interacts}>
             <View style={styles.header}>
                <BackIcon width={hS(14)} height={vS(14)} />
@@ -73,31 +89,27 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
             </View>
             <View style={styles.results}>
                <Animated.View 
-                  style={[
-                     styles.totalMilTextWrapper, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-150, 0]
-                        }) }]
-                     }
-                  ]}>
+                  style={{
+                     ...styles.totalMilTextWrapper,    
+                     opacity: animateValue, 
+                     transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-50, 0]
+                     }) }]
+                  }}>
                   <AnimatedNumber style={styles.totalMilText} value={liquidDrinked} />
                   <Text style={[styles.totalMilText, styles.totalMilSymbText]}>ml</Text>
                </Animated.View>
                <Animated.Text 
-                  style={[
-                     styles.goalMilText, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateY: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-20, 0]
-                        }) }]
-                     }
-                  ]}>
-                  {`Goal today: ${3000} ml`}
+                  style={{
+                     ...styles.goalMilText, 
+                     opacity: animateValue, 
+                     transform: [{ translateY: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-20, 0]
+                     }) }]
+                  }}>
+                  {`Goal today: ${dailyWater} ml`}
                </Animated.Text>
             </View>
             <View style={styles.updates}>
@@ -108,21 +120,15 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                      start={{ x: .2, y: 0 }}
                      end={{ x: .5, y: 1 }}>
                      <WhitePlusIcon width={hS(20)} height={vS(20)} />
-                     <Text style={styles.increaseMilAmount}>200 ml</Text>
+                     <Text style={styles.increaseMilAmount}>{`${cupsize} ml`}</Text>
                   </LinearGradient>
                </TouchableOpacity>
-               <View style={styles.sideUpdates}>
-                  <TouchableOpacity
-                     style={styles.sideUpdateButton}
-                     activeOpacity={.8}
-                     onPress={decreaseLiquid}>
-                     <StrongBlueMinusIcon width={hS(22)} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                     style={styles.sideUpdateButton}
-                     activeOpacity={.8}>
-                  </TouchableOpacity>
-               </View>
+               <TouchableOpacity
+                  style={styles.sideUpdateButton}
+                  activeOpacity={.8}
+                  onPress={decreaseLiquid}>
+                  <StrongBlueMinusIcon width={hS(22)} />
+               </TouchableOpacity>
             </View>
          </View>
       </View>
@@ -135,9 +141,8 @@ const styles = StyleSheet.create({
    },
 
    waveContainer: {
-      left: 0, 
-      right: 0,
-      bottom: 0,
+      width: hS(792),
+      height: vS(4800),
       position: 'absolute'
    },
 
@@ -216,7 +221,8 @@ const styles = StyleSheet.create({
       backgroundColor: `rgba(${Colors.strongBlue.rgb.join(', ')}, .2)`,
       justifyContent: 'center',
       alignItems: 'center',
-      borderRadius: 500
+      borderRadius: 500, 
+      marginTop: vS(22)
    },
 
    increaseMilAmount: {

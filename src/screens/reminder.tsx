@@ -108,7 +108,7 @@ export default withSync((): JSX.Element => {
 
 	reminderValues['water-start-remind'] = `${formatNum(startWater.h)}:${formatNum(startWater.m)}`
 	reminderValues['water-end-remind'] = `${formatNum(endWater.h)}:${formatNum(endWater.m)}`
-	reminderValues['water-interval-remind'] = `${waterInterval.h && waterInterval.h + 'h' || ''} ${waterInterval.m && waterInterval.m + 'm' || ''}`
+	reminderValues['water-interval-remind'] = `${waterInterval.h && waterInterval.h + ' hrs ' || ''}${waterInterval.m && waterInterval.m + ' mins' || ''}`
 
 	return (
 		<View style={styles.container}>

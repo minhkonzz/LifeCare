@@ -1,7 +1,13 @@
 import { memo, Dispatch, SetStateAction, useState, useRef, useEffect } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../store'
+import { resetTimes } from '../store/fasting'
+import { toDateTimeV1 } from '@utils/datetimes'
+import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback-white.svg'
 import EditWhite from '@assets/icons/edit-white.svg'
@@ -24,6 +30,9 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const TimeSetting = memo(() => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
+	const { name: planName } = currentPlan
+	const endTimeStamp = Date.now()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -43,22 +52,22 @@ const TimeSetting = memo(() => {
 					outputRange: [16, 0]
 				}) }]
 			}}>
-				<Text style={styles.planNameText}>16:8 Intermittent Fasting plan</Text>
+				<Text style={styles.planNameText}>{planName}</Text>
 			</Animated.View>
-			<View style={{ width: '100%' }}>
+			<View style={styles.wfull}>
 				<View style={styles.timeSetting}>
 					<View style={styles.timeSettingTitle}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
+					<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
 				</View>
 				<View style={{...styles.timeSetting, marginTop: vS(28) }}>
 					<View style={styles.timeSettingTitle}>
-						<View style={[styles.timeSettingDecor, { backgroundColor: 'rgb(255, 155, 133)' }]} />
+						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>Today, 8:30 PM</Text>
+					<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
 				</View>
 			</View>
 		</Animated.View>
@@ -68,6 +77,7 @@ const TimeSetting = memo(() => {
 const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
 
 	useEffect(() => {
 		Animated.parallel([
@@ -107,7 +117,7 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 									outputRange: [10, 0]
 								}) }]
 							}}>
-							64.5 kg
+							{`${currentWeight} kg`}
 						</Animated.Text>
 						<Animated.Text style={{
 							...styles.trackWeightValueNote, 
@@ -157,7 +167,7 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 								outputRange: [-10, 0]
 							}) }]
 						}}>
-						Starting: 89 kg
+						{`Start: ${startWeight} kg`}
 					</Animated.Text>
 					<Animated.Text 
 						style={{
@@ -168,7 +178,7 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 								outputRange: [10, 0]
 							}) }]
 						}}>
-						Goal: 62 kg
+						{`Goal: ${goalWeight} kg`}
 					</Animated.Text>
 				</View>
 			</View>
@@ -177,9 +187,21 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 })
 
 export default (): JSX.Element => {
+	const dispatch = useDispatch()
+	const navigation = useNavigation<any>()
 	const bottomBarHeight = useDeviceBottomBarHeight()
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const [ visible, setVisible ] = useState<boolean>(false)
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
+	const session = useSelector((state: AppState) => state.user.session) 
+   const userId: string | null = session && session.user.id || null
+	const { name: planName } = currentPlan
+	const endTimeStamp: number = Date.now()
+	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
+	const hours: number = Math.floor(totalMins / 60)
+	const mins: number = totalMins % 60
+
+	console.log('mins:', mins)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -189,47 +211,52 @@ export default (): JSX.Element => {
       }).start()
    }, [])
 
+	const onSave = async () => {
+		await UserService.saveFastingRecord({ userId, startTimeStamp, endTimeStamp, planName })
+		dispatch(resetTimes())
+		navigation.goBack()
+	}
+
+	const onDelete = () => {
+		dispatch(resetTimes())
+		navigation.goBack()
+	}
+
 	return (
 		<ScrollView contentContainerStyle={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
 			<AnimatedLinearGradient
-				style={[
-               styles.primeDecor,
-               {
-                  opacity: animateValue,
-                  transform: [{ scale: animateValue }]
-               }
-            ]}
+				style={{
+               ...styles.primeDecor,
+					opacity: animateValue,
+					transform: [{ scale: animateValue }]
+            }}
 				colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 				start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }} />
 			<View style={styles.header}>
 				<BackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
 				<Animated.Text 
-					style={[
-						styles.headerTitle,
-						{
-							opacity: animateValue,
-							transform: [{ translateY: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-10, 0]
-							}) }]
-						}
-					]}>
-					Total fasting time
-				</Animated.Text>
-				<Animated.View style={[
-					styles.timeTitle, 
-					{
+					style={{
+						...styles.headerTitle,
 						opacity: animateValue,
 						transform: [{ translateY: animateValue.interpolate({
 							inputRange: [0, 1], 
-							outputRange: [10, 0]
+							outputRange: [-10, 0]
 						}) }]
-					}
-				]}>
-					<AnimatedNumber value={16} style={styles.numTitle} />
+					}}>
+					Total fasting time
+				</Animated.Text>
+				<Animated.View style={{
+					...styles.timeTitle,
+					opacity: animateValue,
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [10, 0]
+					}) }]
+				}}>
+					<AnimatedNumber value={hours} style={styles.numTitle} />
 					<Text style={styles.symbolTitle}>h</Text>
-					<AnimatedNumber value={24} style={{...styles.numTitle, marginLeft: hS(17)}} />
+					<AnimatedNumber value={mins} style={{...styles.numTitle, marginLeft: hS(17)}} />
 					<Text style={styles.symbolTitle}>m</Text>
 				</Animated.View>
 			</View>
@@ -238,7 +265,7 @@ export default (): JSX.Element => {
 			<View style={styles.bottom}>
 				<TouchableOpacity
 					activeOpacity={.7}
-					onPress={() => { }}>
+					onPress={onDelete}>
 					<LinearGradient
 						style={styles.bottomButton}
 						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
@@ -249,7 +276,7 @@ export default (): JSX.Element => {
 				</TouchableOpacity>
 				<TouchableOpacity
 					activeOpacity={.7}
-					onPress={() => { }}>
+					onPress={onSave}>
 					<LinearGradient
 						style={styles.bottomButton}
 						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
@@ -265,6 +292,8 @@ export default (): JSX.Element => {
 }
 
 const styles = StyleSheet.create({
+	wfull: { width: '100%' },
+
 	container: {
 		backgroundColor: '#fff',
 		flex: 1,

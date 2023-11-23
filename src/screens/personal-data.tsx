@@ -32,7 +32,7 @@ const Main = () => {
 		currentWeight, 
 		goalWeight,
 		goal
-	} = useSelector((state: AppState) => state.user.session.metadata)
+	} = useSelector((state: AppState) => state.user.metadata)
 
 	if (Object.keys(settingRowCallbacks).length === 0) {
 		settingRowCallbacks['gender'] = () => { setGenderPopupVisible(true) }

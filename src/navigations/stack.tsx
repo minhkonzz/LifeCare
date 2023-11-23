@@ -16,6 +16,7 @@ import Reminder from '@screens/reminder'
 import FastingPlans from '@screens/plans'
 import DayPlan from '@screens/day-plan'
 import FastingStages from '@screens/fasting-stages'
+import FastingResult from '@screens/fasting-result'
 import BodyMeasures from '@screens/body-measures'
 import Feedback from '@screens/feedback'
 import Goal from '@screens/goal'
@@ -29,9 +30,9 @@ const Stack = createStackNavigator()
 export default (): JSX.Element => {
    return (
       <Stack.Navigator
-         initialRouteName='setting'
+         initialRouteName='splash'
          screenOptions={{ headerShown: false }}>
-         {/* <Stack.Screen name='auth' component={Auth}/>
+         <Stack.Screen name='auth' component={Auth}/>
          <Stack.Screen name='welcome' component={Welcome} />
          <Stack.Screen name='survey' component={Survey} />
          <Stack.Screen name='water' component={Water} />
@@ -44,17 +45,18 @@ export default (): JSX.Element => {
          <Stack.Screen name='fastai-mainchat' component={FastAIMainChat} />
          <Stack.Screen name='plans' component={FastingPlans} />
          <Stack.Screen name='fasting-stages' component={FastingStages} />
+         <Stack.Screen name='fasting-result' component={FastingResult} />
          <Stack.Screen name='day-plan' component={DayPlan} />
          <Stack.Screen name='body-measures' component={BodyMeasures} />
-         <Stack.Screen name='timeline' component={Timeline} /> */}
+         <Stack.Screen name='timeline' component={Timeline} />
          <Stack.Screen name='personal-data' component={PersonalData} />
          <Stack.Screen name='reminder' component={Reminder} />
          <Stack.Screen name='setting' component={Setting} />
          <Stack.Screen name='feedback' component={Feedback} />
          <Stack.Screen name='goal' component={Goal} />
-         {/* <Stack.Screen name='insight-reading' component={InsightReading}/>
+         <Stack.Screen name='insight-reading' component={InsightReading}/>
          <Stack.Screen name='add-activity' component={AddActivity} />
-         <Stack.Screen name='add-food' component={AddFood} /> */}
+         <Stack.Screen name='add-food' component={AddFood} />
       </Stack.Navigator>
    )
 }

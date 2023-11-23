@@ -1,31 +1,33 @@
 import { memo, useRef, Dispatch, SetStateAction } from 'react'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { Colors } from '@utils/constants/colors'
+import { useDispatch } from 'react-redux'
+import { resetTimes } from '../../../store/fasting'
+import { useNavigation } from '@react-navigation/native'
+import LinearGradient from 'react-native-linear-gradient'
+import Popup from '../popup'
+
 import {
    Text,
    StyleSheet, 
    TouchableOpacity,
    Animated
 } from 'react-native'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
-import { useDispatch } from 'react-redux'
-import { resetTimes } from '../../../store/fasting'
-import LinearGradient from 'react-native-linear-gradient'
-import Popup from '../popup'
 
 const { hex: darkHex } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const dispatch = useDispatch()
+   const navigation = useNavigation<any>()
 
    const onConfirm = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
-         duration: 300, 
+         duration: 320, 
          useNativeDriver: true
       }).start(({ finished }) => {
-         dispatch(resetTimes())
+         navigation.navigate('fasting-result')
       })
    }
 

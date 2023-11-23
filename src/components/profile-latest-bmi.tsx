@@ -1,20 +1,25 @@
 import { memo, useRef, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { PopupContext } from '@contexts/popup'
-import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { getBMI } from '@utils/fomular'
+import { getBMIStatus } from '@utils/helpers'
+import { EditIcon, PolygonIcon } from '@assets/icons'
+import LinearGradient from 'react-native-linear-gradient'
+import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
-import PolygonIcon from '@assets/icons/polygon.svg'
-import EditIcon from '@assets/icons/edit.svg'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const bmiValue = 28.25
 	const { setPopup } = useContext<any>(PopupContext)
+	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
+	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
+	const bmiStatus: string = getBMIStatus(bmiValue)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 	const rangeAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 
@@ -22,12 +27,12 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		Animated.parallel([
 			Animated.timing(animateValue, {
 				toValue: isViewable && 1 || 0,
-				duration: 1010,
+				duration: 920,
 				useNativeDriver: true
 			}), 
 			Animated.timing(rangeAnimateValue, {
 				toValue: isViewable && 1 || 0,
-				duration: 1100, 
+				duration: 1000, 
 				delay: 500,
 				useNativeDriver: false
 			})
@@ -45,11 +50,11 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				opacity: animateValue,
 				transform: [{ translateX: animateValue.interpolate({
 					inputRange: [0, 1], 
-					outputRange: [-150, 0]
+					outputRange: [-50, 0]
 				}) }]
 			}}>
 				<View style={styles.header}>
-					<Text style={styles.title}>Latest BMI (kg/m2)</Text>
+					<Text style={styles.title}>{`Latest BMI (kg/m2)`}</Text>
 					<TouchableOpacity
 						style={styles.updateButton}
 						activeOpacity={.7}
@@ -59,7 +64,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				</View>
 				<View style={styles.bmiValue}>
 					<Text style={styles.bmiValueNumber}>{bmiValue}</Text>
-					<Text style={styles.bmiValueDesc}>Overweight</Text>
+					<Text style={styles.bmiValueDesc}>{bmiStatus}</Text>
 				</View>
 			</Animated.View>
 			<View>
@@ -71,31 +76,33 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				}}>
 					<PolygonIcon width={hS(14)} height={vS(14)} />
 				</Animated.View>
-				<Animated.View style={[
-					styles.rangeColors, 
-					{ 
-						height: rangeAnimateValue.interpolate({
-							inputRange: [0, 1] ,
-							outputRange: [0, vS(20)]
-						})	
-					}
-				]}>
+				<Animated.View style={{
+					...styles.rangeColors, 
+					height: rangeAnimateValue.interpolate({
+						inputRange: [0, 1] ,
+						outputRange: [0, vS(20)]
+					})	
+				}}>
 				{
-					bmiRangesData.map((e, i) => {
-						return (
+					bmiRangesData.map((e, i) => 
+						<View key={i} style={{ width: `${(e.max - e.min + (i > 2 ? -0.5 : i === 1 ? 1.8 : 1)) / 24 * 87}%`, height: vS(32) }}>
 							<LinearGradient
 								key={`${e.id}-${i}`}
 								style={{
-									width: `${(e.max - e.min + (i > 2 ? -0.5 : i === 1 ? 1.8 : 1)) / 24 * 87}%`,
-									height: vS(11),
+									width: '100%',
+									height: vS(13),
 									borderRadius: 100
 								}}
 								colors={e.color}
 								start={{ x: .5, y: 0 }}
 								end={{ x: .5, y: 1 }}
 							/>
-						)
-					})
+							<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: vS(4) }}>
+								<Text style={{...styles.bmiPoint, marginLeft: i !== 0 ? hS(-7) : 0 }}>{e.min}</Text>
+								{ i === bmiRangesData.length - 1 && <Text style={styles.bmiPoint}>{e.max}</Text> }
+							</View>
+						</View>
+					)
 				}
 				</Animated.View>
 			</View>
@@ -107,13 +114,14 @@ const styles = StyleSheet.create({
 	container: {
 		marginTop: vS(24),
 		width: hS(370),
-		height: vS(150),
+		height: vS(185),
 		borderRadius: hS(24),
 		paddingHorizontal: hS(18),
 		paddingVertical: vS(16)
 	},
 
 	header: {
+		flexDirection: 'row',
 		width: '100%',
 		justifyContent: 'space-between',
 		alignItems: 'center'
@@ -152,7 +160,8 @@ const styles = StyleSheet.create({
 		width: '100%',
       flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'flex-end'
+		alignItems: 'flex-end', 
+		marginTop: vS(18)
    }, 
 
 	updateButton: {
@@ -162,5 +171,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center', 
 		backgroundColor: `rgba(${darkRgb.join(', ')}, .16)`
+	},
+
+	bmiPoint: {
+		fontFamily: 'Poppins-Medium',
+		fontSize: hS(10),
+		color: darkHex,
+		letterSpacing: .2
 	}
 })

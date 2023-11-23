@@ -1,30 +1,20 @@
 import AnimatedNumber from '@components/shared/animated-text'
-import WhitePlusIcon from '@assets/icons/white_plus.svg'
+import { WhitePlusIcon, FireIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import FireIcon from '@assets/icons/fire.svg'
 import LinearGradient from 'react-native-linear-gradient'
 import { NutritionEditorProps } from '@utils/interfaces'
-import {
-   View, 
-   Text,
-   StyleSheet, 
-   TouchableOpacity
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary 
 
 export default ({ title, totalCalories, caloriesMethod, children }: NutritionEditorProps): JSX.Element => {
-   const navigation = useNavigation()
+   const navigation = useNavigation<any>()
 
    const onAdd = () => {
-      if (title === 'Meal') {
-         navigation.navigate('add-food')
-         return
-      }
-      navigation.navigate('add-activity')
+      navigation.navigate(title === 'Meal' && 'add-food' || 'add-activity')
    }
 
    return (
@@ -35,7 +25,7 @@ export default ({ title, totalCalories, caloriesMethod, children }: NutritionEdi
                <View style={styles.horz}>
                   <FireIcon width={hS(14)} height={vS(17)} />
                   <View style={styles.horz}>
-                     <AnimatedNumber value={totalCalories} style={totalCalories}/>
+                     <AnimatedNumber value={totalCalories} style={styles.totalCalories}/>
                      <Text style={styles.totalCalories}>kcal</Text>
                   </View>
                   <Text style={styles.caloriesMethod}>{caloriesMethod}</Text>

@@ -5,8 +5,7 @@ const initialState: FastingState = {
    newPlan: null, 
    currentPlan: null,
    startTimeStamp: 0,
-   endTimeStamp: 0, 
-   isFasting: false
+   endTimeStamp: 0
 }
 
 const FastingSlice = createSlice({
@@ -19,7 +18,6 @@ const FastingSlice = createSlice({
 
       updateCurrentPlan: (state) => {
          state.currentPlan = { ...state.newPlan }
-         state.newPlan = null
       },
 
       updateTimes: (state, action) => {

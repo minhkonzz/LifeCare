@@ -12,11 +12,8 @@ import {
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
-import WhiteBackIcon from '@assets/icons/goback-white.svg'
-import WhiteScanIcon from '@assets/icons/scan-white.svg'
-import SearchIcon from '@assets/icons/search.svg'
+import { SearchIcon, WhiteScanIcon, WhiteBackIcon, WhitePlusIcon } from '@assets/icons'
 import NutritionAddTotal from '@components/nutrition-add-total'
-import WhitePlusIcon from '@assets/icons/white_plus.svg'
 import addFoodList from '@assets/data/add-food-list.json'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -94,7 +91,8 @@ const styles = StyleSheet.create({
    container: {
       flex: 1,
       paddingHorizontal: hS(22),
-      alignItems: 'center'
+      alignItems: 'center',
+      backgroundColor: '#fff'
    },
 
    header: {

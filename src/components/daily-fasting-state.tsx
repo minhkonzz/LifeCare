@@ -1,4 +1,10 @@
 import { memo, useEffect, useRef } from 'react'
+import { AnimatedCircularProgress } from 'react-native-circular-progress'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { Colors } from '@utils/constants/colors'
+import { useNavigation } from '@react-navigation/native'
+import LinearGradient from 'react-native-linear-gradient'
+import BackIcon from '@assets/icons/goback.svg'
 import {
 	View,
 	Text,
@@ -6,11 +12,6 @@ import {
 	Animated,
 	Pressable
 } from 'react-native'
-import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
-import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback.svg'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { rgb: primaryRgb } = Colors.primary
@@ -19,24 +20,27 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const navigation = useNavigation<any>()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0, 
-			duration: 920, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])
 
 	return (
 		isViewable && 
-		<AnimatedPressable style={{
-			opacity: animateValue, 
-			transform: [{ translateX: animateValue.interpolate({
-				inputRange: [0, 1], 
-				outputRange: [-100, 0]
-			}) }]
-		}}>
+		<AnimatedPressable 
+			style={{
+				opacity: animateValue, 
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-50, 0]
+				}) }]
+			}}
+			onPress={() => navigation.navigate('Timer')}>
 			<LinearGradient
 				colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 				start={{ x: .5, y: 0 }}
@@ -64,11 +68,13 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				</View>
 				<BackIcon style={styles.redirectIcon} width={hS(8)} height={vS(14)} />
 			</LinearGradient>
-		</AnimatedPressable> || <View style={{ height: vS(132) }}></View>
+		</AnimatedPressable> || <View style={styles.blank} />
 	)
 })
 
 const styles = StyleSheet.create({
+	blank: { height: vS(132) },
+
 	container: {
 		flexDirection: 'row',
 		width: hS(365),

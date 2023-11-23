@@ -3,21 +3,23 @@ import { View, Text, StyleSheet } from 'react-native'
 import { NavigationProp } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { updateMetadata } from '../store/user'
 import { AppState } from '../store'
+import { InitialPersonalData } from '@utils/interfaces'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const { session } = useSelector((state: AppState) => state.user)
+   const dispatch = useDispatch()
    const survey = useSelector((state: AppState) => state.survey)
+   const session = useSelector((state: AppState) => state.user.session)
 
    const initPersonalData = async () => {
-      if (!session) throw new Error('Session still not created!!!')
-      const userId = session.user.id
-      const { status } = await UserService.initPersonalData(userId, {
+      let isOk: boolean = false
+      const personalData: InitialPersonalData = {
          gender: survey.gender,
          currentHeight: survey.currentHeight,
          currentWeight: survey.currentWeight, 
@@ -28,8 +30,18 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          fastingFamiliar: survey.fastingFamiliar,
          goal: survey.goal,
          isSurveyed: true
-      })
-      if (status === 204) navigation.navigate('main')
+      }   
+      if (!session) {
+         // user logged in as guest
+         dispatch(updateMetadata(personalData))
+         isOk = true
+      } else {
+         // user logged in account
+         const userId = session?.user?.id
+         const { status } = await UserService.initPersonalData(userId, personalData)
+         if (status === 204) isOk = true
+      }
+      if (isOk) navigation.navigate('main')
    }
 
    useEffect(() => {

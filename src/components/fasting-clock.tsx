@@ -6,17 +6,18 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Circle } from 'react-native-svg'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-import { formatNum } from '@utils/helpers'
+import { timestampToDateTime } from '@utils/datetimes'
 import FireColorIcon from '@assets/icons/fire-color.svg'
 
 const { rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 1 || 0)).current
 	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
-	const [ timeElapsed, setTimeElapsed ] = useState(0)
-	const isFasting = startTimeStamp && endTimeStamp
+	const [ timeElapsed, setTimeElapsed ] = useState<number>(0)
+	const isFasting: boolean = !!(startTimeStamp && endTimeStamp)
+	const elapsedPercent: number = Math.floor(timeElapsed / (endTimeStamp - startTimeStamp) * 100)
 
 	useEffect(() => {
 		let interval: NodeJS.Timeout | undefined = undefined
@@ -28,40 +29,31 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 			}, 1000)
 		}
 		return () => { if (interval) clearInterval(interval) }
-	}, [])
-
-	const formatTime = (time: number) => {
-		const s = isFasting ? formatNum(Math.floor((time / 1000) % 60)) : '00'
-		const m = isFasting ? formatNum(Math.floor((time / 1000 / 60) % 60)) : '00'
-		const h = isFasting ? formatNum(Math.floor((time / 1000 / 60 / 60) % 24)) : '00'
-		return `${h}:${m}:${s}`
-	}
+	}, [startTimeStamp])
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0,
-			duration: 1010,
+			toValue: isViewable && 0 || 1,
+			duration: 840,
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])
 
 	return (
 		<Animated.View
-			style={[
-				styles.container,
-				{
-					opacity: animateValue,
-					transform: [{
-						translateX: animateValue.interpolate({
-							inputRange: [0, 1],
-							outputRange: [-100, 0]
-						})
-					}]
-				}
-			]}>
+			style={{
+				...styles.container,
+				opacity: animateValue,
+				transform: [{
+					translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					})
+				}]
+			}}>
 			<View style={styles.main}>
-				<Text style={styles.elapsedTime}>{isFasting && `Elapsed time (${(timeElapsed / (endTimeStamp - startTimeStamp) * 100)}%)` || ''}</Text>
-				<Text style={styles.time}>{formatTime(timeElapsed)}</Text>
+				<Text style={styles.elapsedTime}>{isFasting && `Elapsed time (${elapsedPercent}%)` || ''}</Text>
+				<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>{isFasting && timestampToDateTime(timeElapsed) || 'Timer not started'}</Text>
 				{ isFasting && <>
 				<Text style={styles.nextStageTitle}>Next stage</Text>
 				<View style={styles.horz}>
@@ -75,7 +67,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				width={hS(28)}
 				size={hS(320)}
 				rotation={360}
-				fill={30}
+				fill={elapsedPercent <= 100 && elapsedPercent || 100}
 				tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
 				backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
 				renderCap={({ center }) => <Circle cx={center.x} cy={center.y} r={hS(20)} fill={darkHex} />}
@@ -134,23 +126,23 @@ const styles = StyleSheet.create({
 
 	time: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(36),
 		color: darkHex,
-		letterSpacing: 2,
+		letterSpacing: 1.2,
 		marginTop: vS(10),
 		marginBottom: vS(5)
 	},
 
 	nextStageTitle: {
+		textAlign: 'center',
 		fontFamily: 'Poppins-Medium',
-		fontSize: hS(11),
+		fontSize: hS(12),
 		color: `rgba(${darkRgb.join(', ')}, .6)`,
 		letterSpacing: .2
 	},
 
 	nextStageName: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: hS(12),
+		fontSize: hS(14),
 		color: darkHex,
 		letterSpacing: .2,
 		marginTop: 5,

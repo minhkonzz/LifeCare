@@ -1,9 +1,12 @@
 import { memo, Dispatch, SetStateAction, useRef } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../../../store'
 import Popup from '../popup'
 import LinearGradient from 'react-native-linear-gradient'
 import WheelPicker from '../wheel-picker'
+import UserService from '@services/user'
 import {
    Text,
    TouchableOpacity,
@@ -21,13 +24,17 @@ const Main = ({
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<boolean>>
 }) => {
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session && session?.user.id || null
+   const { age } = metadata
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(({ finished }) => {
+      }).start(async({ finished }) => {
+         await UserService.updatePersonalData(userId, { age })
          setVisible(false)
       })
    }

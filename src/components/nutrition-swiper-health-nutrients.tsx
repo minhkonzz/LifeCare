@@ -58,8 +58,10 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      width: '100%'
+      width: hS(366),
+      paddingHorizontal: hS(14)
    }, 
+   
    header: {
       flexDirection: 'row',
       justifyContent: 'space-between',  

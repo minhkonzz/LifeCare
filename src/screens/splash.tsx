@@ -6,10 +6,10 @@ import { AppState } from '../store'
 import LottieView from 'lottie-react-native'
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const { session } = useSelector((state: AppState) => state.user)
+   const metadata = useSelector((state: AppState) => state.user.metadata)
 
    useEffect(() => {
-      const routeName = !session && 'welcome' || 'main'
+      const routeName = !metadata && 'welcome' || 'main'
       const timeOutId = setTimeout(() => { navigation.navigate(routeName) }, 2800)
       return () => clearTimeout(timeOutId)
    }, [])

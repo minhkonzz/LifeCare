@@ -1,17 +1,29 @@
 import { memo, useContext } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { PopupContext } from '@contexts/popup'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { kilogramsToPounds } from '@utils/fomular'
 import UpdateWeightsPopup from '@components/shared/popup-content/weights'
 import LinearGradient from 'react-native-linear-gradient'
 import BackIcon from '@assets/icons/goback.svg'
 import EditIcon from '@assets/icons/edit.svg'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    const { setPopup } = useContext<any>(PopupContext)
+   const {
+      currentWeight, 
+      goalWeight, 
+      startWeight
+   } = useSelector((state: AppState) => state.user.metadata)
+
+   const maxCurrentWeight = 125
+   const maxValueMeasure = Math.ceil(maxCurrentWeight / 10) * 10
+   const days = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
    return (
       isViewable && 
@@ -39,15 +51,42 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
          </View>
          <View>
             <View style={styles.horz}>
-               <Text style={styles.weightValue}>72.52</Text>
+               <Text style={styles.weightValue}>{`${kilogramsToPounds(currentWeight)}`}</Text>
                <Text style={styles.weightSymb}>lb</Text>
             </View>
             <View style={styles.progressBar}>
                <View style={styles.activeBar} />
             </View>
             <View style={[styles.horz, styles.progressDesc]}>
-               <Text style={styles.progressText}>Starting: 87.61 lb</Text>
-               <Text style={styles.progressText}>Goal: 62.5 lb</Text>
+               <Text style={styles.progressText}>{`Starting: ${kilogramsToPounds(startWeight)} lb`}</Text>
+               <Text style={styles.progressText}>{`Goal: ${kilogramsToPounds(goalWeight)} lb`}</Text>
+            </View>
+         </View>
+         <View style={styles.chart}>
+            <View style={{ marginRight: hS(14), alignItems: 'flex-end' }}>
+            { Array.from({ length: 6 }, (_, i) => maxValueMeasure - 10 * i).map((e, i) => 
+               <Text key={i} style={{...styles.chartValue, marginTop: i > 0 ? vS(22) : 0}}>{e}</Text>
+            ) }
+            </View>
+            <View style={{ width: hS(292) }}>
+               <FlatList 
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={days} 
+                  renderItem={({ item, index }) => 
+                     <View key={index} style={{ alignItems: 'center', marginLeft: index > 0 ? hS(28) : 0 }}>
+                        <View style={{...styles.dayDecor, backgroundColor: index % 2 && `rgba(${darkRgb.join(', ')}, .5)` || `rgba(${darkRgb.join(', ')}, .3)` }} />
+                        <Text style={{...styles.chartValue, marginTop: vS(8)}}>{ item }</Text>
+                     </View>
+                  } />
+                  <View style={{ 
+                     position: 'absolute', 
+                     width: '100%', 
+                     bottom: (currentWeight < 80 ? 0 : currentWeight > 130 ? vS(220) : (vS(currentWeight) - vS(80)) / vS(24.5) * 100) + vS(26)
+                  }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(10), color: '#FF8E00', letterSpacing: .2, position: 'absolute', right: 0, bottom: vS(4) }}>{`${currentWeight} kg`}</Text>
+                     <View style={{ borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#FF8E00', width: '100%' }} />
+                  </View>
             </View>
          </View>
       </LinearGradient> || <View style={styles.container} />
@@ -58,7 +97,7 @@ const styles = StyleSheet.create({
    container: {
       marginTop: vS(24),
       width: hS(370),
-      height: vS(250), 
+      height: vS(465), 
       borderRadius: hS(24),
       paddingRight: hS(12),
       paddingVertical: vS(16), 
@@ -152,5 +191,22 @@ const styles = StyleSheet.create({
    progressDesc: {
       marginTop: vS(8), 
       justifyContent: 'space-between'
+   },
+
+   chart: {
+      flexDirection: 'row', 
+      marginTop: vS(32)
+   },
+
+   chartValue: {
+      fontFamily: 'Poppins-Regular',
+      fontSize: hS(10),
+      color: darkHex,
+      letterSpacing: .2
+   },
+
+   dayDecor: {
+      width: hS(1),
+      height: vS(220)
    }
 })
