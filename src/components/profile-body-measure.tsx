@@ -1,16 +1,12 @@
 import { FC } from 'react'
-import { 
-   View, 
-   Text,
-   TouchableOpacity,
-   StyleSheet
-} from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { EditIcon, BodyIcon } from '@assets/icons'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
 import LinearGradient from 'react-native-linear-gradient'
-import EditIcon from '@assets/icons/edit.svg'
-import BodySvg from '@assets/icons/body.svg'
 
 const primaryHex: string = Colors.primary.hex
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -25,7 +21,7 @@ interface BodyPartProps {
 const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
    return (
       <View style={styles.bodyPart}>
-         <View style={[styles.bodyPartIndicator, { backgroundColor: indicatorColor }]} />
+         <View style={{...styles.bodyPartIndicator, backgroundColor: indicatorColor }} />
          <View style={styles.bodyPartDetail}>
             <Text style={styles.bodyPartTitle}>{title}</Text>
             <Text style={styles.bodyPartValue}>{`${value || '--'} cm`}</Text>
@@ -35,7 +31,9 @@ const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
 }
 
 export default (): JSX.Element => {
-   const navigation = useNavigation()
+   const navigation = useNavigation<any>()
+   const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppState) => state.user.metadata)
+
    return (
       <LinearGradient
          style={styles.container}
@@ -53,7 +51,7 @@ export default (): JSX.Element => {
          </View>
          <View style={styles.horz}>
             <View>
-               <BodySvg width={hS(105)} height={vS(105)} />
+               <BodyIcon width={hS(105)} height={vS(105)} />
                <View style={[styles.bodyIndicator, styles.chestIndicator]} />
                <View style={[styles.bodyIndicator, styles.waistIndicator]} />
                <View style={[styles.bodyIndicator, styles.hipsIndicator]} />
@@ -61,13 +59,13 @@ export default (): JSX.Element => {
             </View>
             <View style={[styles.detail, styles.horz]}>
                <View style={styles.detailPart}>
-                  <BodyPart title='Chest' indicatorColor={primaryHex} />
-                  <BodyPart title='Hips' indicatorColor='#7B3DFF' />
+                  <BodyPart title='Chest' indicatorColor={primaryHex} value={chestMeasure} />
+                  <BodyPart title='Hips' indicatorColor='#7B3DFF' value={hipsMeasure} />
                </View>
                <View style={styles.gap} />
                <View style={styles.detailPart}>
-                  <BodyPart title='Waist' indicatorColor='#FAFF00' />
-                  <BodyPart title='Thigh' indicatorColor='#FF8A00' />
+                  <BodyPart title='Waist' indicatorColor='#FAFF00' value={waistMeasure} />
+                  <BodyPart title='Thigh' indicatorColor='#FF8A00' value={thighMeasure} />
                </View>
             </View>
          </View>

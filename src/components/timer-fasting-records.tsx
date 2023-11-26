@@ -1,34 +1,38 @@
 import { memo, useRef, useEffect } from 'react'
-import { View, Text, FlatList, StyleSheet, Animated, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { getDatesRange } from '@utils/datetimes'
+import { handleFastingRecords } from '@utils/helpers'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-import fastingRecordsData from '@assets/data/timer-fasting-records.json'
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
+	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
+		const { startTimeStamp, endTimeStamp } = cur
+		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp)}
+	}, {})
+
+	const chartData = getDatesRange(122).map(e => ({
+		date: e.value,
+		totalHours: standardFastingRecords[e.value].totalHours
+	}))
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: isViewable && 1 || 0, 
-				duration: 840, 
-				useNativeDriver: true
-			}), 
-			Animated.timing(progressAnimateValue, {
-				toValue: isViewable && 1 || 0, 
-				duration: 840, 
-				delay: 500, 
-				useNativeDriver: false
-			})
-		]).start()
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0, 
+			duration: 840, 
+			useNativeDriver: true
+		}).start()
 	}, [isViewable])
 
 	return (
@@ -79,33 +83,36 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				style={{...styles.records, opacity: animateValue }}
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				data={fastingRecordsData}
-				renderItem={({ item, index }) => (
-					<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
-						<Text style={{...styles.recText, height: vS(22) }}>{item.hrs > 0 ? `${item.hrs}h` : ''}</Text>
-						<LinearGradient
-							style={styles.recProg}
-							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
-							start={{ x: .5, y: 0 }}
-							end={{ x: .5, y: 1 }}>
-							<AnimatedLinearGradient
-								style={{
-									...styles.recProgValue, 
-									height: progressAnimateValue.interpolate({
-										inputRange: [0, 1], 
-										outputRange: ['0%', `${item.hrs / 24 * 100}%`]
-									}) 
-								}}
-								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
+				data={chartData}
+				renderItem={({ item, index }) => {
+					const [ month, day ] = item.date.split(' ')
+					return (
+						<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
+							<Text style={{...styles.recText, height: vS(22) }}>{item.totalHours > 0 ? `${item.totalHours}h` : ''}</Text>
+							<LinearGradient
+								style={styles.recProg}
+								colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 								start={{ x: .5, y: 0 }}
-								end={{ x: .5, y: 1 }} />
-						</LinearGradient>
-						<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-							<Text style={styles.recText}>{item.day}</Text>
-							<Text style={[styles.recText, { marginTop: vS(-2) }]}>{item.month}</Text>
+								end={{ x: .5, y: 1 }}>
+								<AnimatedLinearGradient
+									style={{
+										...styles.recProgValue, 
+										height: animateValue.interpolate({
+											inputRange: [0, 1], 
+											outputRange: ['0%', `${item.totalHours / 24 * 100}%`]
+										}) 
+									}}
+									colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
+									start={{ x: .5, y: 0 }}
+									end={{ x: .5, y: 1 }} />
+							</LinearGradient>
+							<View style={{ alignItems: 'center', marginTop: vS(7) }}>
+								<Text style={styles.recText}>{day}</Text>
+								<Text style={{...styles.recText, marginTop: vS(-2) }}>{month}</Text>
+							</View>
 						</View>
-					</View>
-				)}
+					)
+				}}
 			/>
 			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
 				<Text style={styles.timelineText}>Timeline</Text>

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable, FlatList } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -154,141 +154,141 @@ const FastingRecordChart2 = (): JSX.Element => {
 	)
 }
 
-// const FastingRecordChart1 = (): JSX.Element => {
-// 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-// 	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+const FastingRecordChart1 = (): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
-// 	useEffect(() => {
-// 		Animated.parallel([
-// 			Animated.timing(animateValue, {
-// 				toValue: 1, 
-// 				duration: 840, 
-// 				useNativeDriver: true
-// 			}), 
-// 			Animated.timing(progressAnimateValue, {
-// 				toValue: 1, 
-// 				duration: 840, 
-// 				delay: 500, 
-// 				useNativeDriver: false
-// 			})
-// 		]).start()
-// 	}, [])
+	useEffect(() => {
+		Animated.parallel([
+			Animated.timing(animateValue, {
+				toValue: 1, 
+				duration: 840, 
+				useNativeDriver: true
+			}), 
+			Animated.timing(progressAnimateValue, {
+				toValue: 1, 
+				duration: 840, 
+				delay: 500, 
+				useNativeDriver: false
+			})
+		]).start()
+	}, [])
 
-// 	const handleFastingRecords = useCallback((start_time_stamp: number, end_time_stamp: number) => {
-// 		const startDate = new Date(start_time_stamp)
-// 		const endDate = new Date(end_time_stamp)
-// 		const fastingData: any[] = []
+	// const handleFastingRecords = useCallback((start_time_stamp: number, end_time_stamp: number) => {
+	// 	const startDate = new Date(start_time_stamp)
+	// 	const endDate = new Date(end_time_stamp)
+	// 	const fastingData: any[] = []
 
-// 		const currentDate = new Date(startDate)
-// 		while (currentDate <= endDate) {
-// 			const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
-// 			const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+	// 	const currentDate = new Date(startDate)
+	// 	while (currentDate <= endDate) {
+	// 		const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+	// 		const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
 
-// 			const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
-// 			const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+	// 		const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+	// 		const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
 
-// 			const totalMilliseconds = endTimeStamp - startTimeStamp
-// 			const totalHours = totalMilliseconds / (1000 * 60 * 60)
+	// 		const totalMilliseconds = endTimeStamp - startTimeStamp
+	// 		const totalHours = totalMilliseconds / (1000 * 60 * 60)
 
-// 			if (totalHours >= 1) {
-// 				const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
-// 				const startTime = formatter.format(new Date(startTimeStamp))
-// 				const endTime = formatter.format(new Date(endTimeStamp))
-// 				const date = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-// 				fastingData.push({ date, startTime, endTime, totalHours })
-// 			}
+	// 		if (totalHours >= 1) {
+	// 			const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+	// 			const startTime = formatter.format(new Date(startTimeStamp))
+	// 			const endTime = formatter.format(new Date(endTimeStamp))
+	// 			const date = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+	// 			fastingData.push({ date, startTime, endTime, totalHours })
+	// 		}
 
-// 			currentDate.setDate(currentDate.getDate() + 1)
-// 		}
-// 		return fastingData
-// 	}, [])
+	// 		currentDate.setDate(currentDate.getDate() + 1)
+	// 	}
+	// 	return fastingData
+	// }, [])
 
-// 	return (
-// 		<Animated.View style={{...styles.container, opacity: animateValue }}>
-// 			<View style={styles.header}>
-// 				<Animated.Text 
-// 					style={{
-// 						...styles.title, 
-// 						opacity: animateValue, 
-// 						transform: [{ translateX: animateValue.interpolate({
-// 							inputRange: [0, 1], 
-// 							outputRange: [-50, 0]
-// 						}) }]
-// 					}}>
-// 					Fasting records
-// 				</Animated.Text>
-// 				<Animated.View style={{
-// 					...styles.hrz, 
-// 					marginTop: vS(8), 
-// 					opacity: animateValue, 
-// 					transform: [{ translateY: animateValue.interpolate({
-// 						inputRange: [0, 1], 
-// 						outputRange: [-30, 0]
-// 					}) }]
-// 				}}>
-// 					<View style={styles.hrz}>
-// 						<LinearGradient
-// 							style={styles.noteColor}
-// 							colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
-// 							start={{ x: .5, y: 0 }}
-// 							end={{ x: .5, y: 1 }}
-// 						/>
-// 						<Text style={styles.noteTitle}>Completed</Text>
-// 					</View>
-// 					<View style={{...styles.hrz, marginLeft: hS(38) }}>
-// 						<LinearGradient
-// 							style={styles.noteColor}
-// 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
-// 							start={{ x: .5, y: 0 }}
-// 							end={{ x: .5, y: 1 }}
-// 						/>
-// 						<Text style={styles.noteTitle}>Not completed</Text>
-// 					</View>
-// 				</Animated.View>
-// 			</View>
-// 			<Animated.FlatList
-// 				style={{...styles.records, opacity: animateValue }}
-// 				horizontal
-// 				showsHorizontalScrollIndicator={false}
-// 				data={fastingRecords}
-// 				renderItem={({ item, index }) => (
-// 					<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
-// 						<Text style={{...styles.recText, height: vS(22) }}>{item.totalHours > 0 ? `${item.totalHours}h` : ''}</Text>
-// 						<LinearGradient
-// 							style={styles.recProg}
-// 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
-// 							start={{ x: .5, y: 0 }}
-// 							end={{ x: .5, y: 1 }}>
-// 							<AnimatedLinearGradient
-// 								style={{
-// 									...styles.recProgValue, 
-// 									height: progressAnimateValue.interpolate({
-// 										inputRange: [0, 1], 
-// 										outputRange: ['0%', `${item.totalHours / 24 * 100}%`]
-// 									}) 
-// 								}}
-// 								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
-// 								start={{ x: .5, y: 0 }}
-// 								end={{ x: .5, y: 1 }} />
-// 						</LinearGradient>
-// 						<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-// 							<Text style={styles.recText}>{item.date.split(' ')[1]}</Text>
-// 							<Text style={{...styles.recText, marginTop: vS(-2) }}>{item.date.split(' ')[0]}</Text>
-// 						</View>
-// 					</View>
-// 				)}
-// 			/>
-// 			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
-// 				<Text style={styles.timelineText}>Timeline</Text>
-// 			</AnimatedPressable>
-// 		</Animated.View> || <View style={styles.container} />
-// 	)
-// }
+	return (
+		<Animated.View style={{...styles.container, opacity: animateValue }}>
+			<View style={styles.header}>
+				<Animated.Text 
+					style={{
+						...styles.title, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-50, 0]
+						}) }]
+					}}>
+					Fasting records
+				</Animated.Text>
+				<Animated.View style={{
+					...styles.hrz, 
+					marginTop: vS(8), 
+					opacity: animateValue, 
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-30, 0]
+					}) }]
+				}}>
+					<View style={styles.hrz}>
+						<LinearGradient
+							style={styles.noteColor}
+							colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}
+						/>
+						<Text style={styles.noteTitle}>Completed</Text>
+					</View>
+					<View style={{...styles.hrz, marginLeft: hS(38) }}>
+						<LinearGradient
+							style={styles.noteColor}
+							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}
+						/>
+						<Text style={styles.noteTitle}>Not completed</Text>
+					</View>
+				</Animated.View>
+			</View>
+			<Animated.FlatList
+				style={{...styles.records, opacity: animateValue }}
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				data={fastingRecords}
+				renderItem={({ item, index }) => (
+					<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
+						<Text style={{...styles.recText, height: vS(22) }}>{item.totalHours > 0 ? `${item.totalHours}h` : ''}</Text>
+						<LinearGradient
+							style={styles.recProg}
+							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<AnimatedLinearGradient
+								style={{
+									...styles.recProgValue, 
+									height: progressAnimateValue.interpolate({
+										inputRange: [0, 1], 
+										outputRange: ['0%', `${item.totalHours / 24 * 100}%`]
+									}) 
+								}}
+								colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
+								start={{ x: .5, y: 0 }}
+								end={{ x: .5, y: 1 }} />
+						</LinearGradient>
+						<View style={{ alignItems: 'center', marginTop: vS(7) }}>
+							<Text style={styles.recText}>{item.date.split(' ')[1]}</Text>
+							<Text style={{...styles.recText, marginTop: vS(-2) }}>{item.date.split(' ')[0]}</Text>
+						</View>
+					</View>
+				)}
+			/>
+			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
+				<Text style={styles.timelineText}>Timeline</Text>
+			</AnimatedPressable>
+		</Animated.View> || <View style={styles.container} />
+	)
+}
 
 export default () => {
    return (
       <View style={{ flex: 1, padding: 20, backgroundColor: '#fff' }}>
-         <FastingRecordChart2 />
+         <FastingRecordChart1 />
       </View>
    )
 }

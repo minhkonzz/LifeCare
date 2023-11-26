@@ -2,16 +2,18 @@ import { memo, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BluePlusIcon from '@assets/icons/blue_plus.svg'
+import { BluePlusIcon } from '@assets/icons'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { getDatesRange } from '@utils/datetimes'
 import LinearGradient from 'react-native-linear-gradient'
-import hyrdrateRecords from '@assets/data/profile-hydrate-data.json'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const Record = ({ item, index }) => {
+const Record = ({ item, index }: { item: any, index: number }) => {
 	return (
 		<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', justifyContent: 'center' }}>
 			<Text style={styles.recText}>Nov</Text>
@@ -33,6 +35,18 @@ const Record = ({ item, index }) => {
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const waterRecords = useSelector((state: AppState) => state.user.metadata.waterRecords)
+	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
+		const { id, date, value, goal } = cur
+		acc[date] = { id, value, goal }
+		return acc
+	}, {})
+
+	const chartData = getDatesRange(122).map(e => {
+		const date = e.value
+		const { value, goal, id } = standardWaterRecords[date]
+		return { date, value, goal, id }
+	})
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -68,7 +82,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 							<Text style={styles.headerNoteText}>Completed</Text>
 						</View>
 						<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
-							<View style={[styles.headerNoteCircle, { backgroundColor: '#fafafa' }]} />
+							<View style={{...styles.headerNoteCircle, backgroundColor: '#fafafa' }} />
 							<Text style={styles.headerNoteText}>Goal</Text>
 						</View>
 					</View>
@@ -83,23 +97,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={item => item.id}
-				data={[
-					{
-						id: 'wr1',
-						value: 500, 
-						goal: 2500
-					}, 
-					{
-						id: 'wr2',
-						value: 1250, 
-						goal: 2500
-					},
-					{
-						id: 'wr3',
-						value: 1800, 
-						goal: 2500
-					}
-				]} 
+				data={chartData} 
 				renderItem={({ item, index }) => <Record {...{ item, index }} />} 
 			/>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>

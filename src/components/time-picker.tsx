@@ -1,15 +1,10 @@
-import {
-   View, 
-   Text,
-   Pressable,  
-   StyleSheet
-} from 'react-native'
-
+import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import EditPrimaryIcon from '@assets/icons/edit-primary.svg'
+import { PrimaryEditIcon } from '@assets/icons'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex } = Colors.primary
 
 interface TimePickerProps {
    title: string, 
@@ -22,27 +17,20 @@ export default ({ title, indicatorColor, editable, active }: TimePickerProps): J
    return (
       <View style={[styles.container, styles.horz]}>
          <View style={styles.horz}>
-            <View style={[styles.indicator, { backgroundColor: indicatorColor }]} />
+            <View style={{...styles.indicator, backgroundColor: indicatorColor }} />
             <Text style={styles.title}>{title}</Text>
          </View>
          <View style={styles.horz}>
-            <Text style={[
-               styles.dateTime, 
-               {...(active ? 
-                  {
-                     fontFamily: 'Poppins-SemiBold', 
-                     color: Colors.primary.hex    
-                  } :
-                  {
-                     fontFamily: 'Poppins-Regular', 
-                     color: `rgba(${Colors.darkPrimary.rgb.join(',')}, .8)`
-                  }
-               )}
-            ]}>
+            <Text style={{
+               ...styles.dateTime, 
+               ...(active ? 
+               { fontFamily: 'Poppins-SemiBold', color: primaryHex } :
+               { fontFamily: 'Poppins-Regular', color: `rgba(${darkRgb.join(',')}, .8)` }
+            )}}>
                Today, 12:30PM
             </Text>
             <Pressable onPress={() => {}}>
-               <EditPrimaryIcon width={hS(16)} height={vS(16)} />
+               <PrimaryEditIcon width={hS(16)} height={vS(16)} />
             </Pressable>
          </View>
       </View>
@@ -50,9 +38,7 @@ export default ({ title, indicatorColor, editable, active }: TimePickerProps): J
 }
 
 const styles = StyleSheet.create({
-   container: {
-      width: '100%'
-   }, 
+   container: { width: '100%' }, 
 
    horz: {
       flexDirection: 'row', 
@@ -69,7 +55,7 @@ const styles = StyleSheet.create({
    title: {
       fontFamily: 'Poppins-Regular', 
       fontSize: hS(13), 
-      color: darkPrimary, 
+      color: darkHex, 
       letterSpacing: .2, 
       marginLeft: hS(17)
    }, 

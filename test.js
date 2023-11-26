@@ -29,5 +29,6 @@
 
 // console.log(handle(1700014550000, 1700190950000))
 
-const d = new Date('2023-11-23 11:40:21')
+const d = new Date('2023-08-12T10:12:21')
+// console.log(`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}, ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
 console.log(d.getHours())

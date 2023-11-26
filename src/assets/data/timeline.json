@@ -1,0 +1,45 @@
+{
+   "waterRecords": [
+      {
+         "id": "w1",
+         "value": 1950,
+         "goal": 2500,
+         "date": "2023-10-24",
+         "times": [
+            {
+               "id": "wt1",
+               "value": 250,
+               "createdAt": "2023-10-24T10:05:21"
+            },
+            {
+               "id": "wt2",
+               "value": 350,
+               "createdAt": "2023-10-24T11:05:21"
+            },
+            {
+               "id": "wt3",
+               "value": 250,
+               "createdAt": "2023-10-24T13:29:21"
+            }
+         ]
+      }
+   ],
+
+   "bodyRecords": [
+      {
+         "id": "br1",
+         "value": "64.5",
+         "createdAt": "2023-10-25T14:22:35"
+      },
+      {
+         "id": "br2",
+         "value": "63",
+         "createdAt": "2023-11-12T09:15:35"
+      },
+      {
+         "id": "br3",
+         "value": "60.2",
+         "createdAt": "2023-12-28T18:22:35"
+      }
+   ]
+}

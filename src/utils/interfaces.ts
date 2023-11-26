@@ -1,6 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from 'react'
 import { NavigationProp } from '@react-navigation/native'
-import { Animated } from 'react-native'
 
 export interface WaterWaveProps {
    w: number, 
@@ -88,11 +87,14 @@ export interface PersonalData extends InitialPersonalData {
       id: string,
       value: number, 
       goal: number, 
-      createdAt: string, 
+      date: string,  // "2023-11-23"
+      createdAt: string,  // UTC time
+      updatedAt: string,
       times: Array<{
          id: string, 
          value: number, 
-         createdAt: string
+         createdAt: string,
+         updatedAt: string
       }>
    }>
    fastingRecords: Array<{
@@ -101,11 +103,13 @@ export interface PersonalData extends InitialPersonalData {
       startTimeStamp: number,
       endTimeStamp: number, 
       notes: string, 
-      createdAt: string
+      createdAt: string,
+      updatedAt: string
    }>
-   weightRecords: Array<{
+   bodyRecords: Array<{
       id: string, 
       value: number, 
+      type: string,
       createdAt: string,
       updatedAt: string
    }>

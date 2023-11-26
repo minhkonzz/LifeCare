@@ -1,3 +1,5 @@
+import { getLocalTimeV1, getDayTitle, getMonthTitle } from "./datetimes"
+
 export const getBMIStatus = (value: number): string => {
    return (
       value < 16 && 'Severe Thinness' ||
@@ -33,4 +35,94 @@ export const convertObjectKeysToSnakeCase = (obj: any) => {
       convertedObj[convertedKey] = obj[key]
       return convertedObj
    }, {})
+}
+
+export const handleFastingRecords = (startTimestamp: number, endTimestamp: number) => {
+   const startDate = new Date(startTimestamp)
+   const endDate = new Date(endTimestamp)
+   const fastingData = {}
+
+   const currentDate = new Date(startDate)
+   while (currentDate <= endDate) {
+      const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+      const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+
+      const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+      const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+
+      const totalMilliseconds = endTimeStamp - startTimeStamp
+      const totalHours = totalMilliseconds / (1000 * 60 * 60)
+
+      if (totalHours >= 1) {
+         const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+         const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
+         const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
+         const date = getLocalTimeV1(currentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+         fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1)
+   }
+   return fastingData
+}
+
+export const handleTimelineData = (waterRecords: any[], bodyRecords: any[]) => {
+   const handled = [
+      ...waterRecords.reduce((acc, cur) => {
+         const { date, times } = cur
+         const d = new Date(date)
+         const day = getDayTitle(d, true)
+         const _d = d.getDate()
+         const month = d.getMonth() + 1
+         const year = d.getFullYear()
+         return [...acc, ...times.map((e: any) => {
+            const datetimeCreated: Date = new Date(e.createdAt)
+            const hour: number = datetimeCreated.getHours()
+            const min: number = datetimeCreated.getMinutes()
+            const sec: number = datetimeCreated.getSeconds()
+            return {
+               id: e.id,
+               value: e.value,
+               type: 'water',
+               day,
+               date: _d,
+               month,
+               year,
+               hour,
+               min,
+               sec
+            }
+         })]
+
+      }, []),
+      
+      ...bodyRecords.reduce((acc, cur) => {
+         const datetimeCreated: Date = new Date(cur.createdAt)
+         const day = getDayTitle(datetimeCreated, true)
+         const date = datetimeCreated.getDate()
+         const month = datetimeCreated.getMonth() + 1
+         const year = datetimeCreated.getFullYear()
+         const hour = datetimeCreated.getHours()
+         const min = datetimeCreated.getMinutes()
+         const sec = datetimeCreated.getSeconds()
+         return [...acc, {
+            id: cur.id,
+            value: cur.value,
+            type: 'weight',
+            day,
+            date,
+            month,
+            year,
+            hour,
+            min, 
+            sec
+         }]
+      }, [])
+   ]
+
+   return handled.sort((a, b) => {
+      const aDatetime = new Date(`${a.year}-${a.month}-${a.date} ${a.hour}:${a.min}:${a.sec}`)
+      const bDatetime = new Date(`${b.year}-${b.month}-${b.date} ${b.hour}:${b.min}:${b.sec}`)
+      return bDatetime.getTime() - aDatetime.getTime()
+   })
 }

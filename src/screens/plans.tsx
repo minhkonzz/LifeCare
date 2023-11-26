@@ -64,7 +64,7 @@ const Plans = () => {
 	const { popup: Popup, setPopup } = useContext(PopupContext)
 
 	return (
-		<View style={[styles.container, { paddingBottom: bottomBarHeight }]}>
+		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
 			<View style={styles.header}>
 				<View style={{ width: '100%', paddingHorizontal: hS(24) }}>
 					<StackHeader title='Plans' />
@@ -75,13 +75,11 @@ const Plans = () => {
 					data={plansData}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item, index }) =>
-						<View style={[
-							styles.planCategory,
-							{
-								borderBottomWidth: vS(4),
-								borderBottomColor: primaryHex
-							}
-						]}>
+						<View style={{
+							...styles.planCategory,
+							borderBottomWidth: vS(4),
+							borderBottomColor: primaryHex
+						}}>
 							<Text style={[
 								styles.planCategoryTitle,
 								{ color: index === tabIndexSelected ? darkHex : `rgba(${darkRgb.join(', ')}, .8)` }]}>
@@ -125,9 +123,7 @@ const styles = StyleSheet.create({
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
 	},
 
-	header: {
-		width: '100%'
-	},
+	header: { width: '100%' },
 
 	planCategory: {
 		width: hS(140),

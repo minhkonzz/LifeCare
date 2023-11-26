@@ -13,8 +13,7 @@ import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import RestaurantIcon from '@assets/icons/restaurant.svg'
-import ElectroIcon from '@assets/icons/electro.svg'
+import { ElectroIcon, RestaurantIcon } from '@assets/icons'
 import RequireEndFastingPopup from '@components/shared/popup-content/require-end-fasting'
 import ConfirmPopup from '@components/shared/popup-content/ask-start-fasting'
 
@@ -22,7 +21,7 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ item }): JSX.Element => {
 	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
-	const { setPopup } = useContext(PopupContext)
+	const { setPopup } = useContext<any>(PopupContext)
 	const dispatch = useDispatch()
 
 	const onSelectPlan = () => {
@@ -49,7 +48,7 @@ export default ({ item }): JSX.Element => {
 						<ElectroIcon width={hS(8)} height={vS(10)} />
 						<Text style={styles.hrsDesc}>{`${item.hrs_fast} hours for fasting`}</Text>
 					</View>
-					<View style={[styles.hrsDescWrapper, { marginTop: vS(5) }]}>
+					<View style={{...styles.hrsDescWrapper, marginTop: vS(5) }}>
 						<RestaurantIcon width={hS(9)} height={vS(9)} />
 						<Text style={styles.hrsDesc}>{`${item.hrs_eat} hours for eating`}</Text>
 					</View>
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		width: hS(257),
 		height: vS(148),
-		elevation: 4,
+		elevation: 10,
 		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
 		backgroundColor: '#fff',
 		borderRadius: hS(32),

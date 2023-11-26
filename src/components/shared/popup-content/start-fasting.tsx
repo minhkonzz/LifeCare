@@ -109,9 +109,6 @@ const Main = ({
          <View style={styles.main}>
             <View style={styles.indicator} />
             <View style={styles.wheelpickers}>
-               {/* <Picker items={dateOpts.map(e => e.title)} styles={styles.dateWheelPicker} onIndexChange={setNewDate} />
-               <Picker items={hoursOpts} styles={styles.hoursWheelPicker} onIndexChange={setNewHours} />
-               <Picker items={minsOpts} styles={styles.minsWheelPicker} onIndexChange={setNewMins} /> */}
                <WheelPickers />
             </View>
          </View>

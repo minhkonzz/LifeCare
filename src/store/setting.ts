@@ -58,20 +58,27 @@ const SettingSlice = createSlice({
       }, 
 
       initReminders: (state, action) => {
-         configPushNotification(action.payload)
+         const drinked = action.payload
+         const { startWater, endWater, waterInterval } = state.reminders
+         configPushNotification({
+            startWater,
+            endWater,
+            waterInterval,
+            drinked
+         })
       },
 
-      updateStartFastRemind: (state, action) => {
-         const { startFast, beforeStartFast } = action.payload
-         configPushStartFastNotification({ startFast, beforeStartFast })
-         state.reminders.beforeStartFast = beforeStartFast
-      },
+      // updateStartFastRemind: (state, action) => {
+      //    const { startFast, beforeStartFast } = action.payload
+      //    configPushStartFastNotification({ startFast, beforeStartFast })
+      //    state.reminders.beforeStartFast = beforeStartFast
+      // },
 
-      updateEndFastRemind: (state, action) => {
-         const { endFast, beforeEndFast } = action.payload
-         configPushEndFastNotification({ endFast, beforeEndFast })
-         state.reminders.beforeEndFast = action.payload
-      },
+      // updateEndFastRemind: (state, action) => {
+      //    const { endFast, beforeEndFast } = action.payload
+      //    configPushEndFastNotification({ endFast, beforeEndFast })
+      //    state.reminders.beforeEndFast = action.payload
+      // },
 
       // updateWeightRemind: (state, action) => {
       //    const { days, h, m } = action.payload
@@ -106,8 +113,8 @@ export const {
    updateNotififcation,
    updateSyncGoogleFit,
    initReminders,
-   updateStartFastRemind, 
-   updateEndFastRemind
+   // updateStartFastRemind, 
+   // updateEndFastRemind
 } = SettingSlice.actions
 
 export default SettingSlice.reducer

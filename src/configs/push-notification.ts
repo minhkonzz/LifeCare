@@ -1,36 +1,14 @@
 import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import { NOTIFICATION_CHANNEL_ID } from '@utils/constants/notification'
-import BackgroundTimer from 'react-native-background-timer'
+import { calculateAmountBetweenTimes } from '@utils/datetimes'
 
-/*
-   function calculateTimeDifference(startTime, endTime) {
-   var startDate = new Date("2000-01-01 " + startTime);
-   var endDate = new Date("2000-01-02 " + endTime); // Thêm một ngày để đảm bảo endTime nằm sau startTime
-
-   // Kiểm tra nếu endTime nhỏ hơn startTime, tăng thêm một ngày cho endDate
-   if (endDate < startDate) {
-      endDate.setDate(endDate.getDate() + 1);
-   }
-
-   var timeDiff = endDate - startDate;
-
-   var hours = Math.floor(timeDiff / (1000 * 60 * 60));
-   var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-
-   return {
-      hours: hours,
-      minutes: minutes
-   };
-   }
-
-   // Sử dụng hàm calculateTimeDifference
-   var startTime = "22:13";
-   var endTime = "01:45";
-
-   var timeDiff = calculateTimeDifference(startTime, endTime);
-   console.log(timeDiff.hours + " giờ " + timeDiff.minutes + " phút");
-*/
+import {  
+   WATER_REMIND,
+   START_FAST_REMIND,
+   END_FAST_REMIND,
+   WEIGHT_REMIND
+} from '@utils/constants/notification'
 
 export const configPushStartFastNotification = (bundledConfig: any) => {
    const {
@@ -48,13 +26,23 @@ export const configPushStartFastNotification = (bundledConfig: any) => {
    const currentHour = d.getHours()
    const currentMin = d.getMinutes()
 
-   // have total miliseconds
-   const totalMiliseconds = 100000
-
-   BackgroundTimer.setTimeout(() => {
-      PushNotification.localNotification({})
-      configPushStartFastNotification({ startFast, beforeStartFast })
-   }, totalMiliseconds)
+   const totalMiliseconds = calculateAmountBetweenTimes({
+      startTime: `${currentHour}:${currentMin}`,
+      endTime: `${hourRemind}:${minRemind}`
+   })
+   
+   PushNotification.localNotificationSchedule({
+      channelId: NOTIFICATION_CHANNEL_ID,
+      date: new Date(Date.now() + totalMiliseconds),
+      title: "Get ready for the next fasting phase",
+      message: `You'll in fasting period after ${beforeStartFast} minutes`,
+      allowWhileIdle: true, 
+      playSound: true, 
+      soundName: 'default',
+      userInfo: {
+         type: START_FAST_REMIND
+      }
+   })
 }
 
 export const configPushEndFastNotification = (bundledConfig: any) => {
@@ -66,20 +54,38 @@ export const configPushEndFastNotification = (bundledConfig: any) => {
    const endFastDate = new Date(endFast)
    const hourEndFast = endFastDate.getHours()
    const minEndFast = endFastDate.getMinutes()
-   const hourRemind = hourEndFast
-   const minRemind = minEndFast - beforeEndFast
+
+   const { hourRemind, minRemind } = minEndFast < beforeEndFast && 
+   {
+      hourRemind: hourEndFast - 1,
+      minRemind: 60 - Math.abs(minEndFast - beforeEndFast)
+   } ||
+   {
+      hourRemind: hourEndFast,
+      minRemind: minEndFast - beforeEndFast
+   }
 
    const d = new Date()
    const currentHour = d.getHours()
    const currentMin = d.getMinutes()
 
-   // have total miliseconds
-   const totalMiliseconds = 100000
-
-   BackgroundTimer.setTimeout(() => {
-      PushNotification.localNotification({})
-      configPushStartFastNotification({ endFast, beforeEndFast })
-   }, totalMiliseconds)
+   const totalMsUntilPush = calculateAmountBetweenTimes({
+      startTime: `${currentHour}:${currentMin}`,
+      endTime: `${hourRemind}:${minRemind}`
+   })
+   
+   PushNotification.localNotificationSchedule({
+      channelId: NOTIFICATION_CHANNEL_ID,
+      date: new Date(Date.now() + totalMsUntilPush),
+      title: "Eating time is coming",
+      message: `You'll in eating period after ${beforeEndFast} minutes`,
+      allowWhileIdle: true, 
+      playSound: true, 
+      soundName: 'default',
+      userInfo: {
+         type: END_FAST_REMIND
+      }
+   })
 }
 
 export const configPushWeightNotification = (bundledConfig: any) => {
@@ -87,46 +93,78 @@ export const configPushWeightNotification = (bundledConfig: any) => {
 }
 
 export const configPushWaterDrinkNotification = (bundledConfig: any) => {
-   const { reminders, drinked } = bundledConfig
+   const {
+      startWater,
+      endWater,
+      waterInterval,
+      drinked
+   } = bundledConfig
 
-   const shouldSendWaterDrinkNotification = () => {
-      const { h: startHour } = reminders.startWater
-      const { h: endHour } = reminders.endWater
-      const currentDate = new Date()
-      const currentHour = currentDate.getHours()
-      return (currentHour >= startHour && currentHour < endHour) || (currentHour > startHour && currentHour <= endHour)
-   }
+   const { h: startHour, m: startMin } = startWater
+   const { h: endHour, m: endMin } = endWater
+   const currentDate = new Date()
+   const currentHour = currentDate.getHours()
+   const shouldSendNotification = (currentHour >= startHour && currentHour < endHour) || (currentHour > startHour && currentHour <= endHour)
 
-   const { h: hourInterval, m: minInterval } = reminders.waterInterval
-   const totalSeconds = hourInterval * 3600000 + minInterval * 60000
-   BackgroundTimer.setInterval(() => {
-      if (shouldSendWaterDrinkNotification()) {
-         PushNotification.localNotification({
-            channelId: NOTIFICATION_CHANNEL_ID,
-            title: 'Remember to keep track your water',
-            message: `Time to drink more water. You drinked ${drinked} ml today`,
-            allowWhileIdle: true, 
-            playSound: true, 
-            soundName: 'default'
-         })
+   const { h: hourInterval, m: minInterval } = waterInterval
+   const totalIntervalMs: number = hourInterval * 3600000 + minInterval * 60000
+
+   const currentMin = currentDate.getMinutes()
+   const totalMsUntilEndOfDay: number = calculateAmountBetweenTimes({
+      startTime: `${currentHour}:${currentMin}`,
+      endTime: `${endHour}:${endMin}`
+   })
+
+   const totalMsUntilPush: number = shouldSendNotification && totalIntervalMs < totalMsUntilEndOfDay && totalIntervalMs || calculateAmountBetweenTimes({
+      startTime: `${currentHour}:${currentMin}`,
+      endTime: `${startHour}:${startMin}`
+   })
+
+   PushNotification.localNotificationSchedule({
+      channelId: NOTIFICATION_CHANNEL_ID,
+      id: `WATER${WATER_REMIND}`,
+      date: new Date(Date.now() + totalMsUntilPush),
+      title: 'Remember to keep track your water',
+      message: `Time to drink more water. You drinked ${drinked} ml today`,
+      allowWhileIdle: true, 
+      playSound: true, 
+      soundName: 'default',
+      userInfo: {
+         type: WATER_REMIND
       }
-   }, totalSeconds)
+   })
 }
 
 export const configPushNotification = (bundledConfig: any) => {
    
    const { 
-      reminders,
-      startFast, 
-      endFast,
-      drinked, 
-      currentWeight
+      startWater,
+      endWater, 
+      waterInterval, 
+      drinked
    } = bundledConfig
 
    PushNotification.configure({
       onRegister: function (token) {},
 
-      onNotification: function (notification) {},
+      onNotification: function (notification) {
+         const { data } = notification
+         const notificationType = data.type
+         switch (notificationType) {
+            case START_FAST_REMIND: {
+               
+               return
+            }
+            case END_FAST_REMIND: {  
+               return
+            }
+            case WATER_REMIND: {
+               PushNotification.cancelLocalNotification(`WATER${WATER_REMIND}`)
+               configPushWaterDrinkNotification(bundledConfig)
+               return
+            }
+         }
+      },
 
       onRegistrationError: function (err) {
          console.error(err.message)
@@ -150,7 +188,5 @@ export const configPushNotification = (bundledConfig: any) => {
       vibrate: true
    }, created => console.log(`created channel ${created}`))
 
-   configPushWaterDrinkNotification({ reminders, drinked })
-   configPushStartFastNotification({ reminders, startFast, endFast })
-   configPushWeightNotification({ reminders, currentWeight })
+   configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
 }

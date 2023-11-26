@@ -1,8 +1,12 @@
 import { memo, useRef, useEffect } from 'react'
 import { View, StyleSheet, Text, Animated, Pressable, FlatList } from 'react-native'
 import { Colors } from '@utils/constants/colors'
-import LinearGradient from 'react-native-linear-gradient'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import { getDatesRange } from '@utils/datetimes'
+import { handleFastingRecords } from '@utils/helpers'
+import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -38,6 +42,21 @@ const Record = ({ item, index }) => {
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
+	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
+		const { startTimeStamp, endTimeStamp } = cur
+		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp) }
+	}, {})
+
+	const chartData = getDatesRange(122).map(e => {
+		const { startTime, endTime, totalHours } = standardFastingRecords[e.value]
+		return {
+			date: e.value,
+			startTime,
+			endTime,
+			totalHours
+		}
+	})
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -88,23 +107,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				<FlatList 
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					data={[
-						{
-							startTime: '2:00 AM',
-							endTime: '06:00 AM',
-							totalHours: Math.round(4) 
-						}, 
-						{
-							startTime: '12:00 AM',
-							endTime: '12:00 AM',
-							totalHours: 24
-						},
-						{
-							startTime: '12:00 AM',
-							endTime: '3:15 AM',
-							totalHours: Math.round(3.263888888888889)
-						}
-					]} 
+					data={chartData} 
 					renderItem={({ item, index }) => <Record {...{ item, index }} />} />
 			</View>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
@@ -228,7 +231,13 @@ const styles = StyleSheet.create({
 		letterSpacing: .4
 	},
 
-	recProg: { width: 20, height: vS(180), borderRadius: 100, backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, marginVertical: vS(10) },
+	recProg: { 
+		width: 20, 
+		height: vS(180), 
+		borderRadius: 100, 
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, 
+		marginVertical: vS(10) 
+	},
 
 	recProgValue: {
 		width: '100%',
