@@ -6,7 +6,6 @@ export default (BaseComponent: FC) => {
    return (props: any) => {
       const isOnline = useSelector((state: AppState) => state.network.isOnline)
       const changes = useSelector((state: AppState) => state.user.changes)
-      console.log('AutoSyncComponent')
 
       useEffect(() => {
          if (changes) {

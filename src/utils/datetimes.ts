@@ -71,22 +71,28 @@ export const getLocalTimeV1 = (utcDate: Date): Date => {
    const day: number = utcDate.getDate()
    const hours: number = utcDate.getHours()
    const mins: number = utcDate.getMinutes()
-   const seconds: number = utcDate.getSeconds()
-   return new Date(`${year}:${month}:${day} ${hours}:${mins}:${seconds}`)
+   const secs: number = utcDate.getSeconds()
+   return new Date(`${year}-${month}-${day} ${hours}:${mins}:${secs}`)
 }
 
+// moi update cho nay, can sua toan bo cac cho lien quan
 export const getDatesRange = (limit: number) => {
-   const dateArray: Array<{ title: string, value: string }> = []
+   const dateArray: Array<{ title: string, value: string, date: number, month: number, year: number }> = []
    const currentDate = new Date()
    for (let i = -limit; i <= limit; i++) {
       const newDate = new Date(currentDate)
       newDate.setDate(currentDate.getDate() + i)
-      const month = newDate.toLocaleString('en-US', { month: 'short' })
-      const day = newDate.getDate()
-      const formattedDate = `${month} ${day}`
+      const month = newDate.getMonth() + 1
+      const date = newDate.getDate()
+      const year = newDate.getFullYear()
+      const formattedMonth = newDate.toLocaleString('en-US', { month: 'short' })
+      const formattedDate = `${formattedMonth} ${date}`
       dateArray.push({
          title: i === -1 && 'Yesterday' || i === 1 && 'Tomorrow' || i === 0 && 'Today' || formattedDate,
-         value: formattedDate
+         value: formattedDate,
+         date,
+         month, 
+         year
       })
    }
    return dateArray
