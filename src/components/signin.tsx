@@ -1,13 +1,15 @@
 import { useState, useEffect, memo, useRef, useCallback } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Keyboard } from 'react-native'
 import { GoogleIcon, AtIcon, LockIcon } from '@assets/icons'
-import AuthInput from '@components/auth-input'
-import Button from '@components/shared/button/Button'
 import { useSelector } from 'react-redux'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { LoginComponentProps } from '@utils/interfaces'
 import { AppState } from '../store'
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
+import { GOOGLE_CLIENT_ID } from '@env'
+import AuthInput from '@components/auth-input'
+import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
 import UserService from '@services/user'
 
@@ -15,7 +17,6 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginComponentProps): JSX.Element => {
-	console.log('render SignIn component')
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current 
 	const translateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
@@ -24,7 +25,9 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 			toValue: 1, 
 			duration: 640, 
 			useNativeDriver: true
-		}).start()
+		}).start(() => {
+			GoogleSignin.configure({ webClientId: GOOGLE_CLIENT_ID })
+		})
 		
 		const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
 			Animated.timing(translateY, {
@@ -38,6 +41,29 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 			keyboardDidHideListener.remove()
 		}
 	}, [])
+
+	const onGoogleSignIn = async () => {
+		try {
+			const userInfo = await GoogleSignin.signIn()
+			console.log('user info:', userInfo)
+			if (userInfo.idToken) {
+				await UserService.signInWithGoogle(userInfo.idToken)
+			} else {
+				throw new Error('no ID token present')
+			}
+		} catch (error: any) {
+			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+				console.log('google sign in canceled')
+			} else if (error.code === statusCodes.IN_PROGRESS) {
+				console.log('Google Sign in already in progress')
+			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				console.log('Google Play Service not avaliable')
+			} else {
+				console.log(error.message)
+				console.log('unhandled google sign in error')
+			}
+		}
+	}
 
 	const onBeforeNavigate = (onAnimateCompleted?: () => void) => {
 		invokeAuthMessage('Login success', 'success')
@@ -151,7 +177,8 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 					</View>
 					<TouchableOpacity
 						style={styles.googleLoginButton}
-						activeOpacity={.7}>
+						activeOpacity={.7}
+						onPress={onGoogleSignIn}>
 						<GoogleIcon
 							style={styles.googleIcon}
 							width={hS(32)}

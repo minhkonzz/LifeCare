@@ -25,8 +25,19 @@ export type PopupContextType = {
 export type FastingState = {
    newPlan: any,
    currentPlan: any, 
+   prevStartTimeStamp: number, 
    startTimeStamp: number, 
    endTimeStamp: number
+}
+
+export type DailyWaterState = {
+   date: string, 
+   drinked: number, 
+   needSync: boolean,
+   initCupsize: number,
+   cupsize: number,
+   specs: Array<{ id: string, liquid: number, time: string, type: boolean }>
+   changes: Array<{ id: string, liquid: number, time: string }>
 }
 
 export type Message = {

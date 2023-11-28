@@ -29,6 +29,5 @@
 
 // console.log(handle(1700014550000, 1700190950000))
 
-const d = new Date('2023-08-12T10:12:21')
-// console.log(`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}, ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
-console.log(d.getHours())
+const d = new Date('2023-11-28T08:57:44.240408+00:00')
+console.log(d.toLocaleString())

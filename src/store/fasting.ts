@@ -4,6 +4,7 @@ import { FastingState } from '@utils/types'
 const initialState: FastingState = {
    newPlan: null, 
    currentPlan: null,
+   prevStartTimeStamp: 0, 
    startTimeStamp: 0,
    endTimeStamp: 0
 }

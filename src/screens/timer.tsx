@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BackIcon from '@assets/icons/goback.svg'
+import { BackIcon } from '@assets/icons'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
@@ -63,14 +63,16 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-export default (): JSX.Element => (
-	<Screen header='tab' title='Timer' paddingHorzContent content={[
-		MainTop,
-		FastingClock,
-		FastingActivator,
-		FastingRecords
-	]} />
-)
+export default memo((): JSX.Element => {
+	return (
+		<Screen header='tab' title='Timer' paddingHorzContent content={[
+			MainTop,
+			FastingClock,
+			FastingActivator,
+			// FastingRecords
+		]} />
+	)
+})
 
 const styles = StyleSheet.create({
 	mainTop: {

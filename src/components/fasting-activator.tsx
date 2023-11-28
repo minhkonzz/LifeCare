@@ -8,13 +8,10 @@ import { PopupContext } from '@contexts/popup'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/datetimes'
+import { getCurrentTimestamp } from '@utils/datetimes'
 import StartFastingPopup from '@components/shared/popup-content/start-fasting'
 import fastingStagesData from '@assets/data/fasting-stages.json'
-import PrimaryEditIcon from '@assets/icons/edit-primary.svg'
-import BloodSugarIncreaseIcon from '@assets/icons/blood-sugar-increase.svg'
-import BloodSugarDecreaseIcon from '@assets/icons/blood-sugar-decrease.svg'
-import BloodSugarNormalIcon from '@assets/icons/blood-sugar-normal.svg'
-import FireColorIcon from '@assets/icons/fire-color.svg'
+import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
 import LinearGradient from 'react-native-linear-gradient'
 import ConfirmStopFastingPopup from '@components/shared/popup-content/confirm-stop-fasting'
 
@@ -65,70 +62,85 @@ const FastingActivateTime: FC<ActivateTimeProps> = ({ activate, current, value =
 }
 
 const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: Animated.Value, navigation: any }) => {
-	const [ timeElapsed, setTimeElapsed ] = useState<number>(0)
 	const startTimestamp: number = useSelector((state: AppState) => state.fasting.startTimeStamp)
-	const elapsedHours = Math.floor((timeElapsed / 1000 / 60 / 60) % 24)
-	const stage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to)
-	const { title, from, to, icon } = stage
-	const stageElapsedPercent: number = Math.floor((elapsedHours - from) / (to - from) * 100)
-	const StageIcon = icon
+	const [ data, setData ] = useState<{ timeElapsed: number, stageElapsedPercent: number, stage: any } | null>(null)
 
 	useEffect(() => {
 		let interval = setInterval(() => {
-			const currentTimeStamp = new Date().getTime()
-			const elapsedTime = currentTimeStamp - startTimestamp
-			setTimeElapsed(elapsedTime)
-		}, 1000)
+			const currentTimeStamp = getCurrentTimestamp()
+			const timeElapsed = currentTimeStamp - startTimestamp
+			const elapsedHours = Math.floor((timeElapsed / 1000 / 60 / 60) % 24)
+			let currentStage: any
+
+			if (data && data.stage) {
+				const { to } = data.stage
+				currentStage = elapsedHours >= to && stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || data.stage
+			} else {
+				currentStage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stages.at(-1)
+			}
+
+			const { from, to } = currentStage
+			const stageElapsedPercent: number = (elapsedHours - from) / (to - from) * 100
+			setData({ timeElapsed, stageElapsedPercent, stage: currentStage })
+		}, 999)
 
 		return () => { clearInterval(interval) }
 	}, [startTimestamp])
 
-	return (
-		<AnimatedPressable 
-			onPress={() => navigation.navigate('fasting-stages')}
-			style={{ opacity: animateValue }}>
-			<LinearGradient
-				style={styles.stage}
-				colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
-				start={{ x: .5, y: 0 }}
-				end={{ x: .51, y: .5 }}>
-				<View style={{ flexDirection: 'row' }}>
-					<LinearGradient
-						style={styles.stageIcBg}
-						colors={['#000', 'rgba(0, 0, 0, 0)']}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }}>
-						<AnimatedCircularProgress
-							lineCap='round'
-							style={{ position: 'absolute' }}
-							width={hS(7)}
-							size={hS(80)}
-							rotation={360}
-							fill={stageElapsedPercent}
-							tintColor='#30E3CA'
-							backgroundColor='#fff'
-						/>
-						<StageIcon width={hS(36)} height={vS(36)} />
-					</LinearGradient>
-					<Animated.View 
-						style={{ 
-							marginLeft: hS(15), 
-							opacity: animateValue, 
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-50, 0]
-							}) }] 
-						}}>
-						<Text style={styles.stageSmText}>CURRENT STAGE</Text>
-						<Text style={styles.stageLgText}>{title}</Text>
-						<Text style={styles.stageLgText}>
-							{`${timestampToDateTime(hoursToTimestamp(to) - timeElapsed)} left to next stage`}
-						</Text>
-					</Animated.View>
-				</View>
-			</LinearGradient>
-		</AnimatedPressable>
-	)
+	if (data) {
+		const { stageElapsedPercent, timeElapsed, stage } = data
+		const { title, icon, to } = stage
+		const StageIcon = icon
+
+		return (
+			<AnimatedPressable 
+				onPress={() => navigation.navigate('fasting-stages')}
+				style={{ opacity: animateValue }}>
+				<LinearGradient
+					style={styles.stage}
+					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+					start={{ x: .5, y: 0 }}
+					end={{ x: .51, y: .5 }}>
+					<View style={{ flexDirection: 'row' }}>
+						<LinearGradient
+							style={styles.stageIcBg}
+							colors={['#000', 'rgba(0, 0, 0, 0)']}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<AnimatedCircularProgress
+								lineCap='round'
+								style={{ position: 'absolute' }}
+								width={hS(7)}
+								size={hS(80)}
+								rotation={360}
+								fill={stageElapsedPercent}
+								tintColor='#30E3CA'
+								backgroundColor='#fff'
+							/>
+							<StageIcon width={hS(36)} height={vS(36)} />
+						</LinearGradient>
+						<Animated.View 
+							style={{ 
+								marginLeft: hS(15), 
+								opacity: animateValue, 
+								transform: [{ translateX: animateValue.interpolate({
+									inputRange: [0, 1], 
+									outputRange: [-50, 0]
+								}) }] 
+							}}>
+							<Text style={styles.stageSmText}>CURRENT STAGE</Text>
+							<Text style={{...styles.stageLgText, marginBottom: vS(4) }}>{title}</Text>
+							<Text style={styles.stageSmText}>
+								{`${timestampToDateTime(hoursToTimestamp(to) - timeElapsed)} left to next stage`}
+							</Text>
+						</Animated.View>
+					</View>
+				</LinearGradient>
+			</AnimatedPressable>
+		)
+	}
+
+	return <></>
 })
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {

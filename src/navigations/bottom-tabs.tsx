@@ -18,7 +18,7 @@ const BottomNavigator = createBottomTabNavigator()
 const BottomNav = memo(() => {
 	return (
 		<BottomNavigator.Navigator tabBar={props => <BottomTabs {...props} />}>
-	   	<BottomNavigator.Group screenOptions={{ headerShown: false }}>
+	   	<BottomNavigator.Group screenOptions={{ headerShown: false, unmountOnBlur: true }}>
 				<BottomNavigator.Screen
 		    		options={{ tabBarLabel: 'Daily' }}
 		    		name='daily'

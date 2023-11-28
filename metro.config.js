@@ -5,12 +5,12 @@ const resolver = defaultConfig.resolver
 
 const config = {
     transformer: {
-	babelTransformerPath: require.resolve('react-native-svg-transformer')
-    }, 
+        babelTransformerPath: require.resolve('react-native-svg-transformer')
+    },
 
     resolver: {
-	assetExts: resolver.assetExts.filter(ext => ext !== 'svg'), 
-	sourceExts: [...resolver.sourceExts, 'svg']
+        assetExts: resolver.assetExts.filter(ext => ext !== 'svg'),
+        sourceExts: [...resolver.sourceExts, 'svg']
     }
 }
 

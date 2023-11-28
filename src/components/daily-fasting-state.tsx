@@ -3,8 +3,9 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
+import { BackIcon } from '@assets/icons'
 import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback.svg'
+
 import {
 	View,
 	Text,

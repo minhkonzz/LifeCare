@@ -10,6 +10,15 @@ export default {
       return await supabase.auth.signInWithPassword({ email, password })
    },
 
+   signInWithGoogle: async (idToken: string) => {
+      const { data, error } = await supabase.auth.signInWithIdToken({
+         provider: 'google',
+         token: idToken
+      })
+      if (error) throw new Error('Something went wrong when sign in with Google')
+      console.log(data)
+   },
+
    signUpWithEmail: async (email: string, password: string) => {
       return await supabase.auth.signUp({ email, password })
    },
@@ -70,6 +79,61 @@ export default {
       
       if (err2) throw new Error('Something went wrong when create new water record time')
    }, 
+
+   syncDailyWater: async (payload: { userId: string, date: string, drinked: number, goal: number, specs: any[] }): Promise<void> => {
+      const { userId, drinked, date, goal, specs } = payload
+      const { data: d1, error: err1 } = await supabase.from('water_records').select('id').eq('date', date)
+      if (err1) throw new Error('Something went wrong when get id of water record')
+
+      if (d1.length === 0) {
+         const { data: d2, error: err2 } = await supabase.from('water_records').insert({
+            user_id: userId,
+            value: drinked,
+            goal,
+            date
+         }).select('id')
+         
+         if (err2) throw new Error('Something went wrong when insert new water record')
+         const waterRecordId = d2[0].id
+         const { error: err3 } = await supabase.from('water_record_times').insert(specs.map(e => ({
+            id: e.id,
+            water_record_id: waterRecordId,
+            value: e.liquid
+         })))
+         if (err3) throw new Error('Something went wrong when create water record times')
+         return
+      }
+
+      const waterRecordId = d1[0].id
+      if (drinked === 0) {
+         const { error: err6 } = await supabase.from('water_records')
+            .update({ value: drinked })
+            .eq('id', waterRecordId)
+         
+         if (err6) throw new Error('Something wrong when remove water record')
+      }
+      else {
+         const { error: err7 } = await supabase.from('water_record') .update({ value: drinked }).eq('id', waterRecordId)
+         if (err9) throw new Error('Something wrong when update water record')
+      }
+
+      specs.forEach(async(e) => {
+         const { id, type, liquid, time } = e
+         if (type) {
+            const { error: err4 } = await supabase.from('water_record_times').insert({
+               id,
+               water_record_id: waterRecordId,
+               value: liquid,
+               created_at: time,
+               updated_at: time
+            })
+            if (err4) throw new Error('Something wrong when insert new water record time')
+            return
+         }
+         const { error: err5 } = await supabase.from('water_record_times').delete().eq('id', id)
+         if (err5) throw new Error('Something wrong when remove water record time')
+      })
+   },
 
    saveFastingRecord: async (payload: any): Promise<void> => {
       const { userId, startTimeStamp, endTimeStamp, planName } = payload 

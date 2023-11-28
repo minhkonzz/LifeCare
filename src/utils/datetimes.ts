@@ -5,6 +5,15 @@ export const getCurrentTimestamp = (): number => {
    return date.getTime()
 }
 
+export const getCurrentDate = (): string => {
+   const today = new Date()
+   const year = today.getFullYear()
+   const month = String(today.getMonth() + 1).padStart(2, '0')
+   const date = String(today.getDate()).padStart(2, '0')
+
+   return `${year}-${month}-${date}`
+}
+
 export const isSameDay = (d1: Date, d2: Date): boolean => {
    const yearD1: number = d1.getFullYear()
    const monthD1: number = d1.getMonth()

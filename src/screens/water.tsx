@@ -5,10 +5,11 @@ import { NavigationProp } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
-import { updateLiquid } from '../store/water'
-import LinearGradient from 'react-native-linear-gradient'
+import { updateLiquid, resetSpecs } from '../store/water'
 import { BackIcon, SettingIcon, WhitePlusIcon, StrongBlueMinusIcon } from '@assets/icons'
-import StrongWaveSvg from '@assets/images/strong_wave.svg'
+import { WaveSvg } from '@assets/images'
+import UserService from '@services/user'
+import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
 
 import {
@@ -29,9 +30,14 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { drinked: liquidDrinked, cupsize } = useSelector((state: AppState) => state.water)
-   const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+   const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppState) => state.water)
+   const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
+   const { session } = useSelector((state: AppState) => state.user)
+   const userId: string = session?.user?.id
    const dispatch = useDispatch()
+
+   console.log('changes:', changes)
+   console.log('specs:', specs)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -67,6 +73,18 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
       dispatch(updateLiquid(DECREASE))
    }
 
+   const onSync = async () => {
+      await UserService.syncDailyWater({
+         userId,
+         date,
+         drinked: liquidDrinked,
+         goal: dailyWater,
+         specs
+      })
+      console.log('daily water sync success')
+      dispatch(resetSpecs())
+   }
+
    return (
       <View style={styles.container}>
          <Animated.View style={{
@@ -77,7 +95,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                { translateY: waterTranslateY }
             ]
          }}>
-            <StrongWaveSvg width={hS(792)} height='100%' />
+            <WaveSvg width={hS(792)} height='100%' />
          </Animated.View>
          <View style={styles.interacts}>
             <View style={styles.header}>
@@ -111,6 +129,15 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                   }}>
                   {`Goal today: ${dailyWater} ml`}
                </Animated.Text>
+
+               { needSync && 
+               <TouchableOpacity
+                  style={styles.syncButton}
+                  activeOpacity={.7}
+                  onPress={onSync}>
+                  <Text>Sync</Text>
+               </TouchableOpacity> }
+
             </View>
             <View style={styles.updates}>
                <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseLiquid}>
@@ -138,6 +165,15 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 const styles = StyleSheet.create({
    container: {
       flex: 1
+   },
+
+   syncButton: {
+      width: hS(80),
+      height: vS(80),
+      borderRadius: hS(40),
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: vS(30)
    },
 
    waveContainer: {
