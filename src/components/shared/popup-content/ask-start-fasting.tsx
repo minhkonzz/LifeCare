@@ -2,18 +2,13 @@ import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppState } from '../../../store'
 import { updateCurrentPlan, updateNewPlan } from '../../../store/fasting'
+import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-
-import {
-   View, 
-   Text,
-   StyleSheet, 
-   TouchableOpacity,
-   Animated
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -21,6 +16,9 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
    const navigation = useNavigation<any>()
    const dispatch = useDispatch()
+   const { newPlan } = useSelector((state: AppState) => state.fasting)
+   const { session } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session?.user?.id
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = (isAllowed: boolean) => {
@@ -28,9 +26,13 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          toValue: 0, 
          duration: 300, 
          useNativeDriver: true
-      }).start(({ finished }) => {
+      }).start(async () => {
          const targetRoute = isAllowed && 'day-plan' || 'main'
-         if (targetRoute === 'main') dispatch(updateCurrentPlan())
+         if (targetRoute === 'main') {
+            // dispatch(updateCurrentPlan())
+            const currentPlanId = newPlan.id
+            await UserService.updatePersonalData(userId, { currentPlanId })
+         }
          navigation.navigate(targetRoute)
       })
    }

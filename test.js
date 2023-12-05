@@ -29,5 +29,5 @@
 
 // console.log(handle(1700014550000, 1700190950000))
 
-const d = new Date('2023-11-28T08:57:44.240408+00:00')
-console.log(d.toLocaleString())
+const d = new Date()
+console.log(d.toLocaleString('en-US', { month: 'short' }))

@@ -61,13 +61,13 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 const Plans = () => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
 	const [ tabIndexSelected, setTabIndexSelected ] = useState<number>(0)
-	const { popup: Popup, setPopup } = useContext(PopupContext)
+	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
-			<View style={styles.header}>
+			{/* <View style={styles.header}>
 				<View style={{ width: '100%', paddingHorizontal: hS(24) }}>
-					<StackHeader title='Plans' />
+					
 				</View>
 				<FlatList
 					horizontal
@@ -87,7 +87,8 @@ const Plans = () => {
 							</Text>
 						</View>
 					} />
-			</View>
+			</View> */}
+			<StackHeader title='Plans' />
 			<ScrollView style={styles.main}>
 				<PlanCategorySection
 					title='Beginner'

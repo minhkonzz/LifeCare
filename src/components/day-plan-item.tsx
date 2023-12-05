@@ -1,12 +1,6 @@
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
-import {
-	View,
-	Text,
-	StyleSheet,
-	Pressable,
-	Image
-} from 'react-native'
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { updateNewPlan } from '../store/fasting'
 import { PopupContext } from '@contexts/popup'

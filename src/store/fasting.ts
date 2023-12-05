@@ -17,7 +17,12 @@ const FastingSlice = createSlice({
          state.newPlan = action.payload
       },
 
-      updateCurrentPlan: (state) => {
+      updateCurrentPlan: (state, action) => {
+         const currentPlan = action.payload
+         if (currentPlan) {
+            state.currentPlan = currentPlan
+            return
+         }
          state.currentPlan = { ...state.newPlan }
       },
 

@@ -21,7 +21,7 @@ export const formatNum = (value: number): string => {
    return value.toString().padStart(2, '0')
 }
 
-export const convertObjectKeysToCamelCase = (obj: any) => {
+export const convertObjectKeysToCamelCase = (obj: any): any => {
    return Object.keys(obj).reduce((convertedObj, key) => {
       const convertedKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase())
       convertedObj[convertedKey] = obj[key]
@@ -93,7 +93,6 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[]) => {
                sec
             }
          })]
-
       }, []),
       
       ...bodyRecords.reduce((acc, cur) => {

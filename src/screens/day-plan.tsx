@@ -7,15 +7,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import { BackIcon, WhiteBackIcon, PrimaryEditIcon, RestaurantIcon, ElectroIcon, LightIcon } from '@assets/icons'
+import UserService from '@services/user'
 import DateTimePopup from '@components/shared/popup-content/start-fasting'
 import DayPlanItem from '@components/day-plan-item'
 import Button from '@components/shared/button/Button'
-import BackIcon from '@assets/icons/goback.svg'
-import WhiteBackIcon from '@assets/icons/goback-white.svg'
-import EditPrimary from '@assets/icons/edit-primary.svg'
-import RestaurantIcon from '@assets/icons/restaurant.svg'
-import ElectroIcon from '@assets/icons/electro.svg'
-import LightIcon from '@assets/icons/light.svg'
 import LinearGradient from 'react-native-linear-gradient'
 
 import {
@@ -67,7 +63,7 @@ const TimeSetting = ({
 					<View style={styles.horz}>
 						<Text style={styles.timeSettingValueText}>{startTime}</Text>
 						<Pressable onPress={() => setVisible(true)}>
-							<EditPrimary width={hS(16)} height={vS(16)} />
+							<PrimaryEditIcon width={hS(16)} height={vS(16)} />
 						</Pressable>
 					</View>
 				</View>
@@ -78,7 +74,7 @@ const TimeSetting = ({
 					</View>
 					<View style={styles.horz}>
 						<Text style={styles.timeSettingValueText}>{endTime}</Text>
-						<EditPrimary width={hS(16)} height={vS(16)} />
+						<PrimaryEditIcon width={hS(16)} height={vS(16)} />
 					</View>
 				</View>
 			</View>
@@ -91,6 +87,8 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
+	const { session } = useSelector((state: AppState) => state.user)
+	const userId: string | null = session?.user?.id
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
@@ -101,10 +99,11 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 		setIsFirstRender(false)
 	}, [])
 
-	const onStartFasting = () => {
+	const onStartFasting = async () => {
+		await UserService.updatePersonalData(userId, { startTimeStamp: _startTimeStamp, endTimeStamp, currentPlanId: newPlan.id })
 		navigation.navigate('main')
-		dispatch(updateTimes({ _start: _startTimeStamp, _end: endTimeStamp }))
-		dispatch(updateCurrentPlan())
+		// dispatch(updateTimes({ _start: _startTimeStamp, _end: endTimeStamp }))
+		// dispatch(updateCurrentPlan())
 	}
 
 	return (
@@ -166,16 +165,12 @@ export default (): JSX.Element => {
 	const headerColor = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	useEffect(() => {
-		animateHeaderColor()
-	}, [headerStyles])
-
-	const animateHeaderColor = () => {
 		Animated.timing(headerColor, {
 			toValue: headerStyles ? 1 : 0,
 			duration: 200,
 			useNativeDriver: false
 		}).start()
-	}
+	}, [headerStyles])
 
 	const handleScroll = (event: any) => {
 		const scrolledY = event.nativeEvent.contentOffset.y
@@ -207,18 +202,16 @@ export default (): JSX.Element => {
 				<Content {...{ setVisible }} />
 			</ScrollView>
 			<Animated.View
-				style={[
-					styles.horz,
-					styles.header,
-					{
-						backgroundColor: headerColor.interpolate({
-							inputRange: [0, 1],
-							outputRange: ['transparent', '#fff']
-						}),
-						...(headerStyles && JSON.parse(headerStyles) || {})
-					}
-				]}>
-				<Pressable onPress={() => { }}>
+				style={{
+					...styles.horz,
+					...styles.header,
+					backgroundColor: headerColor.interpolate({
+						inputRange: [0, 1],
+						outputRange: ['transparent', '#fff']
+					}),
+					...(headerStyles && JSON.parse(headerStyles) || {})
+				}}>
+				<Pressable>
 					<GoBackIcon width={hS(9.2)} height={vS(16)} />
 				</Pressable>
 				<Text style={{...styles.headerTitle, color: headerStyles && darkHex || '#fff' }}>1 day plan</Text>

@@ -8,9 +8,8 @@ export default (BaseComponent: FC) => {
       const changes = useSelector((state: AppState) => state.user.changes)
 
       useEffect(() => {
-         if (changes) {
+         if (isOnline && changes) {
             // perform sync
-            console.log('perform sync')
          }
       }, [isOnline])
 

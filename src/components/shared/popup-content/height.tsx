@@ -1,26 +1,18 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
+import { memo, useState, Dispatch, useRef, SetStateAction } from 'react'
+import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { updateMetadata } from '../../../store/user'
+import { centimeterToInch, inchToCentimeter } from '@utils/fomular'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
-import { useSelector } from 'react-redux'
-import { AppState } from '../../../store'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
+const options: string[] = ['cm', 'in']
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const Main = ({
@@ -30,6 +22,7 @@ const Main = ({
    animateValue: Animated.Value, 
    setVisible: Dispatch<SetStateAction<any>>
 }) => {
+   const dispatch = useDispatch()
    const { session, metadata } = useSelector((state: AppState) => state.user)
    const userId: string | null = session && session.user.id || null 
    const { currentHeight } = metadata
@@ -40,15 +33,28 @@ const Main = ({
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(async({ finished }) => {
-         await UserService.updatePersonalData(userId, { currentHeight: height })
+      }).start(async() => {
+         const payload = { currentHeight: height }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload) 
+            return
+         }
+         dispatch(updateMetadata(payload))
          setVisible(false)
       })
    }
 
+   const onChangeOption = (index: number) => {
+      if (index === 0) {
+         setHeight(inchToCentimeter(height))
+         return
+      }
+      setHeight(centimeterToInch(height))
+   }
+
    return (
       <>
-         <PrimaryToggleValue />
+         <PrimaryToggleValue {...{ options, onChangeOption }} />
          <MeasureInput 
             contentCentered
             symb='cm' 

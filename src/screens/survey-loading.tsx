@@ -6,7 +6,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateMetadata } from '../store/user'
 import { AppState } from '../store'
-import { InitialPersonalData } from '@utils/interfaces'
+import { InitialPersonalData, PersonalData } from '@utils/interfaces'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
 
@@ -19,26 +19,51 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 
    const initPersonalData = async () => {
       let isOk: boolean = false
-      const personalData: InitialPersonalData = {
+      let initPersonalData: InitialPersonalData = {
          gender: survey.gender,
+         age: survey.age, 
          currentHeight: survey.currentHeight,
          currentWeight: survey.currentWeight, 
          startWeight: survey.currentWeight,
          goalWeight: survey.goalWeight,
-         age: survey.age, 
          exercisePerformance: survey.exercisePerformance,
          fastingFamiliar: survey.fastingFamiliar,
          goal: survey.goal,
          isSurveyed: true
       }   
+
       if (!session) {
          // user logged in as guest
+         const personalData: PersonalData = {
+            ...initPersonalData,
+            chestMeasure: 0,
+            thighMeasure: 0,
+            waistMeasure: 0,
+            hipsMeasure: 0, 
+            dailyWater: 2500,
+            dailyCarbs: 0,
+            dailyFat: 0,
+            dailyProtein: 0,
+            name: '',
+            email: '',
+            startTimeStamp: 0,
+            endTimeStamp: 0,
+            currentPlanId: '',
+            waterRecords: [],
+            fastingRecords: [], 
+            bodyRecords: []
+         }
          dispatch(updateMetadata(personalData))
          isOk = true
       } else {
-         // user logged in account
          const userId = session?.user?.id
-         const { status } = await UserService.initPersonalData(userId, personalData)
+         const { status } = await UserService.initPersonalData(userId, initPersonalData)
+         dispatch(updateMetadata({
+            waterRecords: [],
+            fastingRecords: [],
+            bodyRecords: []
+         }))
+         initPersonalData['waterRecords']
          if (status === 204) isOk = true
       }
       if (isOk) navigation.navigate('main')

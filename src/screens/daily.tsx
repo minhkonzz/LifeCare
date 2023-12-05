@@ -26,6 +26,7 @@ import NutritionTrack from '@components/daily-nutrition-track'
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: lightHex } = Colors.lightPrimary
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const Header = memo(({ isViewable }: { isViewable: boolean }) => {
@@ -119,15 +120,21 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 					}}>
 						Lorem Ipsum is simply dummy text of the printing and typesetting industry
 					</Animated.Text>
-					<TouchableOpacity style={styles.chatbotAdvertiseButton} activeOpacity={.8}>
+					<AnimatedTouchableOpacity 
+						style={{
+							...styles.chatbotAdvertiseButton,
+							opacity: animateValue, 
+							transform: [{ translateY: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [20, 0]
+							}) }]
+						}} 
+						activeOpacity={.8}>
 						<Text style={styles.chatbotAdvertiseButtonText}>Glad to try</Text>
-					</TouchableOpacity>
+					</AnimatedTouchableOpacity>
 				</View>
-				<View style={{ flexDirection: 'row' }}>
-					<Image 
-						source={require('../assets/lottie/FastAIBotInterface.gif')} 
-						style={styles.animatedChatbotInterface}
-					/>
+				<View style={styles.chatbotAdvertiseBottom}>
+					<Image source={require('../assets/lottie/FastAIBotInterface.gif')} style={styles.animatedChatbotInterface} />
 					<Text style={styles.gptRef}>Powered by GPT3.5</Text>
 				</View>
 			</LinearGradient>
@@ -157,6 +164,10 @@ export default (): JSX.Element => (
 )
 
 const styles = StyleSheet.create({
+	chatbotAdvertiseBottom: {
+		flexDirection: 'row'
+	},
+
 	metricRow: {
 		width: hS(370),
 		height: vS(161),

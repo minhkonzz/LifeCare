@@ -14,7 +14,7 @@ import { WheelPickerProps } from '@utils/interfaces'
 
 let valueScrolledTo: string | number = -1
 
-export default memo(({ items, itemHeight, fs, onIndexChange }: WheelPickerProps): JSX.Element => {
+export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex }: WheelPickerProps): JSX.Element => {
 
 	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
 
@@ -27,7 +27,6 @@ export default memo(({ items, itemHeight, fs, onIndexChange }: WheelPickerProps)
 		if (onIndexChange && valueScrolledTo !== value) {
 			valueScrolledTo = value
 			onIndexChange(index)
-			console.log('value scrolled to:', valueScrolledTo)
 		}
 	}
 
@@ -70,6 +69,7 @@ export default memo(({ items, itemHeight, fs, onIndexChange }: WheelPickerProps)
 
 	return (
 		<Animated.FlatList
+			{...{ initialScrollIndex }}
 			style={[styles.container, { height: itemHeight * 5 }]}
 			data={['', '', ...items, '', '']}
 			renderItem={({ item, index }) => <WheelPickerItem {...{ item, index }} />}

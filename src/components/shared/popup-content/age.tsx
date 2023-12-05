@@ -1,18 +1,15 @@
 import { memo, Dispatch, SetStateAction, useRef } from 'react'
+import { Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../../../store'
+import { updateMetadata } from '../../../store/user'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import Popup from '../popup'
 import LinearGradient from 'react-native-linear-gradient'
 import WheelPicker from '../wheel-picker'
 import UserService from '@services/user'
-import {
-   Text,
-   TouchableOpacity,
-   StyleSheet,
-   Animated
-} from 'react-native'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const ageNumbers: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
@@ -24,6 +21,7 @@ const Main = ({
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<boolean>>
 }) => {
+   const dispatch = useDispatch()
    const { session, metadata } = useSelector((state: AppState) => state.user)
    const userId: string | null = session && session?.user.id || null
    const { age } = metadata
@@ -33,8 +31,13 @@ const Main = ({
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(async({ finished }) => {
-         await UserService.updatePersonalData(userId, { age })
+      }).start(async() => {
+         const payload = { age }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
          setVisible(false)
       })
    }

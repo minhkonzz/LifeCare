@@ -50,16 +50,15 @@ export default {
    },
 
    updatePersonalData: async (
-      userId: string | null, 
-      payload: any,
-      offlineCallback?: () => void
-   ): Promise<void> => {
-      if (!userId) {
-         console.log('user is guest')
-         return
-      } 
+      userId: string, 
+      payload: any
+   ): Promise<string> => {
       const { error } = await supabase.from('users').update(convertObjectKeysToSnakeCase(payload)).eq('id', userId)
-      if (error) throw new Error('Some thing went wrong when update personal data')
+      if (error) {
+         const splits: string[] = error.message.split(': ')
+         return splits[splits.length === 1 && 0 || 1].toUpperCase()
+      }
+      return ''
    },
 
    savePrevWaterRecords: async (payload: WaterRecordsPayload): Promise<void> => {
@@ -76,7 +75,7 @@ export default {
             value: e.liquid,
             created_at: e.time
          })))
-      
+
       if (err2) throw new Error('Something went wrong when create new water record time')
    }, 
 
@@ -114,7 +113,7 @@ export default {
       }
       else {
          const { error: err7 } = await supabase.from('water_record') .update({ value: drinked }).eq('id', waterRecordId)
-         if (err9) throw new Error('Something wrong when update water record')
+         if (err7) throw new Error('Something wrong when update water record')
       }
 
       specs.forEach(async(e) => {
@@ -135,10 +134,10 @@ export default {
       })
    },
 
-   saveFastingRecord: async (payload: any): Promise<void> => {
+   saveFastingRecord: async (payload: any, offlineCallback?: () => void): Promise<void> => {
       const { userId, startTimeStamp, endTimeStamp, planName } = payload 
       if (!userId) {
-         console.log('user is guest')
+         if (offlineCallback) offlineCallback()
          return
       } 
       const { error } = await supabase.from('fasting_records')

@@ -66,7 +66,6 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		const CurrentStageIcon = stage.icon
 		const nextStage = stages[nextStageIndex]
 		const { icon: NextStageIcon, title: nextStageTitle } = nextStage
-		
 		const elapsedPercent: number = Math.floor(timeElapsed / (endTimeStamp - startTimeStamp) * 100)
 
 		return (
@@ -102,10 +101,11 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
 					renderCap={({ center }) => (
 						isFasting && 
-						<View style={{ justifyContent: 'center', alignItems: 'center' }}>
-							<Circle cx={center.x} cy={center.y} r={hS(24)} fill={darkHex} /> 
-							<CurrentStageIcon width={32} height={32} />
-						</View> || <></>
+						// <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+						// 	<Circle cx={center.x} cy={center.y} r={hS(24)} fill={darkHex} /> 
+						// 	<CurrentStageIcon width={32} height={32} />
+						// </View> || <></>
+						<Circle cx={center.x} cy={center.y} r={hS(16)} fill={darkHex} /> || <></>
 					)}
 				/>
 			</Animated.View>

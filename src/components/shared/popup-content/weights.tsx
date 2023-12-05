@@ -1,29 +1,17 @@
-import { 
-   memo, 
-   useState, 
-   ReactNode, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   View,
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
-
+import { memo, useState, ReactNode, Dispatch, useRef, SetStateAction } from 'react'
+import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { updateMetadata } from '../../../store/user'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-import { useSelector } from 'react-redux'
-import { AppState } from '../../../store'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import UserService from '@services/user'
 
+const options: string[] = ['kg', 'lb']
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { rgb: darkRgb } = Colors.darkPrimary
 
@@ -34,6 +22,7 @@ const Main = ({
    animateValue: Animated.Value, 
    setVisible: Dispatch<SetStateAction<any>> 
 }) => {
+   const dispatch = useDispatch()
    const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const session = useSelector((state: AppState) => state.user.session)
    const userId: string | null = session && session.user.id || null
@@ -64,10 +53,14 @@ const Main = ({
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(({ finished }) => {
-         UserService.updatePersonalData(userId, { currentWeight: weight, goalWeight: goal }).then(() => {
-            setVisible(null)
-         })
+      }).start(async() => {
+         const payload = { currentWeight: weight, goalWeight: goal }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
+         setVisible(null)
       })
    }
 
@@ -95,27 +88,23 @@ const Main = ({
 
    return (
       <>
-         <PrimaryToggleValue />
+         <PrimaryToggleValue {...{ options }} />
          <View style={{...styles.input, marginTop: vS(10) }}>
             {
                weightError &&
                <Animated.Text style={{
                   ...styles.inputTitle, 
                   color: 'red',
-                  transform: [
-                     {
-                        translateY: focusAnimateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-10, 0]
-                        })
-                     }, 
-                     {
-                        scale: focusAnimateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [1, 1.1]
-                        })
-                     }
-                  ] 
+                  transform: [{ 
+                     translateY: focusAnimateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-10, 0]
+                     }) }, {
+                     scale: focusAnimateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [1, 1.1]
+                     })
+                  }] 
                }}>
                   Invalid current weight
                </Animated.Text> ||

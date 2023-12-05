@@ -1,8 +1,9 @@
 import { useCallback, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, Pressable, FlatList } from 'react-native'
+import { View, Text, Image, StyleSheet, Animated, Pressable, FlatList } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { getDatesRange } from '@utils/datetimes'
+import { BlurView } from '@react-native-community/blur'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -281,19 +282,52 @@ const FastingRecordChart1 = (): JSX.Element => {
 			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
 				<Text style={styles.timelineText}>Timeline</Text>
 			</AnimatedPressable>
+			<View style={styles.blurOverlayWrapper}>
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={12} />
+				<Text style={styles.noDataText}>No data found</Text>
+			</View>
 		</Animated.View> || <View style={styles.container} />
 	)
 }
 
 export default () => {
    return (
-      <View style={{ flex: 1, padding: 20, backgroundColor: '#fff' }}>
+      <View style={styles.root}>
          <FastingRecordChart1 />
       </View>
    )
 }
 
 const styles = StyleSheet.create({
+	blurOverlayWrapper: {		
+		position: 'absolute',
+		top: 0,
+		left: 0, 
+		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+
+	blurOverlay: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%'
+	},
+
+	noDataText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(14),
+		color: darkHex,
+		letterSpacing: .2
+	},
+
+	root: {
+		flex: 1, 
+		padding: 20, 
+		background: '#fff'
+	},
+
 	dayHours: {
 		alignItems: 'flex-end',
 		marginRight: hS(14)
@@ -355,12 +389,12 @@ const styles = StyleSheet.create({
 	container: {
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		// backgroundColor: '#fff',
+		backgroundColor: '#fff',
 		width: hS(369),
 		height: vS(400),
 		borderRadius: hS(32),
-		// elevation: 12,
-		// shadowColor: `rgba(${darkRgb.join(', ')}, .7)`,
+		elevation: 12,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .7)`,
 		paddingHorizontal: hS(18),
 		paddingTop: vS(18),
 		paddingBottom: vS(8),

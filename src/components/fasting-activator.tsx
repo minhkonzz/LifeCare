@@ -9,9 +9,9 @@ import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/datetimes'
 import { getCurrentTimestamp } from '@utils/datetimes'
+import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
 import StartFastingPopup from '@components/shared/popup-content/start-fasting'
 import fastingStagesData from '@assets/data/fasting-stages.json'
-import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
 import LinearGradient from 'react-native-linear-gradient'
 import ConfirmStopFastingPopup from '@components/shared/popup-content/confirm-stop-fasting'
 
@@ -102,11 +102,8 @@ const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: 
 					start={{ x: .5, y: 0 }}
 					end={{ x: .51, y: .5 }}>
 					<View style={{ flexDirection: 'row' }}>
-						<LinearGradient
-							style={styles.stageIcBg}
-							colors={['#000', 'rgba(0, 0, 0, 0)']}
-							start={{ x: .5, y: 0 }}
-							end={{ x: .5, y: 1 }}>
+						<View
+							style={styles.stageIcBg}>
 							<AnimatedCircularProgress
 								lineCap='round'
 								style={{ position: 'absolute' }}
@@ -115,10 +112,10 @@ const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: 
 								rotation={360}
 								fill={stageElapsedPercent}
 								tintColor='#30E3CA'
-								backgroundColor='#fff'
+								backgroundColor='rgba(255, 255, 255, .4)'
 							/>
 							<StageIcon width={hS(36)} height={vS(36)} />
-						</LinearGradient>
+						</View>
 						<Animated.View 
 							style={{ 
 								marginLeft: hS(15), 

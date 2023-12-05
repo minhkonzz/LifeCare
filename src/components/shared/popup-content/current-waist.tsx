@@ -1,34 +1,45 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
+import { memo, useState, Dispatch, useRef, SetStateAction } from 'react'
+import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
+import { updateMetadata } from '../../../store/user'
+import UserService from '@services/user'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
-   const [ currentWaist, setCurrentWaist ] = useState<number>(0)
+const Main = ({ 
+   animateValue,
+   setVisible
+}: { 
+   animateValue: Animated.Value, 
+   setVisible: Dispatch<SetStateAction<any>>
+}) => {
+   const dispatch = useDispatch()
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const { waistMeasure } = metadata
+   const userId: string | null = session && session.user.id || null
+   const [ waist, setWaist ] = useState<number>(waistMeasure)
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start()
+      }).start(async() => {
+         const payload = { waistMeasure: waist }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
+         setVisible(false)
+      })
    }
 
    return (
@@ -37,8 +48,8 @@ const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
          <MeasureInput 
             contentCentered
             symb='cm' 
-            value={currentWaist} 
-            onChangeText={t => setCurrentWaist(+t)} 
+            value={waist} 
+            onChangeText={t => setWaist(+t)} 
             additionalStyles={styles.input} />
          <TouchableOpacity
             onPress={onSave}
@@ -67,7 +78,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

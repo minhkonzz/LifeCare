@@ -1,44 +1,65 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
+import { memo, useState, Dispatch, useRef, SetStateAction } from 'react'
+import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { Colors } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector, useDispatch } from 'react-redux'
+import { updateMetadata } from '../../../store/user'
+import { AppState } from '../../../store'
+import { inchToCentimeter, centimeterToInch } from '@utils/fomular'
+import UserService from '@services/user'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
+const options: string[] = ['cm', 'in']
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
-   const [ currentChest, setCurrentChest ] = useState<number>(0)
+const Main = ({ 
+   animateValue,
+   setVisible
+}: { 
+   animateValue: Animated.Value, 
+   setVisible: Dispatch<SetStateAction<any>>
+}) => {
+   const dispatch = useDispatch()
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const { chestMeasure } = metadata
+   const [ chest, setChest ] = useState<number>(chestMeasure)
+   const userId: string | null = session && session?.user.id || null
 
    const onSave = () => {
       Animated.timing(animateValue, {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start()
+      }).start(async () => {
+         const payload = { chestMeasure }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
+         setVisible(false)
+      })
+   }
+
+   const onChangeOption = (index: number) => {
+      if (index === 0) {
+         setChest(inchToCentimeter(chest))
+         return
+      }
+      setChest(centimeterToInch(chest))
    }
 
    return (
       <>
-         <PrimaryToggleValue />
+         <PrimaryToggleValue {...{ options, onChangeOption }} />
          <MeasureInput 
             contentCentered
             symb='cm' 
-            value={currentChest} 
-            onChangeText={t => setCurrentChest(+t)} 
+            value={chest} 
+            onChangeText={t => setChest(+t)} 
             additionalStyles={styles.input} />
          <TouchableOpacity
             onPress={onSave}
@@ -67,7 +88,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

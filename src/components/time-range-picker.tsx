@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+import { PopupContext } from '@contexts/popup'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -29,7 +31,7 @@ export default ({ title, indicatorColor, editable, active }: TimePickerProps): J
             )}}>
                Today, 12:30PM
             </Text>
-            <Pressable onPress={() => {}}>
+            <Pressable>
                <PrimaryEditIcon width={hS(16)} height={vS(16)} />
             </Pressable>
          </View>

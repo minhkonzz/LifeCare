@@ -1,32 +1,30 @@
-import { 
-   memo, 
-   useState, 
-   Dispatch, 
-   useRef, 
-   SetStateAction 
-} from 'react'
-import {
-   Text,
-   TouchableOpacity,
-   Animated,
-   StyleSheet
-} from 'react-native'
+import { memo, useState, Dispatch, useRef, SetStateAction } from 'react'
+import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
+import { updateMetadata } from '../../../store/user'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { milliliterToOunce, ounceToMilliliter } from '@utils/fomular'
+import UserService from '@services/user'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import SettingToggleValue from '../setting-toggle-value'
-import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../../../store'
-import { updateGoal } from '../../../store/water'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { milliliterToOunce, ounceToMilliliter } from '@utils/fomular'
 
 const symbOptions: [string, string] = ['ML', 'OZ']
 
-const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
+const Main = ({ 
+   animateValue, 
+   setVisible
+}: { 
+   animateValue: Animated.Value, 
+   setVisible: Dispatch<SetStateAction<any>>
+}) => {
    const dispatch = useDispatch()
-   const { goal: currentGoal } = useSelector((state: AppState) => state.water)
-   const [ goal, setGoal ] = useState<number>(currentGoal)
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session && session.user.id || null
+   const { dailyWater } = metadata
+   const [ goal, setGoal ] = useState<number>(dailyWater)
    const [ toggled, setToggled ] = useState<boolean>(false)
    const [ selectedSymbOption, setSelectedSymbOption ] = useState<string>(symbOptions[Number(toggled)])
 
@@ -35,9 +33,14 @@ const Main = ({ animateValue }: { animateValue: Animated.Value }) => {
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(({ finished }) => {
-         if (goal === currentGoal) return
-         dispatch(updateGoal(goal))
+      }).start(async() => {
+         const payload = { dailyWater: goal }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
+         setVisible(false)
       })
    }
 
@@ -84,7 +87,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue }} />
+         <Main {...{ animateValue, setVisible }} />
       </Popup>
    )
 })

@@ -16,11 +16,13 @@ const minsOpts = Array.from({ length: 60 }).map((e, i) => i)
 const Picker = memo(({
    items,
    onIndexChange,
-   styles
+   styles,
+   initialScrollIndex = 0
 }: {
    items: string[] | number[],
    onIndexChange: (index: number) => void,
-   styles: any
+   styles: any,
+   initialScrollIndex?: number
 }): JSX.Element => {
    return ( 
       <View style={styles}>
@@ -28,7 +30,8 @@ const Picker = memo(({
             items,
             itemHeight: vS(45),
             fs: hS(18),
-            onIndexChange
+            onIndexChange,
+            initialScrollIndex
          }} />
       </View>
    )
@@ -41,7 +44,7 @@ const Main = ({
 }: {
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<any>>,
-   onSave?: (date: string, hours: number, mins: number) => void
+   onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }): JSX.Element => {
 
    const [ date, setDate ] = useState<string>('')
@@ -53,8 +56,8 @@ const Main = ({
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(() => {
-         if (onSave) onSave(date, hours, mins)
+      }).start(async() => {
+         if (onSave) await onSave(date, hours, mins)
          setVisible(false)
       })
    }
@@ -72,11 +75,34 @@ const Main = ({
    }, [])
 
    const WheelPickers = useCallback(memo(() => {
+      const d: Date = new Date()
+      const hour: number = d.getHours()
+      const min: number = d.getMinutes()
+      const date: number = d.getDate()
+      const formattedDate: string = `${d.toLocaleString('en-US', { month: 'short' })} ${date}`
+      const currentDateIndex: number = dateOpts.findIndex(e => e.value === formattedDate)
+      const currentHourIndex: number = hoursOpts.findIndex(e => e === hour)
+      const currentMinIndex: number = minsOpts.findIndex(e => e === min)
+
       return (
          <>
-            <Picker items={dateOpts.map(e => e.title)} styles={styles.dateWheelPicker} onIndexChange={setNewDate} />
-            <Picker items={hoursOpts} styles={styles.hoursWheelPicker} onIndexChange={setNewHours} />
-            <Picker items={minsOpts} styles={styles.minsWheelPicker} onIndexChange={setNewMins} />
+            <Picker 
+               items={dateOpts.map(e => e.title)} 
+               styles={styles.dateWheelPicker} 
+               onIndexChange={setNewDate} 
+               initialScrollIndex={currentDateIndex} />
+
+            <Picker 
+               items={hoursOpts} 
+               styles={styles.hoursWheelPicker} 
+               onIndexChange={setNewHours} 
+               initialScrollIndex={currentHourIndex} />
+            
+            <Picker 
+               items={minsOpts} 
+               styles={styles.minsWheelPicker} 
+               onIndexChange={setNewMins} 
+               initialScrollIndex={currentMinIndex} />
          </>
       )
    }), [])
@@ -112,7 +138,7 @@ export default ({
 }: {
    setVisible: Dispatch<SetStateAction<any>>,
    title: string,
-   onSave?: (date: string, hours: number, mins: number) => void
+   onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }) => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 

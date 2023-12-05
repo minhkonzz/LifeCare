@@ -1,21 +1,6 @@
-import { 
-   memo, 
-   useEffect, 
-   useRef, 
-   useContext
-} from 'react'
-import {
-   View, 
-   Text,
-   Pressable,
-   Image,
-   Animated,  
-   StyleSheet
-} from 'react-native'
-import BackIcon from '@assets/icons/goback.svg'
-import EditIcon from '@assets/icons/edit.svg'
-import LinearGradient from 'react-native-linear-gradient'
-import UpdateWeightsPopup from '@components/shared/popup-content/weights'
+import { memo, useEffect, useRef, useContext } from 'react'
+import { View, Text, Pressable, Image, Animated, StyleSheet } from 'react-native'
+import { EditIcon, BackIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
@@ -23,6 +8,8 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import LinearGradient from 'react-native-linear-gradient'
+import UpdateWeightsPopup from '@components/shared/popup-content/weights'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -30,6 +17,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
    const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+   const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
    const change: number = kilogramsToPounds(currentWeight - startWeight)
    const { setPopup } = useContext<any>(PopupContext)
    const navigation = useNavigation<any>()
@@ -37,14 +25,14 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
    useEffect(() => {
       Animated.timing(animateValue, {
          toValue: isViewable && 1 || 0, 
-         duration: 1010, 
+         duration: 840, 
          useNativeDriver: true
       }).start()
    }, [isViewable])
 
    return (
       isViewable && 
-      <AnimatedPressable style={[styles.container, { opacity: animateValue }]}>
+      <AnimatedPressable style={{...styles.container, opacity: animateValue }}>
          <LinearGradient
             style={styles.wrapper}
             colors={[`rgba(255, 211, 110, .36)`, `rgba(255, 211, 110, .8)`]}
@@ -66,16 +54,14 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
             </View>
             <View style={styles.current}>
 					<Animated.View 
-                  style={[
-                     styles.current2, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-50, 0]
-                        }) }]
-                     }
-                  ]}>
+                  style={{
+                     ...styles.current2, 
+                     opacity: animateValue, 
+                     transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-50, 0]
+                     }) }]
+                  }}>
 						<Text style={styles.current3}>{`${kilogramsToPounds(currentWeight)}`}</Text>
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
@@ -85,24 +71,22 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 						</View>
 					</Animated.View>
 					<AnimatedPressable 
-                  style={[
-                     styles.editButton, 
-                     {
-                        opacity: animateValue,
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [50, 0]
-                        }) }]
-                     }
-                  ]}
+                  style={{
+                     ...styles.editButton, 
+                     opacity: animateValue,
+                     transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [50, 0]
+                     }) }]
+                  }}
                   onPress={() => setPopup(UpdateWeightsPopup)}>
 						<EditIcon width={hS(16)} height={vS(16)} />
 					</AnimatedPressable>
 				</View>
             <View style={styles.progressBar}>
-               <Text style={styles.progressText}>{`${(currentWeight - startWeight) / (goalWeight - startWeight) * 100}%`}</Text>
+               <Text style={styles.progressText}>{`${percent}%`}</Text>
                <LinearGradient
-						style={styles.activeBar}
+						style={{...styles.activeBar, width: `${percent}%`}}
 						colors={['#ffb72b', `rgba(255, 183, 43, .6)`]}
 						start={{ x: 0, y: .5 }}
 						end={{ x: 1, y: .5 }}
@@ -110,43 +94,37 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
             </View>
             <View style={styles.current8}>
 					<Animated.Text 
-                  style={[
-                     styles.current9, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-50, 0]
-                        }) }]
-                     }
-                  ]}>
+                  style={{
+                     ...styles.current9, 
+                     opacity: animateValue, 
+                     transform: [{ translateX: animateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-50, 0]
+                     }) }]
+                  }}>
                   {`Starting: ${kilogramsToPounds(startWeight)} lb`}
                </Animated.Text>
 					<Animated.Text 
-                  style={[
-                     styles.current9, 
-                     {
-                        opacity: animateValue, 
-                        transform: [{ translateX: animateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [50, 0]
-                        }) }]
-                     }
-                  ]}>
-                  {`Goal: ${kilogramsToPounds(goalWeight)} lb`}
-               </Animated.Text>
-				</View>
-            <AnimatedPressable 
-               style={[
-                  styles.bodyMeasureRef, 
-                  {
+                  style={{
+                     ...styles.current9, 
                      opacity: animateValue, 
                      transform: [{ translateX: animateValue.interpolate({
                         inputRange: [0, 1], 
                         outputRange: [50, 0]
                      }) }]
-                  }
-               ]}
+                  }}>
+                  {`Goal: ${kilogramsToPounds(goalWeight)} lb`}
+               </Animated.Text>
+				</View>
+            <AnimatedPressable 
+               style={{
+                  ...styles.bodyMeasureRef, 
+                  opacity: animateValue, 
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [50, 0]
+                  }) }]
+               }}
                onPress={() => navigation.navigate('body-measures')}>
 					<LinearGradient
 						style={styles.bodyMeasureRefWrapper}
@@ -272,7 +250,6 @@ const styles = StyleSheet.create({
    },
 
    activeBar: {
-      width: '52%',
       height: '100%',
       borderRadius: 200
    },

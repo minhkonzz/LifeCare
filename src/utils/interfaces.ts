@@ -17,6 +17,7 @@ export interface WheelPickerProps {
 	itemHeight: number, 
    fs?: number,
 	onIndexChange?: (index: number) => void,
+   initialScrollIndex?: number
 }
 
 export interface OptionProps {
@@ -83,6 +84,9 @@ export interface PersonalData extends InitialPersonalData {
    dailyProtein?: number
    name?: string 
    email?: string
+   startTimeStamp?: number
+   endTimeStamp?: number
+   currentPlanId?: string
    waterRecords?: Array<{
       id: string,
       value: number, 
@@ -97,7 +101,7 @@ export interface PersonalData extends InitialPersonalData {
          updatedAt: string
       }>
    }>
-   fastingRecords: Array<{
+   fastingRecords?: Array<{
       id: string, 
       planName: string, 
       startTimeStamp: number,
@@ -106,7 +110,7 @@ export interface PersonalData extends InitialPersonalData {
       createdAt: string,
       updatedAt: string
    }>
-   bodyRecords: Array<{
+   bodyRecords?: Array<{
       id: string, 
       value: number, 
       type: string,

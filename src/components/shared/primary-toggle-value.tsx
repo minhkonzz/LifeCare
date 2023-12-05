@@ -1,29 +1,24 @@
 import { useState, useRef } from 'react'
-import {
-   View, 
-   Text, 
-   StyleSheet, 
-   Pressable, 
-   Animated
-} from 'react-native'
-
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
+
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const options: Array<string> = ["cm/ft", "kg/lb"]
+// const options: Array<string> = ["cm/ft", "kg/lb"]
 const OPTION_WIDTH: number = hS(98)
 
 const { rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface PrimaryToggleValue {
-   onChangeOption?: () => void
+   options: string[],
+   onChangeOption?: (selectedIndex: number) => void
    additionalStyles?: any
 }
 
-export default ({ onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.Element => {
+export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.Element => {
    const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
@@ -32,8 +27,8 @@ export default ({ onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.E
          toValue: index * OPTION_WIDTH,
          duration: 300, 
          useNativeDriver: true
-      }).start(({ finished }) => {
-         if (onChangeOption) onChangeOption()
+      }).start(() => {
+         if (onChangeOption) onChangeOption(index)
          setSelectedIndex(index)
       })
    }
@@ -41,7 +36,7 @@ export default ({ onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.E
    return (
       <View style={additionalStyles && {...styles.container, ...additionalStyles} || styles.container}>
          <AnimatedLinearGradient
-            style={[styles.toggleButton, { transform: [{ translateX }] }]}
+            style={{...styles.toggleButton, transform: [{ translateX }] }}
             colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
             start={{ x: .5, y: 0 }}
             end={{ x: .52, y: 1 }} />
@@ -51,13 +46,11 @@ export default ({ onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.E
                   key={`${e}-${i}`} 
                   style={styles.option}
                   onPress={() => changeOption(i)}>
-                  <Text style={[
-                     styles.optionText, 
-                     {  
-                        fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
-                        color: i === selectedIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
-                     }
-                  ]}>
+                  <Text style={{
+                     ...styles.optionText, 
+                     fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
+                     color: i === selectedIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
+                  }}>
                      {e}
                   </Text>
                </Pressable>

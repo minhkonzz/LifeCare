@@ -46,7 +46,7 @@ export default ({ item, index, elapsedHours }: FastingStageProps): JSX.Element =
 								rotation={360}
 								fill={elapsedHours > to ? 100 : (elapsedHours - from) / (to - from) * 100}
 								tintColor='#30E3CA'
-								backgroundColor='#fff'
+								backgroundColor='rgba(255, 255, 255, .4)'
 							/>
 							<MainIcon width={hS(36)} height={vS(36)} />
 						</LinearGradient>

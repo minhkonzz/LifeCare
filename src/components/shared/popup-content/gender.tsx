@@ -1,18 +1,10 @@
 import { memo, useState, useRef } from 'react'
-import Popup from '@components/shared/popup'
+import { View, Text, Pressable, Animated, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { RadioOptionsPopupProps } from '@utils/interfaces'
+import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-
-import {
-   View, 
-   Text,
-   Pressable,
-   Animated,
-   StyleSheet,
-   TouchableOpacity
-} from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -26,8 +18,9 @@ export default memo(({ options, setVisible }: RadioOptionsPopupProps): JSX.Eleme
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(({ finished }) => {
+      }).start(async() => {
          // do something with selected gender
+         
       })
    }
 

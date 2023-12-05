@@ -7,20 +7,35 @@ import { updateMetadata, updateSession } from '../store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
 import { PersonalData } from '@utils/interfaces'
+import { updateTimes, updateCurrentPlan } from '../store/fasting'
+import plansData from '@assets/data/plans.json'
 import UserService from '@services/user'
 import Stack from './stack'
 import NetInfo from '@react-native-community/netinfo'
+import TestChart from '@screens/test-chart'
 
 export default (): JSX.Element => {
    const dispatch = useDispatch()
    const [ initialized, setInitialized ] = useState<boolean>(false)
    const prevSession = useSelector((state: AppState) => state.user.session)
 
-   const initializePersonalData = async (userId: string): Promise<void> => {
+   const initializeUserData = async (userId: string): Promise<void> => {
       const isSurveyed = await UserService.checkUserSurveyed(userId)
       if (!isSurveyed) return 
-      const response: PersonalData = await UserService.getPersonalData(userId)
-      dispatch(updateMetadata(convertObjectKeysToCamelCase(response)))
+      const response = await UserService.getPersonalData(userId)
+      const convertedResponse = convertObjectKeysToCamelCase(response)
+      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = convertedResponse
+
+      if (startTimeStamp && endTimeStamp) {
+         dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
+      }
+
+      if (currentPlanId) {
+         const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
+         dispatch(updateCurrentPlan(convertObjectKeysToCamelCase(currentPlan)))
+      }
+      
+      dispatch(updateMetadata(personalData))
    }
 
    useEffect(() => {
@@ -32,13 +47,15 @@ export default (): JSX.Element => {
 
       const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-            const userId: string = session?.user?.id
-            await initializePersonalData(userId)
+            if (session) {
+               const userId: string = session.user.id
+               await initializeUserData(userId)
+            }
             dispatch(updateSession(session))
          }
          if (prevSession) {
             const userId: string = prevSession?.user?.id 
-            await initializePersonalData(userId)
+            await initializeUserData(userId)
          }
          if ((prevSession || session) && !channel) {
             channel = supabase.channel('schema-db-changes')
@@ -47,7 +64,19 @@ export default (): JSX.Element => {
                schema: 'public',
                table: 'users'
             }, (payload: any) => { 
-               dispatch(updateMetadata(convertObjectKeysToCamelCase(payload.new)))
+               const convertedResponse = convertObjectKeysToCamelCase(payload.new)
+               const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = convertedResponse
+
+               if (startTimeStamp && endTimeStamp) {
+                  dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
+               }
+
+               if (currentPlanId) {
+                  const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
+                  dispatch(updateCurrentPlan(convertObjectKeysToCamelCase(currentPlan)))
+               }
+               
+               dispatch(updateMetadata(personalData))
             }).subscribe()
          }
          setInitialized(true)
@@ -60,7 +89,6 @@ export default (): JSX.Element => {
    }, [])
 
    if (!initialized) return <></>
-   console.log('render Stack')
 
    return (
       <NavigationContainer>

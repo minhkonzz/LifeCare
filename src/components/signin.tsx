@@ -8,6 +8,7 @@ import { LoginComponentProps } from '@utils/interfaces'
 import { AppState } from '../store'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
 import { GOOGLE_CLIENT_ID } from '@env'
+import { CornerArrowUpRightIcon } from '@assets/icons'
 import AuthInput from '@components/auth-input'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
@@ -45,7 +46,6 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 	const onGoogleSignIn = async () => {
 		try {
 			const userInfo = await GoogleSignin.signIn()
-			console.log('user info:', userInfo)
 			if (userInfo.idToken) {
 				await UserService.signInWithGoogle(userInfo.idToken)
 			} else {
@@ -71,7 +71,7 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 			toValue: 0, 
 			duration: 640, 
 			useNativeDriver: true
-		}).start(({ finished }) => {
+		}).start(() => {
 			if (onAnimateCompleted) onAnimateCompleted()
 		})
 	}
@@ -88,6 +88,10 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 		}).start()
 	}
 
+	const onSkipLogin = () => {
+		onBeforeNavigate(() => { navigation.navigate('survey') })
+	}
+
 	const SignInButton = useCallback(() => {
 		const { email, password } = useSelector((state: AppState) => state.auth)
 		const [ processing, setProcessing ] = useState<boolean>(false)
@@ -98,6 +102,8 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 				setProcessing(true)
 				const { data, error } = await UserService.signInPassword(email, password)
 				if (error) {
+					console.log("error name:", error.name)
+					console.log("error message:", error.message)
 					setProcessing(false)
 					invokeAuthMessage('Invalid Email or Password. Please check again', 'error')
 					return
@@ -146,9 +152,15 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 					outputRange: [-800, 0]
 				}) }]
 			}}>
-				<View>
-					<Text style={styles.lgTitle}>Hello Friend,</Text>
-					<Text style={styles.smTitle}>Login to track your fasting now</Text>
+				<View style={styles.hrz}>
+					<View>
+						<Text style={styles.lgTitle}>Hello Friend,</Text>
+						<Text style={styles.smTitle}>Login to track your fasting now</Text>
+					</View>
+					<Pressable style={styles.hrz} onPress={onSkipLogin}>
+						<Text style={styles.loginGuestText}>Skip</Text>
+						<CornerArrowUpRightIcon width={18} />
+					</Pressable>
 				</View>
 				<View>
 					<AuthInput
@@ -203,6 +215,20 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'space-between'
+	},
+
+	hrz: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center'
+	},
+
+	loginGuestText: {
+		fontFamily: 'Poppins-Medium',
+		fontSize: hS(12), 
+		color: darkHex,
+		letterSpacing: .2,
+		marginRight: hS(8)
 	},
 
 	buttonLoading: {

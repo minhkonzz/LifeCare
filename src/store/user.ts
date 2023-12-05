@@ -16,10 +16,14 @@ export const userSlice = createSlice({
       },
 
       updateMetadata: (state, action) => {
-         state.metadata = { ...action.payload }
-      }
+         state.metadata = state.metadata && {...state.metadata, ...action.payload } || { ...action.payload }
+      },
+
+      cache: (state, action) => {
+         state.changes
+      } 
    }
 })
 
-export const { updateMetadata, updateSession } = userSlice.actions
+export const { updateMetadata, updateSession, cache } = userSlice.actions
 export default userSlice.reducer

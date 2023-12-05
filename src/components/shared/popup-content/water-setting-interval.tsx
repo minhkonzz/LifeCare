@@ -25,7 +25,7 @@ const Main = ({
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(({ finished }) => {
+      }).start(() => {
          // missing validate input
          setVisible(false)
          dispatch(updateWaterInterval({ h: hours, m: mins }))
