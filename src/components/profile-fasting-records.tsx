@@ -1,5 +1,5 @@
 import { memo, useRef, useEffect } from 'react'
-import { View, StyleSheet, Text, Animated, Pressable, FlatList } from 'react-native'
+import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
@@ -21,7 +21,7 @@ const Record = ({ item, index }) => {
 	const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
 
 	return (
-		<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
+		<Pressable key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
 			<Text style={styles.recText}>Nov</Text>
 			<View style={styles.recProg}>
 				<AnimatedLinearGradient
@@ -61,7 +61,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0,
-			duration: 1010,
+			duration: 840,
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])
@@ -104,11 +104,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					.map((e, i) => <Text key={i} style={{...styles.dayHour, marginTop: i > 0 ? vS(24) : 0}}>{e}</Text>)
 				}
 				</View>
-				<FlatList 
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					data={chartData} 
-					renderItem={({ item, index }) => <Record {...{ item, index }} />} />
+				<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+					{ chartData.map((e, i) => <Record {...{ item: e, index: i }}/>) }
+				</ScrollView>
 			</View>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
 		</AnimatedLinearGradient> || <View style={styles.container} />

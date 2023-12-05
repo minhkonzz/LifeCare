@@ -5,12 +5,14 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../../../store'
 import { updateMetadata } from '../../../store/user'
+import { inchToCentimeter, centimeterToInch } from '@utils/fomular'
 import UserService from '@services/user'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 
+const options: string[] = ['cm', 'in']
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const Main = ({ 
@@ -42,9 +44,17 @@ const Main = ({
       })
    }
 
+   const onChangeOption = (index: number) => {
+      if (index === 1) {
+         setWaist(centimeterToInch(waist))
+         return
+      }
+      setWaist(inchToCentimeter(waist))
+   }
+
    return (
       <>
-         <PrimaryToggleValue />
+         <PrimaryToggleValue {...{ options, onChangeOption }} />
          <MeasureInput 
             contentCentered
             symb='cm' 

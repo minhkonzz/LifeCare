@@ -9,13 +9,11 @@ import {
 } from 'react-native'
 
 import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS } from '@utils/responsive'
 import { WheelPickerProps } from '@utils/interfaces'
 
 let valueScrolledTo: string | number = -1
 
 export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex }: WheelPickerProps): JSX.Element => {
-
 	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
 
 	const momentumScrollEnd = (
@@ -58,11 +56,13 @@ export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex 
 
 		return (
 			<Animated.View
-				style={[
-					styles.pickerItem,
-					{ opacity, height: itemHeight, transform: [{ scale }, { rotateX }] }
-				]}>
-				<Text style={[styles.pickerItemText, { fontSize: fs }]}>{item}</Text>
+				style={{
+					...styles.pickerItem,
+					opacity, 
+					height: itemHeight, 
+					transform: [{ scale }, { rotateX }] 
+				}}>
+				<Text style={{...styles.pickerItemText, fontSize: fs }}>{item}</Text>
 			</Animated.View>
 		)
 	}
@@ -70,7 +70,7 @@ export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex 
 	return (
 		<Animated.FlatList
 			{...{ initialScrollIndex }}
-			style={[styles.container, { height: itemHeight * 5 }]}
+			style={{...styles.container, height: itemHeight * 5 }}
 			data={['', '', ...items, '', '']}
 			renderItem={({ item, index }) => <WheelPickerItem {...{ item, index }} />}
 			showsVerticalScrollIndicator={false}

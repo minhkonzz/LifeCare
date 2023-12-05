@@ -37,9 +37,9 @@ export default memo(({
 	const closePopup = () => {
 		Animated.timing(animateValue, {
 			toValue: 0,
-			duration: 300,
+			duration: 320,
 			useNativeDriver: true
-		}).start(({ finished }) => {
+		}).start(() => {
 			if (onSelfClose) onSelfClose()
 			setVisible(null)
 		})
@@ -49,10 +49,10 @@ export default memo(({
 		return (
 			<>
 				<View style={styles.header}>
-					<View />
+					<View style={styles._blank} />
 					<Text style={styles.headerTitle}>{title}</Text>
-					<Pressable onPress={closePopup}>
-						<CloseIcon width={hS(10)} height={vS(10)} />
+					<Pressable style={styles.closeButton} onPress={closePopup}>
+						<CloseIcon width={hS(12)} height={vS(12)} />
 					</Pressable>
 				</View>
 				{ children }
@@ -61,19 +61,17 @@ export default memo(({
 	}
 
 	return (
-		<Animated.View style={[
-			styles.overlay, 
-			{ 
-				opacity: animateValue, 
-				justifyContent: type === 'bottomsheet' && 'flex-end' || 'center' 
-			}
-		]}>
-		{
-			type === 'bottomsheet' && 
-			<Animated.View
-				style={[
-					styles.bottomSheet,
-					{
+		<Animated.View style={{
+			...styles.overlay, 
+			opacity: animateValue, 
+			justifyContent: type === 'bottomsheet' && 'flex-end' || 'center' 
+		}}>
+			<Pressable style={styles.touchCloseArea} onPress={closePopup} />
+			{
+				type === 'bottomsheet' && 
+				<Animated.View
+					style={{
+						...styles.bottomSheet,
 						width, 
 						transform: [{
 							translateY: animateValue.interpolate({
@@ -81,31 +79,42 @@ export default memo(({
 								outputRange: [300, 0]
 							})
 						}]
-					}
-				]}>
-				<PopupContent />
-			</Animated.View> ||
-			<Animated.View 
-				style={{
-					...styles.popupCenter, 
-					width, 
-					opacity: animateValue.interpolate({
-						inputRange: [0, .2, 1], 
-						outputRange: [0, 1, 1]
-					}),
-					transform: [{ translateY: animateValue.interpolate({
-						inputRange: [0, 1],
-						outputRange: [-50, 0]
-					})}] 
-				}}>
-				<PopupContent />
-			</Animated.View>
-		}
+					}}>
+					<PopupContent />
+				</Animated.View> ||
+				<Animated.View 
+					style={{
+						...styles.popupCenter, 
+						width, 
+						opacity: animateValue.interpolate({
+							inputRange: [0, .2, 1], 
+							outputRange: [0, 1, 1]
+						}),
+						transform: [{ translateY: animateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [-50, 0]
+						})}] 
+					}}>
+					<PopupContent />
+				</Animated.View>
+			}
 		</Animated.View> 
 	)
 })
 
 const styles = StyleSheet.create({
+	_blank: {
+		width: hS(24)
+	},
+
+	touchCloseArea: {
+		position: 'absolute', 
+		top: 0, 
+		left: 0, 
+		bottom: 0,
+		right: 0
+	},
+
 	bottomSheet: {
 		position: 'absolute',
 		bottom: 0,
@@ -142,6 +151,8 @@ const styles = StyleSheet.create({
 	},
 
 	closeButton: {
+		width: hS(24), 
+		height: vS(12),
 		position: 'absolute',
 		top: 8,
 		right: 8,

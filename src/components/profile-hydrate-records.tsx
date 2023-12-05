@@ -51,7 +51,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: isViewable && 1 || 0,
-			duration: 920,
+			duration: 840,
 			useNativeDriver: true
 		}).start()
 	}, [isViewable])

@@ -5,6 +5,7 @@ import { AppState } from '../../../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata } from '../../../store/user'
+import { kilogramsToPounds, poundsToKilograms } from '@utils/fomular'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
@@ -27,8 +28,8 @@ const Main = ({
    const session = useSelector((state: AppState) => state.user.session)
    const userId: string | null = session && session.user.id || null
    const { currentWeight, goalWeight } = useSelector((state: AppState) => state.user.metadata)
-   const [ weight, setWeight ] = useState<number | string>(currentWeight)
-   const [ goal, setGoal ] = useState<number | string>(goalWeight)
+   const [ weight, setWeight ] = useState<any>(currentWeight)
+   const [ goal, setGoal ] = useState<any>(goalWeight)
    const [ weightError, setWeightError ] = useState<boolean>(false)
    const [ goalError, setGoalError ] = useState<boolean>(false)
 
@@ -46,7 +47,7 @@ const Main = ({
                useNativeDriver: true
             })
          ]).start()
-         return
+         return 
       }
 
       Animated.timing(animateValue, {
@@ -54,7 +55,7 @@ const Main = ({
          duration: 320, 
          useNativeDriver: true
       }).start(async() => {
-         const payload = { currentWeight: weight, goalWeight: goal }
+         const payload = { currentWeight: +weight, goalWeight: +goal }
          if (userId) {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
             return
@@ -66,12 +67,8 @@ const Main = ({
 
    const onChangeWeight = (t: string) => {
       const v: number = +t
-      const invalid: boolean = !v || v > 1000
+      const invalid: boolean = !v || v > 1000 
       setWeightError(invalid)
-      if (v) {
-         setWeight(v)
-         return
-      }
       setWeight(t)
    }
 
@@ -79,16 +76,22 @@ const Main = ({
       const v: number = +t
       const invalid: boolean = !v || v > 1000
       setGoalError(invalid)
-      if (v) {
-         setGoal(v)
+      setGoal(t)
+   }
+
+   const onChangeOption = (index: number) => {
+      if (index === 0) {
+         setWeight(poundsToKilograms(weight))
+         setGoal(poundsToKilograms(goal))
          return
       }
-      setGoal(t)
+      setWeight(kilogramsToPounds(weight))
+      setGoal(kilogramsToPounds(goal))
    }
 
    return (
       <>
-         <PrimaryToggleValue {...{ options }} />
+         <PrimaryToggleValue {...{ options, onChangeOption }} />
          <View style={{...styles.input, marginTop: vS(10) }}>
             {
                weightError &&
@@ -123,20 +126,16 @@ const Main = ({
                <Animated.Text style={{
                   ...styles.inputTitle, 
                   color: 'red',
-                  transform: [
-                     {
-                        translateY: focusAnimateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [-10, 0]
-                        })
-                     }, 
-                     {
-                        scale: focusAnimateValue.interpolate({
-                           inputRange: [0, 1], 
-                           outputRange: [1, 1.1]
-                        })
-                     }
-                  ] 
+                  transform: [{
+                     translateY: focusAnimateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [-10, 0]
+                     }) }, {
+                     scale: focusAnimateValue.interpolate({
+                        inputRange: [0, 1], 
+                        outputRange: [1, 1.1]
+                     })
+                  }] 
                }}>
                   Invalid goal weigh
                t</Animated.Text> ||

@@ -1,17 +1,26 @@
 import { memo, useState, useRef } from 'react'
 import { View, Text, Pressable, Animated, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '@utils/constants/colors'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppState } from '../../../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { RadioOptionsPopupProps } from '@utils/interfaces'
+import { updateMetadata } from '../../../store/user'
+import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 
+const genders: string[] = ['Male', 'Female', 'Other']
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ options, setVisible }: RadioOptionsPopupProps): JSX.Element => {
-   const [ selectedIndex, setSelectedIndex ] = useState<number>(2)
+export default memo(({ setVisible }: RadioOptionsPopupProps): JSX.Element => {
+   const dispatch = useDispatch()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const { session, metadata } = useSelector((state: AppState) => state.user)
+   const userId: string | null = session && session?.user.id || null
+   const { gender } = metadata
+   const [ currentGender, setCurrentGender ] = useState<string>(gender)
 
    const onSave = () => {
       Animated.timing(animateValue, {
@@ -19,8 +28,13 @@ export default memo(({ options, setVisible }: RadioOptionsPopupProps): JSX.Eleme
          duration: 320, 
          useNativeDriver: true
       }).start(async() => {
-         // do something with selected gender
-         
+         const payload = { gender: currentGender }
+         if (userId) {
+            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            return
+         }
+         dispatch(updateMetadata(payload))
+         setVisible(false)
       })
    }
 
@@ -33,15 +47,15 @@ export default memo(({ options, setVisible }: RadioOptionsPopupProps): JSX.Eleme
          setVisible 
       }}>
       {
-         options.map((e, i) => 
+         genders.map((e, i) => 
             <Pressable 
                key={i} 
-               style={[styles.option, { marginTop: (i === 0 ? 0 : vS(33)) }]}
-               onPress={() => setSelectedIndex(i)}>
+               style={{...styles.option, marginTop: i === 0 ? 0 : vS(33) }}
+               onPress={() => setCurrentGender(e)}>
                <Text style={styles.optionText}>{e}</Text>
                <View style={styles.circleBound}>
                { 
-                  selectedIndex === i && 
+                  currentGender === e && 
                   <LinearGradient 
                      style={styles.primaryIndicator}
                      colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}

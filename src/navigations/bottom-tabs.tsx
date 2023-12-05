@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useContext } from 'react'
+import { memo, useState, useEffect, useMemo, useContext } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import PopupProvider, { PopupContext } from '@contexts/popup'
@@ -16,9 +16,11 @@ import Nutrition from '@screens/nutrition'
 const BottomNavigator = createBottomTabNavigator()
 
 const BottomNav = memo(() => {
+	const screenOptions = useMemo(() => ({ headerShown: false, unmountOnBlur: true }), [])
+
 	return (
 		<BottomNavigator.Navigator tabBar={props => <BottomTabs {...props} />}>
-	   	<BottomNavigator.Group screenOptions={{ headerShown: false, unmountOnBlur: true }}>
+	   	<BottomNavigator.Group {...{ screenOptions }}>
 				<BottomNavigator.Screen
 		    		options={{ tabBarLabel: 'Daily' }}
 		    		name='daily'

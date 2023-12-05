@@ -40,7 +40,6 @@ export interface NutritionEditorProps {
 }
 
 export interface RadioOptionsPopupProps {
-   options: Array<string> 
    setVisible: Dispatch<SetStateAction<boolean>>
 }
 
@@ -69,7 +68,8 @@ export interface InitialPersonalData {
    goalWeight?: number
    exercisePerformance?: string
    fastingFamiliar?: string
-   goal?: string[],
+   goal?: string[]
+   firstTimeTrackWater?: boolean
    isSurveyed?: boolean
 }
 

@@ -22,9 +22,10 @@ export default (): JSX.Element => {
    const initializeUserData = async (userId: string): Promise<void> => {
       const isSurveyed = await UserService.checkUserSurveyed(userId)
       if (!isSurveyed) return 
-      const response = await UserService.getPersonalData(userId)
-      const convertedResponse = convertObjectKeysToCamelCase(response)
-      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = convertedResponse
+      const { response, error } = await UserService.getPersonalData(userId)
+      if (error) console.log('error when get user data (1)')
+      // const convertedResponse = convertObjectKeysToCamelCase(response)
+      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = response
 
       if (startTimeStamp && endTimeStamp) {
          dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))

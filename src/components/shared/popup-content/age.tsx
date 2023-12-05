@@ -1,18 +1,17 @@
-import { memo, Dispatch, SetStateAction, useRef } from 'react'
+import { memo, useState, Dispatch, SetStateAction, useRef } from 'react'
 import { Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../../../store'
 import { updateMetadata } from '../../../store/user'
-import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import Popup from '../popup'
 import LinearGradient from 'react-native-linear-gradient'
 import WheelPicker from '../wheel-picker'
 import UserService from '@services/user'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const ageNumbers: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
+const ages: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
 
 const Main = ({
    animateValue, 
@@ -25,6 +24,8 @@ const Main = ({
    const { session, metadata } = useSelector((state: AppState) => state.user)
    const userId: string | null = session && session?.user.id || null
    const { age } = metadata
+   const [ currentAge, setCurrentAge ] = useState<number>(age)
+   const currentAgeIndex: number = ages.findIndex(e => e === currentAge)
 
    const onSave = () => {
       Animated.timing(animateValue, {
@@ -32,7 +33,7 @@ const Main = ({
          duration: 320, 
          useNativeDriver: true
       }).start(async() => {
-         const payload = { age }
+         const payload = { age: currentAge }
          if (userId) {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
             return
@@ -42,9 +43,17 @@ const Main = ({
       })
    }
 
+   const onChangeAge = (index: number) => {
+      setCurrentAge(ages[index])
+   }
+
    return (
       <>
-         <WheelPicker items={ageNumbers} itemHeight={vS(72)} />
+         <WheelPicker 
+            items={ages} 
+            itemHeight={vS(72)} 
+            onIndexChange={onChangeAge} 
+            initialScrollIndex={currentAgeIndex} />
          <TouchableOpacity
             onPress={onSave}
             activeOpacity={.7}

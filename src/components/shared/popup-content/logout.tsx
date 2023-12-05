@@ -13,7 +13,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>>
          toValue: 0, 
          duration: 320, 
          useNativeDriver: true
-      }).start(async ({ finished }) => {
+      }).start(async() => {
          await UserService.signOut()
          setVisible(null)
       })

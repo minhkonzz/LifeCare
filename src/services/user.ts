@@ -2,8 +2,9 @@ import { supabase } from "@configs/supabase"
 import { WaterRecordsPayload } from "@utils/types"
 import { InitialPersonalData } from "@utils/interfaces"
 import { PersonalData } from "@utils/interfaces"
-import { convertObjectKeysToSnakeCase } from "@utils/helpers"
+import { convertObjectKeysToSnakeCase, convertObjectKeysToCamelCase } from "@utils/helpers"
 import { autoId } from "@utils/helpers"
+import { PostgrestError } from "@supabase/supabase-js"
 
 export default {
    signInPassword: async (email: string, password: string) => {
@@ -35,14 +36,19 @@ export default {
       return is_surveyed
    },
 
-   getPersonalData: async (userId: string): Promise<PersonalData> => {
-      const { data, error } = await supabase.from('users').select('*').eq('id', userId)
-      if (error) {
-         console.log(error)
-         throw new Error('Something went wrong when get personal data')
+   getPersonalData: async (userId: string): Promise<any> => {
+      const { data: userResponse, error: fetchUserError } = await supabase.from('users').select('*').eq('id', userId)
+      const { data: waterRecordsResponse, error: fetchWaterRecordsError } = await supabase.from('water_records').select('id, created_at, updated_at, value, goal, date, water_record_times(water_record_id)').eq('user_id', userId)
+      const { data: bodyRecordsResponse, error: fetchBodyRecordsError } = await supabase.from('').select('id, created_at, updated_at, value, type').eq('user_id', userId)
+      console.log('water records response:', waterRecordsResponse)
+      console.log('body records response:', bodyRecordsResponse)
+      console.log('water records error:', fetchWaterRecordsError)
+      if (fetchUserError || fetchWaterRecordsError || fetchBodyRecordsError) return { errorMessage: 'Error when get user data' }
+      const userData = convertObjectKeysToCamelCase(userResponse[0])
+      return {
+         response: userData,
+         error: null
       }
-      const result: PersonalData = data[0]
-      return result
    },
 
    initPersonalData: async (userId: string, payload: InitialPersonalData): Promise<any> => {
