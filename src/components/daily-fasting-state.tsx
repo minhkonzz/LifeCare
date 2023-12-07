@@ -4,7 +4,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from '@assets/icons'
+import { BackIcon, SpoonForkIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
@@ -112,7 +112,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					style={styles.container}>
 					<View style={styles.main}>
 						<View style={styles.circle}>
-							{/* Spoon icon here */}
+							<SpoonForkIcon style={styles.spoonForkIc} width={hS(40)} />
 							<AnimatedCircularProgress 
 								lineCap='round' 
 								width={hS(8)}
@@ -123,7 +123,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 								backgroundColor={`rgba(255, 255, 255, .4)`}
 							/>
 						</View>
-						<Text style={styles.t1}>Eating times!</Text>
+						<Text style={{...styles.t1, marginLeft: hS(16) }}>Eating times!</Text>
 					</View>
 					<BackIcon style={styles.redirectIcon} width={hS(8)} height={vS(14)} />
 				</LinearGradient>
@@ -136,6 +136,10 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 
 const styles = StyleSheet.create({
 	blank: { height: vS(132) },
+
+	spoonForkIc: {
+		position: 'absolute'
+	},
 
 	container: {
 		flexDirection: 'row',

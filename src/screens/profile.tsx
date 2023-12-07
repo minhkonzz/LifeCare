@@ -2,8 +2,11 @@ import { memo, useEffect, useRef, useContext } from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { ClockIcon, LogoutIcon, SettingIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
+import { PopupContext } from '@contexts/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import LatestBMI from '@components/profile-latest-bmi'
 import FastingRecords from '@components/profile-fasting-records'
@@ -13,7 +16,6 @@ import Weight from '@components/profile-weight'
 import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
-import { PopupContext } from '@contexts/popup'
 import LogoutPopup from '@components/shared/popup-content/logout'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -22,28 +24,66 @@ const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
-const ProfileUser = memo(({ isViewable }: { isViewable: boolean }) => {
+const Header = memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const { session, metadata } = useSelector((state: AppState) => state.user)
 	const { setPopup } = useContext<any>(PopupContext)
+	const userId: string | null = session && session.user.id || null
 
-	return (
-		isViewable && 
-		<View style={[styles.profileUser, styles.horz]}>
-			<View style={styles.horz}>
-				<Image style={styles.avatar} source={require('../assets/images/UserAvatar.png')} />
-				<View style={styles.personalTexts}>
-					<Text style={styles.name}>Minh Pham</Text>
-					<Text style={styles.email}>minhphm37@gmail.com</Text>
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0,
+			duration: 840,
+			useNativeDriver: true
+		}).start()
+	}, [isViewable])
+
+	if (userId) {
+		const { name, email } = metadata
+		return (
+			<Animated.View style={{...styles.profileUser, ...styles.horz, opacity: animateValue}}>
+				<View style={styles.horz}>
+					<Animated.Image 
+						style={{
+							...styles.avatar, 
+							opacity: animateValue,
+							transform: [{ scale: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [.8, 1]
+							}) }] 
+						}} 
+						source={require('../assets/images/UserAvatar.png')} />
+					<Animated.View style={{
+						...styles.personalTexts, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [20, 0]
+						}) }]
+					}}>
+						<Text style={styles.name}>{name}</Text>
+						<Text style={styles.email}>{email}</Text>
+					</Animated.View>
 				</View>
-			</View>
-			<TouchableOpacity 
-				style={styles.logout} 
-				activeOpacity={.7}
-				onPress={() => setPopup(LogoutPopup)}>
-				<LogoutIcon width={hS(18)} height={vS(20)} />
-				<Text style={styles.logoutText}>Logout</Text>
-			</TouchableOpacity>
-		</View> || <View style={styles.profileUser} />
-	)
+				<AnimatedTouchableOpacity 
+					style={{
+						...styles.logout, 
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [50, 0]
+						}) }] 
+					}} 
+					activeOpacity={.7}
+					onPress={() => setPopup(LogoutPopup)}>
+					<LogoutIcon width={hS(18)} height={vS(20)} />
+					<Text style={styles.logoutText}>Logout</Text>
+				</AnimatedTouchableOpacity>
+			</Animated.View>
+		)
+	}
+
+	return <Backup {...{ animateValue }} />
 })
 
 const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
@@ -150,20 +190,21 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-export default (): JSX.Element => (
-	<Screen paddingHorzContent header='tab' title='Me' content={[
-		ProfileUser, 
-		Backup, 
-		PlanUpgrade, 
-		LatestBMI, 
-		FastingRecords, 
-		Weight, 
-		HydrateRecords, 
-		BodyMeasure,
-		TimelineRef, 
-		SettingRef
-	]} />
-)
+export default (): JSX.Element => {
+	return (
+		<Screen paddingHorzContent header='tab' title='Me' content={[
+			Header, 
+			PlanUpgrade, 
+			LatestBMI, 
+			FastingRecords, 
+			Weight, 
+			HydrateRecords, 
+			BodyMeasure,
+			TimelineRef, 
+			SettingRef
+		]} />
+	)
+}
 
 const styles = StyleSheet.create({	
 	container: { flex: 1 },

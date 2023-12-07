@@ -21,22 +21,14 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const bmiStatus: string = getBMIStatus(bmiValue)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const rangeAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const cursorAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 
 	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(animateValue, {
-				toValue: isViewable && 1 || 0,
-				duration: 920,
-				useNativeDriver: true
-			}), 
-			Animated.timing(rangeAnimateValue, {
-				toValue: isViewable && 1 || 0,
-				duration: 1000, 
-				delay: 500,
-				useNativeDriver: false
-			})
-		]).start()
+		Animated.timing(animateValue, {
+			toValue: isViewable && 1 || 0,
+			duration: 920,
+			useNativeDriver: true
+		}).start()
 	}, [isViewable])
 
 	return (
@@ -69,7 +61,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 			</Animated.View>
 			<View>
 				<Animated.View style={{
-					marginLeft: rangeAnimateValue.interpolate({
+					marginLeft: cursorAnimateValue.interpolate({
 						inputRange: [0, 1], 
 						outputRange: ['0%', `${(bmiValue - 16) / 24 * 100}%`]
 					}) 
@@ -78,7 +70,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				</Animated.View>
 				<Animated.View style={{
 					...styles.rangeColors, 
-					height: rangeAnimateValue.interpolate({
+					height: cursorAnimateValue.interpolate({
 						inputRange: [0, 1] ,
 						outputRange: [0, vS(20)]
 					})	

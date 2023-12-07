@@ -1,11 +1,14 @@
-import { memo, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, TouchableOpacity, FlatList, Pressable } from 'react-native'
+import { memo, useState, useRef, useEffect } from 'react'
+import { View, Text, StyleSheet, Animated, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BluePlusIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-import { getDatesRange } from '@utils/datetimes'
+import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { formatNum } from '@utils/helpers'
+import { BlurView } from '@react-native-community/blur'
+import { PolygonIcon } from '@assets/icons'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -13,29 +16,88 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const Record = ({ item, index }: { item: any, index: number }) => {
-	return (
-		<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', justifyContent: 'center' }}>
-			<Text style={styles.recText}>Nov</Text>
-			<View style={styles.recProg}>
-				<AnimatedLinearGradient
+const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail: boolean }) => {
+	if (!hideDetail) {
+		if (typeof item === 'string') {
+			const [ month, date ] = item.split(' ')
+			return (
+				<View key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', justifyContent: 'center' }}>
+					<Text style={styles.recText}>{month}</Text>
+					<View style={styles.recProg} />
+					<Text style={styles.recText}>{date}</Text>
+				</View>
+			)
+		}
+
+		const [ shown, setShown ] = useState<boolean>(false)
+		const { id, date, value, goal } = item
+		const [ y, m, d ] = date.split('-')
+		const monthTitle = getMonthTitle(m - 1, true)
+		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
+
+		const onPress = () => {
+			Animated.timing(detailAnimateValue, {
+				toValue: !shown && 1 || 0,
+				duration: 200,
+				useNativeDriver: true
+			}).start(() => {
+				setShown(!shown)
+			})
+		}
+
+		return (
+			<Pressable 
+				key={`${id}-${index}`} 
+				style={{ 
+					position: 'relative',
+					marginLeft: index > 0 ? hS(18) : 0, 
+					alignItems: 'center', 
+					justifyContent: 'center'
+				}}
+				{...{ onPress }}>
+				<Text style={styles.recText}>{monthTitle}</Text>
+				<View style={styles.recProg}>
+					<AnimatedLinearGradient
+						style={{...styles.recProgValue, height: `${value / goal * 100}%` }}
+						colors={['rgba(120, 193, 243, .36)', '#78C1F3']}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} 
+					/>
+				</View>
+				<Text style={styles.recText}>{d}</Text>
+				{ shown && 
+				<AnimatedLinearGradient 
 					style={{
-						...styles.recProgValue, 
-						height: `${item.value / item.goal * 100}%`
+						position: 'absolute',
+						top: hS(20),
+						width: hS(120),
+						height: vS(65),
+						borderRadius: hS(12),
+						justifyContent: 'center', 
+						alignItems: 'center',
+						opacity: detailAnimateValue,
+						transform: [{ translateY: detailAnimateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [-15, 0]
+						}) }]
 					}}
-					colors={['rgba(120, 193, 243, .36)', '#78C1F3']}
+					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }} 
-				/>
-			</View>
-			<Text style={styles.recText}>29</Text>
-		</Pressable>
-	)
+					end={{ x: .52, y: .5 }}>
+					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Drinked: ${value}ml`}</Text>
+					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(5) }}>{`Goal: ${goal}ml`}</Text>
+					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25) }} width={16} />
+				</AnimatedLinearGradient> }
+			</Pressable>
+		)
+	}
+	return <View key={index} style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0 }} />
 }
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 	const waterRecords = useSelector((state: AppState) => state.user.metadata.waterRecords)
+
 	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
 		const { id, date, value, goal } = cur
 		acc[date] = { id, value, goal }
@@ -43,10 +105,15 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	}, {})
 
 	const chartData = getDatesRange(122).map(e => {
-		const date = e.value
-		const { value, goal, id } = standardWaterRecords[date]
-		return { date, value, goal, id }
+		const r = standardWaterRecords[e.value]
+		if (r) {
+			const { value, goal, id } = r
+			return { date: e.value, value, goal, id }
+		}
+		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
 	})
+
+	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -56,8 +123,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		}).start()
 	}, [isViewable])
 
+	if (!isViewable) return <View style={styles.container} />
+
 	return (
-		isViewable && 
 		<AnimatedLinearGradient
 			style={{...styles.container, opacity: animateValue }}
 			colors={['rgba(154, 197, 244, .24)', 'rgba(154, 197, 244, .7)']}
@@ -89,23 +157,48 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				</Animated.View>
 				<AnimatedTouchableOpacity 
 					style={{...styles.hydrateRecsUpdateButton, transform: [{ scale: animateValue }] }} 
-					activeOpacity={.8}>
+					activeOpacity={.8}
+					onPress={() => console.log('clicked')}>
 					<BluePlusIcon width={hS(14)} height={vS(15.3)} />
 				</AnimatedTouchableOpacity>
 			</View>
-			<FlatList 
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				keyExtractor={item => item.id}
-				data={chartData} 
-				renderItem={({ item, index }) => <Record {...{ item, index }} />} 
-			/>
+			<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records} contentContainerStyle={{ alignItems: 'center' }}>
+				{ chartData.map((e, i) => <Record {...{ item: e, index: i, hideDetail: noDataFound }} />) }
+			</ScrollView>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
-		</AnimatedLinearGradient> || <View style={styles.container} />
+			{ noDataFound && 
+			<View style={styles.blurOverlayWrapper}>
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={5} />
+				<Text style={styles.noDataText}>No data found</Text>
+			</View> }
+		</AnimatedLinearGradient>
 	)
 })
 
 const styles = StyleSheet.create({
+	blurOverlayWrapper: {		
+		position: 'absolute',
+		top: 0,
+		left: 0, 
+		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+
+	blurOverlay: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%'
+	},
+
+	noDataText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(14),
+		color: darkHex,
+		letterSpacing: .2
+	},
+
 	container: {
 		marginTop: vS(24),
 		width: hS(370),
@@ -113,7 +206,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingVertical: vS(16),
 		paddingHorizontal: hS(18),
-		borderRadius: hS(24)
+		borderRadius: hS(24),
+		overflow: 'hidden',
+		position: 'relative'
 	},
 
 	header: {
@@ -164,7 +259,12 @@ const styles = StyleSheet.create({
 	},
 
 	records: {
-		width: '100%'
+		position: 'absolute',
+		top: 0, 
+		left: 0,
+		width: '100%',
+		height: vS(450),
+		overflow: 'visible',
 	},
 
 	lastUpdatedText: {

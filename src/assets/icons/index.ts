@@ -49,6 +49,7 @@ import WhiteClockIcon from './whiteclock.svg'
 import EyeIcon from './eye.svg'
 import EyeHidedIcon from './eye-hided.svg'
 import CornerArrowUpRightIcon from './corner-arrow-up-right.svg'
+import SpoonForkIcon from './spoon-fork.svg'
 
 export {
    AtIcon,
@@ -101,6 +102,7 @@ export {
    WhiteClockIcon,
    EyeIcon,
    EyeHidedIcon,
-   CornerArrowUpRightIcon
+   CornerArrowUpRightIcon,
+   SpoonForkIcon
 }
 

@@ -29,6 +29,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          exercisePerformance: survey.exercisePerformance,
          fastingFamiliar: survey.fastingFamiliar,
          goal: survey.goal,
+         firstTimeTrackWater: false, 
          isSurveyed: true
       }   
 

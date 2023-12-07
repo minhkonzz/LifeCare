@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { getDatesRange } from '@utils/datetimes'
 import { handleFastingRecords } from '@utils/helpers'
+import { BlurView } from '@react-native-community/blur'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -14,30 +15,35 @@ const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const Record = ({ item, index }) => {
-	const startTime = item.startTime
-	const [ s1, s2 ] = startTime.split(" ")
-	const [ hours, mins ] = s1.split(":").map(Number)
-	const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
+const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail?: boolean }) => {
 
-	return (
-		<Pressable key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
-			<Text style={styles.recText}>Nov</Text>
-			<View style={styles.recProg}>
-				<AnimatedLinearGradient
-					style={{
-						...styles.recProgValue, 
-						height: `${item.totalHours / 24 * 100}%`,
-						top: `${Math.floor(hoursPassed / 24 * 100)}%`
-					}}
-					colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
-					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }} 
-				/>
-			</View>
-			<Text style={styles.recText}>29</Text>
-		</Pressable>
-	)
+	if (!hideDetail) {
+		const startTime = item.startTime
+		const [ s1, s2 ] = startTime.split(' ')
+		const [ hours, mins ] = s1.split(':').map(Number)
+		const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
+
+		return (
+			<Pressable key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
+				{ !hideDetail && <Text style={styles.recText}>Nov</Text> }
+				<View style={styles.recProg}>
+					<AnimatedLinearGradient
+						style={{
+							...styles.recProgValue, 
+							height: `${item.totalHours / 24 * 100}%`,
+							top: `${Math.floor(hoursPassed / 24 * 100)}%`
+						}}
+						colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} 
+					/>
+				</View>
+				{ !hideDetail && <Text style={styles.recText}>29</Text> }
+			</Pressable>
+		)
+	}
+
+	return <View key={index} style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0}} />
 }
 
 export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
@@ -49,14 +55,20 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	}, {})
 
 	const chartData = getDatesRange(122).map(e => {
-		const { startTime, endTime, totalHours } = standardFastingRecords[e.value]
-		return {
-			date: e.value,
-			startTime,
-			endTime,
-			totalHours
+		const r = standardFastingRecords[e.value]
+		if (r) {
+			const { startTime, endTime, totalHours } = r
+			return {
+				date: e.value,
+				startTime,
+				endTime,
+				totalHours
+			}
 		}
+		return null
 	})
+
+	const noDataFound: boolean = chartData.every(e => !e)
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -66,8 +78,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		}).start()
 	}, [isViewable])
 
+	if (!isViewable) return <View style={styles.container} />
+
 	return (
-		isViewable && 
 		<AnimatedLinearGradient
 			style={{...styles.container, opacity: animateValue }}
 			colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
@@ -104,16 +117,44 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					.map((e, i) => <Text key={i} style={{...styles.dayHour, marginTop: i > 0 ? vS(24) : 0}}>{e}</Text>)
 				}
 				</View>
-				<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-					{ chartData.map((e, i) => <Record {...{ item: e, index: i }}/>) }
+				<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records}>
+					{ chartData.map((e, i) => <Record {...{ item: e, index: i, hideDetail: noDataFound }}/>) }
 				</ScrollView>
 			</View>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
-		</AnimatedLinearGradient> || <View style={styles.container} />
+			{ noDataFound && 
+			<View style={styles.blurOverlayWrapper}>
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={5} />
+				<Text style={styles.noDataText}>No data found</Text>
+			</View> }
+		</AnimatedLinearGradient>
 	)
 })
 
 const styles = StyleSheet.create({
+	blurOverlayWrapper: {		
+		position: 'absolute',
+		top: 0,
+		left: 0, 
+		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+
+	blurOverlay: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%'
+	},
+
+	noDataText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(14),
+		color: darkHex,
+		letterSpacing: .2
+	},
+
 	dayHours: {
 		alignItems: 'flex-end',
 		marginRight: hS(14)
@@ -181,7 +222,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal: hS(18),
 		paddingTop: vS(18),
 		paddingBottom: vS(8),
-		marginTop: vS(27)
+		marginTop: vS(27),
+		overflow: 'hidden'
 	},
 
 	header: {
@@ -215,7 +257,8 @@ const styles = StyleSheet.create({
 
 	records: {
 		width: '100%',
-		marginTop: vS(20)
+		marginTop: vS(20),
+		overflow: 'visible'
 	},
 
 	rec: {

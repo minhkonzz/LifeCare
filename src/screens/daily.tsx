@@ -1,23 +1,13 @@
-import { 
-	memo, 
-	useEffect, 
-	useRef
-} from 'react'
-import {
-	View,
-	Text,
-	Image,
-	StyleSheet,
-	Animated,
-	Pressable,
-	TouchableOpacity
-} from 'react-native'
-import Screen from '@components/shared/screen'
-import LinearGradient from 'react-native-linear-gradient'
-import DailyFastingState from '@components/daily-fasting-state'
+import { memo, useEffect, useRef } from 'react'
+import { View, Text, Image, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { AppState } from '../store'
+import Screen from '@components/shared/screen'
+import LinearGradient from 'react-native-linear-gradient'
+import DailyFastingState from '@components/daily-fasting-state'
 import WeightTrack from '@components/daily-weight-track'
 import BMITrack from '@components/daily-bmi-track'
 import WaterTrack from '@components/daily-water-track'
@@ -31,6 +21,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const Header = memo(({ isViewable }: { isViewable: boolean }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+	const { name } = useSelector((state: AppState) => state.user.metadata)
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -56,7 +47,7 @@ const Header = memo(({ isViewable }: { isViewable: boolean }) => {
 							outputRange: [-50, 0]
 						}) }]
 					}}>
-						Hi, Pham
+						{`Hi, ${name}`}
 					</Animated.Text>
 					<Animated.Text style={{
 						...styles.titleGreet, 

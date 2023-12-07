@@ -24,12 +24,11 @@ export default (): JSX.Element => {
       if (!isSurveyed) return 
       const { response, error } = await UserService.getPersonalData(userId)
       if (error) console.log('error when get user data (1)')
-      // const convertedResponse = convertObjectKeysToCamelCase(response)
+
       const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = response
 
-      if (startTimeStamp && endTimeStamp) {
+      if (startTimeStamp && endTimeStamp) 
          dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
-      }
 
       if (currentPlanId) {
          const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)

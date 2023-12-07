@@ -43,7 +43,7 @@ export const handleFastingRecords = (startTimestamp: number, endTimestamp: numbe
    const fastingData = {}
 
    const currentDate = new Date(startDate)
-   while (currentDate <= endDate) {
+   while (currentDate.getDate() <= endDate.getDate() + 1) {
       const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
       const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
 
@@ -57,7 +57,8 @@ export const handleFastingRecords = (startTimestamp: number, endTimestamp: numbe
          const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
          const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
          const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
-         const date = getLocalTimeV1(currentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+         const [ m, d, y ] = currentDate.toLocaleDateString('en-US')
+         const date: string = `${y}-${m}-${d}`
          fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
       }
 

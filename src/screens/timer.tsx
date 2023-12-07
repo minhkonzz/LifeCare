@@ -69,7 +69,7 @@ export default memo((): JSX.Element => {
 			MainTop,
 			FastingClock,
 			FastingActivator,
-			// FastingRecords
+			FastingRecords
 		]} />
 	)
 })

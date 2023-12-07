@@ -10,7 +10,6 @@ export const getCurrentDate = (): string => {
    const year = today.getFullYear()
    const month = String(today.getMonth() + 1).padStart(2, '0')
    const date = String(today.getDate()).padStart(2, '0')
-
    return `${year}-${month}-${date}`
 }
 
@@ -88,17 +87,17 @@ export const getLocalTimeV1 = (utcDate: Date): Date => {
 export const getDatesRange = (limit: number) => {
    const dateArray: Array<{ title: string, value: string, date: number, month: number, year: number }> = []
    const currentDate = new Date()
-   for (let i = -limit; i <= limit; i++) {
+   for (let i = -limit; i <= 10; i++) {
       const newDate = new Date(currentDate)
       newDate.setDate(currentDate.getDate() + i)
-      const month = newDate.getMonth() + 1
+      const month = newDate.getMonth()
       const date = newDate.getDate()
       const year = newDate.getFullYear()
       const formattedMonth = newDate.toLocaleString('en-US', { month: 'short' })
       const formattedDate = `${formattedMonth} ${date}`
       dateArray.push({
          title: i === -1 && 'Yesterday' || i === 1 && 'Tomorrow' || i === 0 && 'Today' || formattedDate,
-         value: formattedDate,
+         value: `${year}-${formatNum(month + 1)}-${formatNum(date)}`,
          date,
          month, 
          year

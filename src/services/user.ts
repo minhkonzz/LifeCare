@@ -38,15 +38,70 @@ export default {
 
    getPersonalData: async (userId: string): Promise<any> => {
       const { data: userResponse, error: fetchUserError } = await supabase.from('users').select('*').eq('id', userId)
-      const { data: waterRecordsResponse, error: fetchWaterRecordsError } = await supabase.from('water_records').select('id, created_at, updated_at, value, goal, date, water_record_times(water_record_id)').eq('user_id', userId)
-      const { data: bodyRecordsResponse, error: fetchBodyRecordsError } = await supabase.from('').select('id, created_at, updated_at, value, type').eq('user_id', userId)
-      console.log('water records response:', waterRecordsResponse)
-      console.log('body records response:', bodyRecordsResponse)
-      console.log('water records error:', fetchWaterRecordsError)
-      if (fetchUserError || fetchWaterRecordsError || fetchBodyRecordsError) return { errorMessage: 'Error when get user data' }
+      if (fetchUserError) return { errorMessage: fetchUserError.message }
+
+      const { data: waterRecordsResponse, error: fetchWaterRecordsError } = await supabase
+         .from('water_records')
+         .select(`
+            id, 
+            created_at, 
+            updated_at, 
+            value, 
+            goal, 
+            date, 
+            water_record_times(id, created_at, updated_at, value)
+         `)
+         .eq('user_id', userId)
+
+      if (fetchWaterRecordsError) return { errorMessage: fetchWaterRecordsError.message }
+
+      const { data: bodyRecordsResponse, error: fetchBodyRecordsError } = await supabase
+         .from('body_records')
+         .select(`
+            id, 
+            created_at, 
+            updated_at, 
+            value, 
+            type
+         `)
+         .eq('user_id', userId)
+
+      if (fetchBodyRecordsError) return { errorMessage: fetchBodyRecordsError.message }
+         
+      const { data: fastingRecordsResponse, error: fetchFastingRecordsError } = await supabase
+         .from('fasting_records')
+         .select(`
+            id, 
+            created_at, 
+            updated_at, 
+            plan_name, 
+            start_time_stamp, 
+            end_time_stamp, 
+            notes
+         `)
+         .eq('user_id', userId)
+
+      if (fetchFastingRecordsError) return { errorMessage: fetchFastingRecordsError.message }
+
       const userData = convertObjectKeysToCamelCase(userResponse[0])
+      const waterRecords = waterRecordsResponse.map(e => {
+         const { water_record_times, ...claims } = e
+         return convertObjectKeysToCamelCase({
+            ...claims,
+            times: water_record_times
+         })
+      })
+
+      const bodyRecords = bodyRecordsResponse.map(e => convertObjectKeysToCamelCase(e))
+      const fastingRecords = fastingRecordsResponse.map(e => convertObjectKeysToCamelCase(e))
+
       return {
-         response: userData,
+         response: {
+            ...userData,
+            waterRecords,
+            bodyRecords,
+            fastingRecords
+         },
          error: null
       }
    },

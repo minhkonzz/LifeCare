@@ -29,5 +29,50 @@
 
 // console.log(handle(1700014550000, 1700190950000))
 
-const d = new Date()
-console.log(d.toLocaleString('en-US', { month: 'short' }))
+const formatNum = (value) => {
+   return value.toString().padStart(2, '0')
+}
+
+const handleFastingRecords = (startTimestamp, endTimestamp) => {
+   const startDate = new Date(startTimestamp) // utc
+   const endDate = new Date(endTimestamp)     // utc
+   const fastingData = {}
+
+   const currentDate = new Date(startDate)
+   while (currentDate <= endDate) {
+      const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+      const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+
+      const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+      const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+
+      // calculate total of day
+      const totalMilliseconds = endTimeStamp - startTimeStamp
+      const totalHours = totalMilliseconds / (1000 * 60 * 60)
+
+      if (totalHours >= 1) {
+         const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+         const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
+         const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
+         const [ m, d, y ] = currentDate.toLocaleDateString().split('/')
+         fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
+      }
+
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1)
+   }
+
+   return fastingData
+}
+
+const getLocalTimeV1 = (utcDate) => {
+   const year = utcDate.getFullYear()
+   const month = utcDate.getMonth() + 1
+   const day = utcDate.getDate()
+   const hours = utcDate.getHours()
+   const mins = utcDate.getMinutes()
+   const secs = utcDate.getSeconds()
+   return new Date(`${year}-${formatNum(month)}-${formatNum(day)} ${formatNum(hours)}:${formatNum(mins)}:${formatNum(secs)}`)
+}
+
+// console.log(handleFastingRecords(1701570543000, 1701729003000))
+console.log(new Date().toLocaleDateString())

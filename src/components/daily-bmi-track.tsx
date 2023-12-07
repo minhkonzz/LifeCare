@@ -1,5 +1,5 @@
-import { useEffect, useRef, useContext } from 'react'
-import LinearGradient from 'react-native-linear-gradient'
+import { memo, useEffect, useRef, useContext } from 'react'
+import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -7,21 +7,14 @@ import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { getBMI } from '@utils/fomular'
 import { getBMIStatus } from '@utils/helpers'
+import LinearGradient from 'react-native-linear-gradient'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
 import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
-
-import { 
-   View, 
-   Text, 
-	Pressable,
-   StyleSheet, 
-	Animated
-} from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-export default (): JSX.Element => {
+export default memo((): JSX.Element => {
 	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -38,7 +31,7 @@ export default (): JSX.Element => {
    return (
 		<Pressable onPress={() => setPopup(UpdateBMIPopup)}>
 			<AnimatedLinearGradient
-				style={[styles.container, { opacity: animateValue }]}
+				style={{...styles.container, opacity: animateValue }}
 				colors={[`rgb(229, 244, 231)`, `rgba(229, 244, 231, .4)`]}
 				start={{ x: .5, y: 0 }}
 				end={{ x: .5, y: 1 }}>
@@ -86,7 +79,7 @@ export default (): JSX.Element => {
 			</AnimatedLinearGradient>
 		</Pressable>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {

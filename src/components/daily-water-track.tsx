@@ -1,20 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'  
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { BluePlusIcon, WatercupIcon } from '@assets/icons'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import WaterWave from '@components/water-wave'
-
-import {
-   View, 
-   Text,
-   TouchableOpacity,
-   StyleSheet,
-   Animated
-} from 'react-native'
 
 const { rgb: lightRgb } = Colors.lightPrimary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -22,7 +15,7 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
-export default (): JSX.Element => {
+export default memo((): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const drinked = useSelector((state: AppState) => state.water.drinked)
    const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
@@ -92,7 +85,7 @@ export default (): JSX.Element => {
          </View>
       </AnimatedLinearGradient>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {
