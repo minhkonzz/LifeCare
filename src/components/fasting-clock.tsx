@@ -61,7 +61,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		}).start()
 	}, [isViewable])
 
-	if (data) {
+	if (!isViewable) return <View style={styles.container} />
+
+	if (data && isFasting) {
 		const { timeElapsed, stage, nextStageIndex } = data
 		const CurrentStageIcon = stage.icon
 		const nextStage = stages[nextStageIndex]
@@ -81,15 +83,14 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					}]
 				}}>
 				<View style={styles.main}>
-					<Text style={styles.elapsedTime}>{isFasting && `Elapsed time (${elapsedPercent}%)` || ''}</Text>
-					<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>{isFasting && timestampToDateTime(timeElapsed) || 'Timer not started'}</Text>
-					{ isFasting && nextStageIndex !== -1 && <>
+					<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedPercent}%)`}</Text>
+					<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>{timestampToDateTime(timeElapsed)}</Text>
+					{ nextStageIndex !== -1 && <>
 					<Text style={styles.nextStageTitle}>Next stage</Text>
 					<View style={styles.horz}>
 						<NextStageIcon width={hS(28)} height={vS(28)} />
 						<Text style={styles.nextStageName}>{nextStageTitle}</Text>
-					</View></> || 
-					<Text style={styles.nextStageTitle}>Press button below to start fasting</Text> }
+					</View></> }
 				</View>
 				<AnimatedCircularProgress
 					lineCap='round'
@@ -99,20 +100,39 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					fill={elapsedPercent >= 0 ? elapsedPercent : 0}
 					tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
 					backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
-					renderCap={({ center }) => (
-						isFasting && 
-						// <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-						// 	<Circle cx={center.x} cy={center.y} r={hS(24)} fill={darkHex} /> 
-						// 	<CurrentStageIcon width={32} height={32} />
-						// </View> || <></>
-						<Circle cx={center.x} cy={center.y} r={hS(16)} fill={darkHex} /> || <></>
-					)}
+					renderCap={({ center }) => <Circle cx={center.x} cy={center.y} r={hS(16)} fill={darkHex} />}
 				/>
 			</Animated.View>
 		)
 	}
 
-	return <></>
+	return (
+		<Animated.View
+			style={{
+				...styles.container,
+				opacity: animateValue,
+				transform: [{
+					translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					})
+				}]
+			}}>
+			<View style={styles.main}>
+				<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>Timer not started'</Text>
+				<Text style={styles.nextStageTitle}>Press button below to start fasting</Text>
+			</View>
+			<AnimatedCircularProgress
+				lineCap='round'
+				width={hS(28)}
+				size={hS(320)}
+				rotation={360}
+				fill={0}
+				tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
+				backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
+			/>
+		</Animated.View>
+	)
 })
 
 const styles = StyleSheet.create({

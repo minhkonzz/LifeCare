@@ -1,4 +1,4 @@
-import { memo, useState, useRef, useCallback } from 'react'
+import { memo, ReactNode, useState, useRef, useCallback } from 'react'
 import { View, FlatList } from 'react-native'
 import { SCREEN_WIDTH, verticalScale as vS } from '@utils/responsive'
 
@@ -6,7 +6,7 @@ interface CarouselProps {
    data: any[],
    style?: any,
    indicator?: (index: number) => JSX.Element, 
-   items?: any[]
+   items?: any
 }
 
 export default memo(({
@@ -60,7 +60,7 @@ export default memo(({
             }} 
             showsHorizontalScrollIndicator={false}
             renderItem={({ item, index }: { item: any, index: number }) => {
-               const RenderItem = items && items[index] || <></>
+               const RenderItem = Array.isArray(items) && items[index] || items
                return <RenderItem {...{ item, index }} />
             }}/>
          { indicator && <Indicator {...{ index }} /> }

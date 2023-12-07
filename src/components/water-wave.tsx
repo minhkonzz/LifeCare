@@ -29,7 +29,7 @@ export default ({ w = hS(127), h = vS(762) }: WaterWaveProps): JSX.Element => {
       Animated.loop(
          Animated.timing(waveAnimateValue, {
             toValue: 1, 
-            duration: 1010, 
+            duration: 840, 
             useNativeDriver: true,
             easing: Easing.linear
          })
@@ -41,7 +41,7 @@ export default ({ w = hS(127), h = vS(762) }: WaterWaveProps): JSX.Element => {
          // toValue: vS(h - h * drinked / dailyWater - 20 * h / SCREEN_HEIGHT),
          // toValue: vS(h + (20 * h / SCREEN_HEIGHT) * drinked / dailyWater),
          toValue: h - vS(63),
-         duration: 1500,
+         duration: 1200,
          useNativeDriver: true
       }).start()
    }, [drinked])
