@@ -6,12 +6,11 @@ import { AppState } from '../store'
 import StrongWaveSvg from '@assets/images/strong_wave.svg'
 
 interface WaterWaveProps {
-   w?: number, 
-   h?: number
+   w: number
 }
 
-export default ({ w = hS(127), h = vS(762) }: WaterWaveProps): JSX.Element => {
-   console.log('screen_height:', SCREEN_HEIGHT)
+export default ({ w }: WaterWaveProps): JSX.Element => {
+   const h = vS(w * 6)
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -38,9 +37,7 @@ export default ({ w = hS(127), h = vS(762) }: WaterWaveProps): JSX.Element => {
 
    useEffect(() => {
       Animated.timing(waterTranslateY, {
-         // toValue: vS(h - h * drinked / dailyWater - 20 * h / SCREEN_HEIGHT),
-         // toValue: vS(h + (20 * h / SCREEN_HEIGHT) * drinked / dailyWater),
-         toValue: h - vS(63),
+         toValue: h - vS(w * drinked / dailyWater),
          duration: 1200,
          useNativeDriver: true
       }).start()
@@ -48,7 +45,7 @@ export default ({ w = hS(127), h = vS(762) }: WaterWaveProps): JSX.Element => {
 
    return (
       <Animated.View style={{
-         width: w,
+         width: w - 5,
          height: h, 
          opacity: animateValue,
          transform: [

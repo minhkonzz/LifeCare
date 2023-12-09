@@ -16,7 +16,7 @@ interface TabHeaderProps {
 export default ({ title }: TabHeaderProps): JSX.Element => {
 	const navigation = useNavigation<any>()
 	const drinked: number = useSelector((state: AppState) => state.water.drinked)
-	const dailyWater: number = useSelector((state: AppState) => state.user.metadata.dailyWater)
+	const { dailyWater, firstTimeTrackWater } = useSelector((state: AppState) => state.user.metadata)
 
 	return (
 		<View style={styles.container}>
@@ -32,7 +32,7 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 					tintColor='#91C8E4'
 					backgroundColor='#E3E3E3' />
 				<View style={styles.watercupInside}>
-					<Pressable onPress={() => navigation.navigate('water')}>
+					<Pressable onPress={() => navigation.navigate(firstTimeTrackWater && 'water-overview' || 'water')}>
 						<WatercupIcon width={hS(14)} height={vS(19)} />
 					</Pressable>
 				</View>

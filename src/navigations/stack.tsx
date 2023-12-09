@@ -6,6 +6,7 @@ import Welcome from '@screens/welcome'
 import Splash from '@screens/splash'
 import Survey from '@screens/survey'
 import Water from '@screens/water'
+import WaterOverview from '@screens/water-overview'
 import WaterSetting from '@screens/water-setting'
 import SurveyLoading from '@screens/survey-loading'
 import SurveySuggest from '@screens/survey-suggest'
@@ -36,6 +37,7 @@ export default (): JSX.Element => {
          <Stack.Screen name='welcome' component={Welcome} />
          <Stack.Screen name='survey' component={Survey} />
          <Stack.Screen name='water' component={Water} />
+         <Stack.Screen name='water-overview' component={WaterOverview} />
          <Stack.Screen name='water-setting' component={WaterSetting} />
          <Stack.Screen name='survey-loading' component={SurveyLoading} />
          <Stack.Screen name='survey-suggest' component={SurveySuggest} />

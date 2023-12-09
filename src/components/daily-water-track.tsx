@@ -17,7 +17,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 export default memo((): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const drinked = useSelector((state: AppState) => state.water.drinked)
-   const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+   const { dailyWater, firstTimeTrackWater } = useSelector((state: AppState) => state.user.metadata)
    const navigation = useNavigation<any>()
 
    useEffect(() => {
@@ -28,7 +28,7 @@ export default memo((): JSX.Element => {
       }).start()
    }, [])
 
-   const onPress = () => { navigation.navigate('water') }
+   const onPress = () => { navigation.navigate(firstTimeTrackWater && 'water-overview' || 'water') }
 
    return (
       <AnimatedPressable style={{ opacity: animateValue }} {...{ onPress }}>
@@ -45,7 +45,7 @@ export default memo((): JSX.Element => {
                   outputRange: [-50, 0]
                }) }]
             }}>
-               <WaterWave />
+               <WaterWave w={hS(127)} />
             </Animated.View>
             <View style={styles.main}>
                <Animated.View style={{

@@ -5,7 +5,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { handleTimelineData } from '@utils/helpers'
 import PopupProvider, { PopupContext } from '@contexts/popup'
 import StackHeader from '@components/shared/stack-header'
-import TimePicker from '@components/time-range-picker'
+// import TimePicker from '@components/time-range-picker'
 import TimelineItem from '@components/timeline-item'
 import timeline from '@assets/data/timeline.json'
 
@@ -24,14 +24,14 @@ const MainContent = memo(() => {
    return (
       <>
          <StackHeader title='Timeline' />
-         <Animated.View 
+         {/* <Animated.View 
             style={{...styles.timePicker, opacity: animateValue, transform: [{ translateY: animateValue.interpolate({
                inputRange: [0, 1],q,
                outputRange: [-30, 0]
             }) }]}}>
             <TimePicker title='From' indicatorColor={Colors.primary.hex} />
             <TimePicker title='To' indicatorColor='#FF9B85' />
-         </Animated.View>
+         </Animated.View> */}
          <FlatList
             contentContainerStyle={styles.timeline}
             showsVerticalScrollIndicator={false}
