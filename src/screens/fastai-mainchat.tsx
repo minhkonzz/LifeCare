@@ -3,26 +3,38 @@ import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Animated
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Message } from '@utils/types'
-import MessageIconSvg from '@assets/icons/message.svg'
-import BackIconSvg from '@assets/icons/goback.svg'
-import MicrophoneIconSvg from '@assets/icons/microphone.svg'
+import { MessageIcon, BackIcon, MicrophoneIcon } from '@assets/icons'
+import { SERVER_URL } from '@env'
+import LottieView from 'lottie-react-native'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-const RenderMessage = memo(({ item }: { item: any }): JSX.Element => {
+const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.Element => {
    const isUserMessage = item.sender === 'user'
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1,
-         duration: 320,
-         useNativeDriver: true
-      }).start()
+      if (!sent) {
+         Animated.timing(animateValue, {
+            toValue: 1,
+            duration: 320,
+            useNativeDriver: true
+         }).start()
+      }
    }, [])
+
+   if (!isUserMessage && !item.text) return (
+      <>
+         <Text style={styles.typingText}>Bot typing</Text>
+         <LottieView 
+            style={styles.chatTypingLottie}
+            source={require('../assets/lottie/chat-typing.json')} 
+            autoPlay />
+      </>
+   )
 
    return (
       <View
@@ -33,15 +45,10 @@ const RenderMessage = memo(({ item }: { item: any }): JSX.Element => {
          }}>
          <AnimatedLinearGradient
             style={{
-               maxWidth: hS(268),
-               elevation: 16,
-               shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
+               ...styles.message,
                opacity: animateValue,
                transform: [{ translateY: animateValue.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }, { scale: animateValue }],
                backgroundColor: isUserMessage ? '#e6e6e6' : '#d1ecf1',
-               borderBottomLeftRadius: hS(28),
-               borderBottomRightRadius: hS(28),
-               padding: hS(16),
                ...isUserMessage ? 
                { borderTopLeftRadius: hS(28) } : 
                { borderTopRightRadius: hS(28) }
@@ -52,66 +59,78 @@ const RenderMessage = memo(({ item }: { item: any }): JSX.Element => {
             <Text style={{...styles.messageText, color: isUserMessage && '#fff' || darkHex }}>{item.text}</Text>
          </AnimatedLinearGradient>
       </View>
-   );
+   )
 })
  
 export default (): JSX.Element => {
    const [ messages, setMessages ] = useState<Message[]>([])
-   const [ userInput, setUserInput ] = useState<string>('')
+   const [ question, setQuestion ] = useState<string>('')
    const flatListRef = useRef<any>()
 
-   useEffect(() => {
-      
-   }, [])
-
-   const pushMessage = (sender: string) => {
-      if (userInput.trim() === '') return
+   const pushMessage = ({ message, sender }: { message: string, sender: string }) => {
+      if (sender === 'user' && !message.trim()) return
 
       const newMessage = {
-         id: messages.length + 1,
-         text: userInput.trim(),
+         id: `${messages.length + 1 * Math.round(Math.random() * 100)}`,
+         text: message,
          sender
       }
 
-      setMessages([...messages, newMessage])
-      if (sender === 'user') setUserInput('')
+      if (sender === 'user') {
+         const botMessageAwait = {
+            id: `${messages.length + 1 * Math.round(Math.random() * 100)}`,
+            text: '',
+            sender: 'bot'
+         }
+         setMessages(prev => [...prev, newMessage, botMessageAwait])
+      }
+      else setMessages(prev => [...prev.slice(0, -1), newMessage])
       flatListRef.current.scrollToEnd({ animated: true })
+   }
+
+   const sendMessage = async (message: string) => {
+      pushMessage({ message, sender: 'user' })
+      setQuestion('')
+      const botResponse = await fetch(`${SERVER_URL}/chat/q`, {
+         method: 'POST',
+         body: JSON.stringify({ question: message }),
+         headers: { 'Content-type': 'application/json; charset=UTF-8' }
+      })
+      const { text } = await botResponse.json()
+      console.log('text:', text)
+      pushMessage({ message: text, sender: 'bot' })
    }
 
    return (
       <View style={styles.container}>
          <View style={styles.header}>
-            <BackIconSvg width={hS(9.2)} />
-            <View style={styles.headerCenter}>
-               <View style={styles.headerTitleWrapper}>
-                  <Text style={styles.headerTitle}>FastAI</Text>
-                  <View style={styles.onlineSignal}/>
-               </View>
-               <Text style={styles.typingText}>Bot typing</Text>
+            <BackIcon style={styles.backIc} width={hS(9.2)} />
+            <View style={styles.headerTitleWrapper}>
+               <Text style={styles.headerTitle}>FastAI</Text>
+               <View style={styles.onlineSignal}/>
             </View>
-            <View />
          </View>  
          <FlatList 
             style={styles.messages}
             ref={flatListRef} 
             data={messages}
             showsVerticalScrollIndicator={false} 
-            keyExtractor={item => item.id + ''}
-            renderItem={({ item }) => <RenderMessage {...{ item }} />} 
+            keyExtractor={item => item.id}
+            renderItem={({ item, index }) => <RenderMessage {...{ item, sent: (index < messages.length - 2) }} />}
             contentContainerStyle={styles.messagesContent} 
             onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })} />
          <View style={styles.bottomChatBox}>
             <View style={styles.typpingBoxWrapper}>
-               <TextInput value={userInput} style={styles.typingBox} placeholder='Ask me something' onChangeText={t => setUserInput(t)} />
-               <MicrophoneIconSvg style={styles.voiceIc} width={hS(15)} />
+               <TextInput value={question} style={styles.typingBox} placeholder='Ask me something' onChangeText={t => setQuestion(t)} />
+               <MicrophoneIcon style={styles.voiceIc} width={hS(15)} />
             </View>
-            <TouchableOpacity activeOpacity={.7} onPress={() => pushMessage('user')}>
+            <TouchableOpacity activeOpacity={.7} onPress={() => sendMessage(question)}>
                <LinearGradient 
                   style={styles.sendButton}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                   start={{ x: .5, y: 0 }}
                   end={{ x: .52, y: 1 }}>
-                  <MessageIconSvg style={styles.messageIc} width={hS(28)} height={vS(28)} />
+                  <MessageIcon style={styles.messageIc} width={hS(28)} height={vS(28)} />
                </LinearGradient>
             </TouchableOpacity>
          </View>
@@ -128,20 +147,33 @@ const styles = StyleSheet.create({
       paddingHorizontal: hS(24)
    }, 
 
-   header: {
-      width: '100%',
-      flexDirection: 'row', 
-      justifyContent: 'space-between', 
-      alignItems: 'center'
+   message: {
+      maxWidth: hS(268),
+      elevation: 10,
+      shadowColor: `rgba(${darkRgb.join(', ')}, .4)`,
+      padding: hS(16),
+      borderBottomLeftRadius: hS(28),
+      borderBottomRightRadius: hS(28)
    },
 
-   headerCenter: {
-      marginTop: vS(22)
+   backIc: {
+      marginTop: vS(20)
+   },
+
+   chatTypingLottie: {
+      width: hS(150),
+      height: vS(50) 
+   },
+
+   header: {
+      width: '100%'
    },
 
    headerTitleWrapper: {
       flexDirection: 'row', 
-      alignItems: 'center'
+      alignItems: 'center',
+      alignSelf: 'center',
+      marginTop: vS(-30)
    },
 
    headerTitle: {
@@ -162,8 +194,7 @@ const styles = StyleSheet.create({
    typingText: {
       fontSize: hS(10), 
       fontFamily: 'Poppins-Medium', 
-      color: '#a4a4a4',
-      marginTop: vS(4)
+      color: '#a4a4a4'
    }, 
    
    bottomChatBox: {  

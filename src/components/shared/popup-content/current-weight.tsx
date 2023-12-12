@@ -1,15 +1,15 @@
 import { memo, useState, Dispatch, useRef, SetStateAction } from 'react'
 import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
-import PrimaryToggleValue from '../primary-toggle-value'
-import MeasureInput from '../measure-input'
-import Popup from '@components/shared/popup'
-import LinearGradient from 'react-native-linear-gradient'
-import UserService from '@services/user'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../../../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata } from '../../../store/user'
+import PrimaryToggleValue from '../primary-toggle-value'
+import MeasureInput from '../measure-input'
+import Popup from '@components/shared/popup'
+import LinearGradient from 'react-native-linear-gradient'
+import UserService from '@services/user'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 

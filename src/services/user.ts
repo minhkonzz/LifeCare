@@ -210,5 +210,11 @@ export default {
          console.error(error)
          throw new Error('Something went wrong when create new fasting record')
       }
+   },
+
+   updateWeightTimeline: async (userId: string, payload: any): Promise<string> => {
+      const { id, value } = payload
+      const { error } = await supabase.from('body_records').update({ value }).eq('user_id', userId).eq('id', id)
+      return error ? error.message : '' 
    }
 }

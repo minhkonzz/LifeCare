@@ -53,7 +53,6 @@ const BottomNav = memo(() => {
 
 const Main = () => {
 	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-
 	return (
 		<>
 			<BottomNav />

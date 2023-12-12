@@ -1,8 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { memo, useCallback, Dispatch, SetStateAction, useContext } from 'react'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { WatercupIcon, OrangeWeightIcon } from '@assets/icons'
 import { getMonthTitle } from '@utils/datetimes'
+import { PopupContext } from '@contexts/popup'
+import TimelineWeightUpdate from '@components/shared/popup-content/timeline-weight-update'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
@@ -20,7 +23,7 @@ const WaterDrinkTimeline = ({ item }) => {
             </View>
             <View style={styles.iconIndicator} />
          </View>
-         <View style={styles.timelineRight}>
+         <Pressable style={styles.timelineRight} >
             <Text style={styles.time}>{`${item.hour}:${item.min}`}</Text>
             <View style={styles.detail}>
                <Text style={styles.name}>Drink water</Text>
@@ -29,12 +32,18 @@ const WaterDrinkTimeline = ({ item }) => {
                   <Text style={styles.bonus}>2.5</Text>
                </View>
             </View>
-         </View>
+         </Pressable>
       </>
    )
 }
 
 const WeightTimeline = ({ item }) => {
+   const { setPopup } = useContext<any>(PopupContext)
+
+   const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+      return <TimelineWeightUpdate {...{ setVisible, timelineTimeRecord: item }} />
+   }), [])
+
    return (
       <>
          <View style={styles.iconWrapper}>
@@ -43,7 +52,7 @@ const WeightTimeline = ({ item }) => {
             </View>
             <View style={styles.iconIndicator} />
          </View>
-         <View style={{...styles.timelineRight, marginTop: 0 }}>
+         <Pressable style={{...styles.timelineRight, marginTop: 0 }} onPress={() => setPopup(UpdatePopup)} >
             <View style={styles.detail}>
                <Text style={styles.name}>Weight</Text>
                <View style={styles.valueWrapper}>
@@ -51,7 +60,7 @@ const WeightTimeline = ({ item }) => {
                   <Text style={styles.bonus}>2.5</Text>
                </View>
             </View>
-         </View>
+         </Pressable>
       </>
    )
 }
@@ -113,7 +122,7 @@ const styles = StyleSheet.create({
 
    time: {
       fontFamily: 'Poppins-Medium' ,
-      fontSize: hS(14), 
+      fontSize: hS(12), 
       color: `rgba(${darkRgb.join(', ')}, .8)`, 
       letterSpacing: .2, 
       marginBottom: vS(8)

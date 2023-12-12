@@ -7,6 +7,7 @@ import { AppState } from '../store'
 import { getDatesRange } from '@utils/datetimes'
 import { handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -68,8 +69,7 @@ const Record = ({
 	)
 }
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
 	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
 		const { startTimeStamp, endTimeStamp } = cur
@@ -86,14 +86,6 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	})
 
 	const noDataFound: boolean = chartData.every(e => !e)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	if (!isViewable) return <View style={styles.container} />
 

@@ -115,13 +115,13 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 				<Text style={styles.upgradePlanLongDesc}>Unlock all features with upgraded plan</Text>
 			</Animated.View>
 			<AnimatedTouchableOpacity 
-				style={[styles.upgradePlanButton, {
+				style={{...styles.upgradePlanButton,
 					opacity: animateValue, 
 					transform: [{ translateX: animateValue.interpolate({
 						inputRange: [0, 1], 
 						outputRange: [50, 0]
 					}) }]
-				}]} 
+				}} 
 				activeOpacity={.7}>
 				<Text style={styles.upgradePlanButtonText}>Upgrade</Text>
 			</AnimatedTouchableOpacity>
@@ -143,19 +143,9 @@ const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 	return (
 		isViewable && 
-		<AnimatedTouchableOpacity 
-			style={{
-				opacity: animateValue,
-				transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1], 
-					outputRange: [-50, 0]
-				}) }]
-			}}
-			onPress={() => navigation.navigate('timeline')}>
-			<ProfileRedirect title='Timeline'>
-				<ClockIcon width={hS(19)} height={vS(19)} />
-			</ProfileRedirect>
-		</AnimatedTouchableOpacity> || <View style={styles.redirect} />
+		<ProfileRedirect title='Timeline' onPress={() => navigation.navigate('timeline')}>
+			<ClockIcon width={hS(19)} height={vS(19)} />
+		</ProfileRedirect> || <View style={styles.redirect} />
 	)
 })
 
@@ -174,19 +164,9 @@ const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
 
 	return (
 		isViewable && 
-		<AnimatedTouchableOpacity 
-			style={{
-				opacity: animateValue,
-				transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1], 
-					outputRange: [-50, 0]
-				}) }]
-			}}
-			onPress={() => navigation.navigate('setting')}>
-			<ProfileRedirect title='Setting'>
-				<SettingIcon width={hS(20)} height={vS(20)} />
-			</ProfileRedirect>
-		</AnimatedTouchableOpacity> || <View style={styles.redirect} />
+		<ProfileRedirect title='Setting' onPress={() => navigation.navigate('setting')}>
+			<SettingIcon width={hS(20)} height={vS(20)} />
+		</ProfileRedirect> || <View style={styles.redirect} />
 	)
 })
 

@@ -1,14 +1,10 @@
-import { ReactNode } from 'react'
-import {
-   View, 
-   Text,
-   Pressable,
-   StyleSheet
-} from 'react-native'
-
+import { ReactNode, useRef, useEffect } from 'react'
+import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BackIcon from '@assets/icons/goback.svg'
+import { BackIcon } from '@assets/icons'
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 interface ProfileRedirectProps {
    title: string, 
@@ -17,14 +13,34 @@ interface ProfileRedirectProps {
 }
 
 export default ({ title, onPress, children }: ProfileRedirectProps): JSX.Element => {
+   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   
+   useEffect(() => {
+      Animated.timing(animateValue, {
+         toValue: 1,
+         duration: 840,
+         useNativeDriver: true
+      }).start()
+   }, [])
+
    return (
-      <Pressable style={[styles.horz, styles.container]} {...{ onPress }}>
+      <AnimatedPressable 
+         style={{
+            ...styles.horz, 
+            ...styles.container,
+            opacity: animateValue,
+            transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1], 
+					outputRange: [-50, 0]
+				}) }]
+         }} 
+         {...{ onPress }}>
          <View style={styles.horz}>
             { children }
             <Text style={styles.title}>{title}</Text>
          </View>
          <BackIcon style={styles.redirectIc} width={hS(7)} height={vS(12)} />
-      </Pressable>
+      </AnimatedPressable>
    )
 }
 

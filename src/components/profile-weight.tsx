@@ -1,15 +1,15 @@
 import { memo, useContext } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { PopupContext } from '@contexts/popup'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { kilogramsToPounds } from '@utils/fomular'
+import { BackIcon, EditIcon } from '@assets/icons'
+import ProfileWeightChart from './profile-weight-chart'
 import UpdateWeightsPopup from '@components/shared/popup-content/weights'
 import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback.svg'
-import EditIcon from '@assets/icons/edit.svg'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
@@ -62,7 +62,8 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                <Text style={styles.progressText}>{`Goal: ${kilogramsToPounds(goalWeight)} lb`}</Text>
             </View>
          </View>
-         <View style={styles.chart}>
+         <ProfileWeightChart />
+         {/* <View style={styles.chart}>
             <View style={{ marginRight: hS(14), alignItems: 'flex-end' }}>
             { Array.from({ length: 6 }, (_, i) => maxValueMeasure - 10 * i).map((e, i) => 
                <Text key={i} style={{...styles.chartValue, marginTop: i > 0 ? vS(22) : 0}}>{e}</Text>
@@ -88,7 +89,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                      <View style={{ borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#FF8E00', width: '100%' }} />
                   </View>
             </View>
-         </View>
+         </View> */}
       </LinearGradient> || <View style={styles.container} />
    )
 })

@@ -1,16 +1,10 @@
 import { useCallback, useState } from 'react'
-import {
-   View,
-   FlatList, 
-   Platform, 
-   StatusBar, 
-   StyleSheet
-} from 'react-native'
-import TabHeader from '@components/tab-header'
-import StackHeader from './stack-header'
+import { View, FlatList, Platform, StatusBar, StyleSheet } from 'react-native'
 import { BOTTOM_NAVIGATOR_HEIGHT } from '@utils/constants/screen'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import TabHeader from '@components/tab-header'
+import StackHeader from './stack-header'
 
 interface PopupProps {
    content: Array<any>
@@ -48,13 +42,11 @@ export default ({
       <View style={styles.container}>
          <FlatList 
             style={styles.wrapper}
-            contentContainerStyle={[
-               styles.content, 
-               additionalStyles, 
-               { 
-                  paddingBottom: vS(27) + bottomBarHeight + (full ? 0 : vS(BOTTOM_NAVIGATOR_HEIGHT)) 
-               }
-            ]}
+            contentContainerStyle={{
+               ...styles.content, 
+               ...additionalStyles,  
+               paddingBottom: vS(27) + bottomBarHeight + (full ? 0 : vS(BOTTOM_NAVIGATOR_HEIGHT)) 
+            }}
             {...{ onViewableItemsChanged }}
             data={Array.from({ length: content.length }).fill(1)} 
             showsVerticalScrollIndicator={false} 

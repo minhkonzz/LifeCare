@@ -1,4 +1,4 @@
-import { FC, useState, useContext } from 'react'
+import { FC, useContext } from 'react'
 import {
 	View,
 	Text,
@@ -12,10 +12,11 @@ import {
 	Image
 } from 'react-native'
 import { PopupContext } from '../contexts/popup'
-import PopupProvider from '../contexts/popup'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import { CustomIcon } from '@assets/icons'
+import PopupProvider from '../contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
@@ -30,6 +31,20 @@ type PlanCategorySectionProps = {
 	items?: Array<any>
 }
 
+const PlanCategorySectionHeader = ({ title }: { title: string }): JSX.Element => {
+	return (
+		<View style={styles.planCategorySectionHeader}>
+			<LinearGradient
+				style={styles.planCategorySectionDecor}
+				colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+				start={{ x: .5, y: 0 }}
+				end={{ x: .5, y: 1 }}
+			/>
+			<Text style={styles.planCategorySectionTitle}>{title}</Text>
+		</View>
+	)
+}
+
 const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 	title,
 	description,
@@ -37,18 +52,10 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 }) => {
 	return (
 		<View style={styles.planCategorySection}>
-			<View style={styles.planCategorySectionHeader}>
-				<LinearGradient
-					style={styles.planCategorySectionDecor}
-					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }}
-				/>
-				<Text style={styles.planCategorySectionTitle}>{title}</Text>
-			</View>
+			<PlanCategorySectionHeader {...{ title }} />
 			<Text style={styles.planCategorySectionDesc}>{description}</Text>
 			<FlatList
-				style={{ marginTop: vS(16), height: vS(170) }}
+				style={{ marginTop: vS(16), height: vS(250) }}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={item => item.id}
@@ -60,36 +67,12 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 
 const Plans = () => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const [ tabIndexSelected, setTabIndexSelected ] = useState<number>(0)
 	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
-			{/* <View style={styles.header}>
-				<View style={{ width: '100%', paddingHorizontal: hS(24) }}>
-					
-				</View>
-				<FlatList
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					data={plansData}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item, index }) =>
-						<View style={{
-							...styles.planCategory,
-							borderBottomWidth: vS(4),
-							borderBottomColor: primaryHex
-						}}>
-							<Text style={[
-								styles.planCategoryTitle,
-								{ color: index === tabIndexSelected ? darkHex : `rgba(${darkRgb.join(', ')}, .8)` }]}>
-								{item.name}
-							</Text>
-						</View>
-					} />
-			</View> */}
 			<StackHeader title='Plans' />
-			<ScrollView style={styles.main}>
+			<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
 				<PlanCategorySection
 					title='Beginner'
 					description='Skip one meal each day'
@@ -102,6 +85,14 @@ const Plans = () => {
 					title='Advance'
 					description='Keep fasting more than 20 hours'
 					items={plansData[0].items.filter(e => e.group_name === 'Advance').map(e => ({ ...e, categoryName: plansData[0].name }))} />
+
+				{/* <View style={styles.wfull}>
+					<PlanCategorySectionHeader title='Custom' />
+					<View style={styles.customPlan}>
+						<CustomIcon width={hS(18)} height={vS(18)} />
+						<Text style={styles.customPlanText}>Create your own fasting plan</Text>
+					</View>
+				</View> */}
 			</ScrollView>
 			{ Popup && <Popup setVisible={setPopup} /> }
 		</View>
@@ -125,6 +116,12 @@ const styles = StyleSheet.create({
 	},
 
 	header: { width: '100%' },
+
+	planList: {
+		width: hS(16),
+		height: vS(250),
+		borderWidth: 1
+	},
 
 	planCategory: {
 		width: hS(140),

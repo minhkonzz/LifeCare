@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useContext } from 'react'
+import { useContext } from 'react'
 import { View, Text, Pressable, Image, Animated, StyleSheet } from 'react-native'
 import { EditIcon, BackIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
@@ -8,27 +8,20 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
+import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import UpdateWeightsPopup from '@components/shared/popup-content/weights'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
    const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
    const change: number = kilogramsToPounds(currentWeight - startWeight)
    const { setPopup } = useContext<any>(PopupContext)
    const navigation = useNavigation<any>()
-
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: isViewable && 1 || 0, 
-         duration: 840, 
-         useNativeDriver: true
-      }).start()
-   }, [isViewable])
 
    return (
       isViewable && 
@@ -62,7 +55,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
                         outputRange: [-50, 0]
                      }) }]
                   }}>
-						<Text style={styles.current3}>{`${kilogramsToPounds(currentWeight)}`}</Text>
+						<AnimatedText value={kilogramsToPounds(currentWeight)} style={styles.current3} />
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
 							<View style={styles.current6}>
@@ -147,7 +140,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      marginTop: vS(12), 
+      marginTop: vS(23), 
       height: vS(268)
    },
 

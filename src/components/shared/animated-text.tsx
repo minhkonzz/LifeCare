@@ -11,7 +11,7 @@ export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
       setNumber((prevNumber) => {
         if ((value > number && prevNumber >= value) || (value < number && prevNumber <= value)) {
           clearInterval(interval)
-          return prevNumber
+          return value
         }
         return prevNumber + (value < number ? -1 : 1)
       });

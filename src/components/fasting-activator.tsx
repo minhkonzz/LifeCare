@@ -1,4 +1,4 @@
-import { memo, FC, useState, useRef, useEffect, useContext } from 'react'
+import { memo, FC, useState, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
@@ -10,6 +10,7 @@ import { AppState } from '../store'
 import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/datetimes'
 import { getCurrentTimestamp } from '@utils/datetimes'
 import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import StartFastingPopup from '@components/shared/popup-content/start-fasting'
 import fastingStagesData from '@assets/data/fasting-stages.json'
 import LinearGradient from 'react-native-linear-gradient'
@@ -136,24 +137,14 @@ const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: 
 			</AnimatedPressable>
 		)
 	}
-
 	return <></>
 })
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const navigation = useNavigation<any>()
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 	const { startTimeStamp, endTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
 	const { setPopup } = useContext<any>(PopupContext)
 	const isFasting = !!(startTimeStamp && endTimeStamp)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	const handleFastingButton = () => {
 		if (!currentPlan) {

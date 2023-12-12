@@ -7,8 +7,9 @@ import { Circle } from 'react-native-svg'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { timestampToDateTime } from '@utils/datetimes'
-import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
+import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon } from '@assets/icons'
 import { getCurrentTimestamp } from '@utils/datetimes'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import fastingStagesData from '@assets/data/fasting-stages.json'
 
 const { rgb: primaryRgb } = Colors.primary
@@ -23,8 +24,7 @@ const stageIcons = [
 
 const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 1 || 0)).current
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const [ data, setData ] = useState<{ timeElapsed: number, stage: any, nextStageIndex: number } | null>(null)
 	const isFasting: boolean = !!(startTimeStamp && endTimeStamp)
@@ -53,14 +53,6 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		return () => { if (interval) clearInterval(interval) }
 	}, [startTimeStamp])
 
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 0 || 1,
-			duration: 840,
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
-
 	if (!isViewable) return <View style={styles.container} />
 
 	if (data && isFasting) {
@@ -69,6 +61,47 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 		const nextStage = stages[nextStageIndex]
 		const { icon: NextStageIcon, title: nextStageTitle } = nextStage
 		const elapsedPercent: number = Math.floor(timeElapsed / (endTimeStamp - startTimeStamp) * 100)
+		const timeText: string = timestampToDateTime(timeElapsed)
+		
+		const timeExceeded: boolean = timeElapsed - endTimeStamp > 0
+		
+		if (timeExceeded) {
+			const timeExceededText: string = timestampToDateTime(timeElapsed - endTimeStamp)
+			return (
+				<Animated.View
+					style={{
+						...styles.container,
+						opacity: animateValue,
+						transform: [{
+							translateX: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [-50, 0]
+							})
+						}]
+					}}>
+					<View style={styles.main}>
+						<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedPercent}%)`}</Text>
+						<Text style={{...styles.time, fontSize: hS(36) }}>{timeText}</Text>
+						<Text style={styles.elapsedTime}>{`+${timeExceededText}`}</Text>
+						{ nextStageIndex !== -1 && <>
+						<Text style={styles.nextStageTitle}>Next stage</Text>
+						<View style={styles.horz}>
+							<NextStageIcon width={hS(28)} height={vS(28)} />
+							<Text style={styles.nextStageName}>{nextStageTitle}</Text>
+						</View></> }
+					</View>
+					<AnimatedCircularProgress
+						lineCap='round'
+						width={hS(28)}
+						size={hS(320)}
+						rotation={360}
+						fill={100}
+						tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
+						backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
+					/>
+				</Animated.View>
+			)
+		}
 
 		return (
 			<Animated.View
@@ -84,7 +117,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				}}>
 				<View style={styles.main}>
 					<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedPercent}%)`}</Text>
-					<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>{timestampToDateTime(timeElapsed)}</Text>
+					<Text style={{...styles.time, fontSize: hS(36) }}>{timeText}</Text>
 					{ nextStageIndex !== -1 && <>
 					<Text style={styles.nextStageTitle}>Next stage</Text>
 					<View style={styles.horz}>
@@ -119,7 +152,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				}]
 			}}>
 			<View style={styles.main}>
-				<Text style={{...styles.time, fontSize: hS(isFasting ? 36 : 18) }}>Timer not started'</Text>
+				<Text style={{...styles.time, fontSize: hS(18) }}>Timer not started'</Text>
 				<Text style={styles.nextStageTitle}>Press button below to start fasting</Text>
 			</View>
 			<AnimatedCircularProgress
@@ -138,8 +171,8 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 const styles = StyleSheet.create({
 	container: {
 		borderRadius: 500,
-		width: hS(320),
-		height: vS(320),
+		width: hS(328),
+		height: vS(328),
 		justifyContent: 'center',
 		alignItems: 'center',
 		padding: 10,

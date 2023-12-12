@@ -41,7 +41,7 @@ export type DailyWaterState = {
 }
 
 export type Message = {
-   id: number, 
+   id: string, 
    sender: string,
    text: string
 }

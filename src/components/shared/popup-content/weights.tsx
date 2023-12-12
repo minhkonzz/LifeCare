@@ -81,12 +81,12 @@ const Main = ({
 
    const onChangeOption = (index: number) => {
       if (index === 0) {
-         setWeight(poundsToKilograms(weight))
-         setGoal(poundsToKilograms(goal))
+         setWeight(poundsToKilograms(+weight))
+         setGoal(poundsToKilograms(+goal))
          return
       }
-      setWeight(kilogramsToPounds(weight))
-      setGoal(kilogramsToPounds(goal))
+      setWeight(kilogramsToPounds(+weight))
+      setGoal(kilogramsToPounds(+goal))
    }
 
    return (

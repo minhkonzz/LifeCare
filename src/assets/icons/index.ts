@@ -50,6 +50,7 @@ import EyeIcon from './eye.svg'
 import EyeHidedIcon from './eye-hided.svg'
 import CornerArrowUpRightIcon from './corner-arrow-up-right.svg'
 import SpoonForkIcon from './spoon-fork.svg'
+import CustomIcon from './custom.svg'
 
 export {
    AtIcon,
@@ -103,6 +104,7 @@ export {
    EyeIcon,
    EyeHidedIcon,
    CornerArrowUpRightIcon,
-   SpoonForkIcon
+   SpoonForkIcon, 
+   CustomIcon
 }
 
