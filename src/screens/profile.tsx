@@ -7,6 +7,7 @@ import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { PopupContext } from '@contexts/popup'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 import LatestBMI from '@components/profile-latest-bmi'
 import FastingRecords from '@components/profile-fasting-records'
@@ -24,19 +25,10 @@ const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
-const Header = memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const { session, metadata } = useSelector((state: AppState) => state.user)
 	const { setPopup } = useContext<any>(PopupContext)
 	const userId: string | null = session && session.user.id || null
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0,
-			duration: 840,
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	if (userId) {
 		const { name, email } = metadata
@@ -86,17 +78,7 @@ const Header = memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	return <Backup {...{ animateValue }} />
 })
 
-const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 1010, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
-
+const PlanUpgrade = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	return (
 		isViewable &&
 		<AnimatedLinearGradient
@@ -129,17 +111,8 @@ const PlanUpgrade = memo(({ isViewable }: { isViewable: boolean }) => {
 	)	
 })
 
-const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+const TimelineRef = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const navigation = useNavigation<any>()
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 1010, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	return (
 		isViewable && 
@@ -149,18 +122,8 @@ const TimelineRef = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
-const SettingRef = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+const SettingRef = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const navigation = useNavigation<any>()
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			delay: 100, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	return (
 		isViewable && 

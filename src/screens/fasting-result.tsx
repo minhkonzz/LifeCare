@@ -9,8 +9,7 @@ import { resetTimes } from '../store/fasting'
 import { toDateTimeV1 } from '@utils/datetimes'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback-white.svg'
-import EditWhite from '@assets/icons/edit-white.svg'
+import { BackIcon, WhiteEditIcon } from '@assets/icons'
 import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
 import {
@@ -139,7 +138,7 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }}>
-						<EditWhite width={hS(20)} height={vS(20)} />
+						<WhiteEditIcon width={hS(20)} height={vS(20)} />
 					</LinearGradient>
 				</TouchableOpacity>
 			</View>
@@ -194,7 +193,7 @@ export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
 	const session = useSelector((state: AppState) => state.user.session) 
-   const userId: string | null = session && session.user.id || null
+   	const userId: string | null = session && session.user.id || null
 	const { name: planName } = currentPlan
 	const endTimeStamp: number = Date.now()
 	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))

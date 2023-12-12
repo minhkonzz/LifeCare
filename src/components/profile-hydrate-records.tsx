@@ -9,6 +9,7 @@ import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { formatNum } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -94,8 +95,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 	return <View key={index} style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0 }} />
 }
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const waterRecords = useSelector((state: AppState) => state.user.metadata.waterRecords)
 
 	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
@@ -114,14 +114,6 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 	})
 
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0,
-			duration: 840,
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	if (!isViewable) return <View style={styles.container} />
 

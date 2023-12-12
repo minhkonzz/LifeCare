@@ -19,55 +19,6 @@ const { hex: lightHex } = Colors.lightPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-// const Header = memo(({ isViewable }: { isViewable: boolean }) => {
-// 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-// 	const { name } = useSelector((state: AppState) => state.user.metadata)
-
-// 	useEffect(() => {
-// 		Animated.timing(animateValue, {
-// 			toValue: isViewable && 1 || 0, 
-// 			duration: 840, 
-// 			useNativeDriver: true
-// 		}).start()
-// 	}, [isViewable])
-
-// 	return (
-// 		isViewable && 
-// 		<View style={styles.header}>
-// 			<View style={styles.background}>
-// 				<Animated.View style={{...styles.gray, transform: [{ scale: animateValue }] }} />
-// 				<Animated.View style={{...styles.lightBlue, transform: [{ scale: animateValue }] }} />
-// 			</View>
-// 			<View style={styles.userGreet}>
-// 				<View>
-// 					<Animated.Text style={{
-// 						...styles.nameGreet, 
-// 						transform: [{ translateX: animateValue.interpolate({
-// 							inputRange: [0, 1], 
-// 							outputRange: [-50, 0]
-// 						}) }]
-// 					}}>
-// 						{`Hi, ${name}`}
-// 					</Animated.Text>
-// 					<Animated.Text style={{
-// 						...styles.titleGreet, 
-// 						transform: [{ translateX: animateValue.interpolate({
-// 							inputRange: [0, 1], 
-// 							outputRange: [-50, 0]
-// 						}) }]
-// 					}}>
-// 						Welcome back!
-// 					</Animated.Text>
-// 				</View>
-// 				{/* <Animated.Image 
-// 					style={{...styles.userAvatar, transform: [{ scale: animateValue }] }} 
-// 					source={require('../assets/images/UserAvatar.png')} 
-// 				/> */}
-// 			</View>
-// 		</View> || <View style={styles.header} />
-// 	)
-// })
-
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { name } = useSelector((state: AppState) => state.user.metadata)
 
@@ -107,71 +58,6 @@ const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 		</View> || <View style={styles.header} />
 	)
 })
-
-// const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
-// 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-// 	const navigation = useNavigation<any>()
-
-// 	useEffect(() => {
-// 		Animated.timing(animateValue, {
-// 			toValue: isViewable && 1 || 0, 
-// 			duration: 920, 
-// 			useNativeDriver: true
-// 		}).start()
-// 	}, [isViewable])
-
-// 	return (
-// 		isViewable && 
-// 		<AnimatedPressable 
-// 			style={{...styles.chatbotAdvertise, opacity: animateValue }}
-// 			onPress={() => navigation.navigate('fastai-overview')}>
-// 			<LinearGradient 
-// 				style={styles.chatbotAdvertiseBg}
-// 				colors={[lightHex, darkHex]}
-// 				start={{ x: 1, y: 0 }}
-// 				end={{ x: .65, y: 1 }}>  
-// 				<View style={styles.chatbotAdvertiseMain}>
-// 					<Animated.Text style={{
-// 						...styles.chatbotAdvertiseTitle, 
-// 						opacity: animateValue, 
-// 						transform: [{ translateX: animateValue.interpolate({
-// 							inputRange: [0, 1], 
-// 							outputRange: [-50, 0]
-// 						}) }]
-// 					}}>
-// 						Try our FastAI Chatbot
-// 					</Animated.Text>
-// 					<Animated.Text style={{
-// 						...styles.chatbotAdvertiseDesc, 
-// 						opacity: animateValue, 
-// 						transform: [{ translateX: animateValue.interpolate({
-// 							inputRange: [0, 1], 
-// 							outputRange: [-50, 0]
-// 						}) }]
-// 					}}>
-// 						Lorem Ipsum is simply dummy text of the printing and typesetting industry
-// 					</Animated.Text>
-// 					<AnimatedTouchableOpacity 
-// 						style={{
-// 							...styles.chatbotAdvertiseButton,
-// 							opacity: animateValue, 
-// 							transform: [{ translateY: animateValue.interpolate({
-// 								inputRange: [0, 1],
-// 								outputRange: [20, 0]
-// 							}) }]
-// 						}} 
-// 						activeOpacity={.8}>
-// 						<Text style={styles.chatbotAdvertiseButtonText}>Glad to try</Text>
-// 					</AnimatedTouchableOpacity>
-// 				</View>
-// 				<View style={styles.chatbotAdvertiseBottom}>
-// 					<Image source={require('../assets/lottie/FastAIBotInterface.gif')} style={styles.animatedChatbotInterface} />
-// 					<Text style={styles.gptRef}>Powered by GPT3.5</Text>
-// 				</View>
-// 			</LinearGradient>
-// 		</AnimatedPressable> || <View style={styles.chatbotAdvertise} />
-// 	)
-// })
 
 const ChatBotAdvertise = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const navigation = useNavigation<any>()
@@ -248,16 +134,6 @@ const ChatBotAdvertise = withVisiblitySensor(({ isViewable, animateValue }: { is
 		</AnimatedPressable> || <View style={styles.chatbotAdvertise} />
 	)
 })
-
-// const RowMetrics = ({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
-// 	return (
-// 		isViewable && 
-// 		<View style={styles.metricRow}>
-// 			<BMITrack {...{ animateValue }} />
-// 			<WaterTrack {...{ animateValue }} />
-// 		</View> || <View style={styles.metricRow} />
-// 	)
-// }
 
 const RowMetrics = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	return (

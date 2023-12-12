@@ -8,6 +8,7 @@ import { AppState } from '../store'
 import { getBMI } from '@utils/fomular'
 import { getBMIStatus } from '@utils/helpers'
 import { EditIcon, PolygonIcon } from '@assets/icons'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
@@ -15,21 +16,12 @@ import bmiRangesData from '@assets/data/bmi-range-data.json'
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const { setPopup } = useContext<any>(PopupContext)
 	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const bmiStatus: string = getBMIStatus(bmiValue)
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
 	const cursorAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0,
-			duration: 920,
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	return (
 		isViewable && 

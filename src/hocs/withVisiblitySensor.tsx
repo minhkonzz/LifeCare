@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, ComponentType, MemoExoticComponent } from 'react'
+import { memo, useRef, useEffect, ComponentType } from 'react'
 import { Animated } from 'react-native'
 
 export default <P extends object>(BaseComponent: ComponentType<P>) => {
