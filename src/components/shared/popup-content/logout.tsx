@@ -1,42 +1,40 @@
-import { memo, Dispatch, SetStateAction, useRef } from 'react'
-import { Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { Dispatch, SetStateAction } from 'react'
+import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import Popup from '../popup'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import UserService from '@services/user'
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+export default withPopupBehavior(
+   ({ 
+      setVisible, 
+      onConfirm
+   }: { 
+      setVisible: Dispatch<SetStateAction<any>>,
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }) => {
 
-   const onSignOut = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start(async() => {
+      const onSignOut = async () => {
          await UserService.signOut()
          setVisible(null)
-      })
-   }
+      }
 
-   return (
-      <Popup {...{
-         type: 'centered',
-         title: 'Logout',
-         width: hS(300),
-         animateValue,
-         setVisible
-      }}>
-         <Text style={styles.title}>Are you sure want to logout this account</Text>
-         <TouchableOpacity
-            style={styles.logoutButton}
-            activeOpacity={.8}
-            onPress={onSignOut}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-         </TouchableOpacity>
-      </Popup>
-   )
-})
+      return (
+         <>
+            <Text style={styles.title}>Are you sure want to logout this account</Text>
+            <TouchableOpacity
+               style={styles.logoutButton}
+               activeOpacity={.8}
+               onPress={() => onConfirm(onSignOut)}>
+               <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'centered',
+   'Logout',
+   hS(300)
+)
 
 const styles = StyleSheet.create({
    title: {

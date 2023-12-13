@@ -39,10 +39,6 @@ export interface NutritionEditorProps {
    children?: ReactNode
 }
 
-export interface RadioOptionsPopupProps {
-   setVisible: Dispatch<SetStateAction<boolean>>
-}
-
 export interface NetworkState {
    isOnline: boolean
 }

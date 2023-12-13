@@ -1,10 +1,5 @@
 import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
-import {
-   Text,
-   StyleSheet, 
-   TouchableOpacity,
-   Animated
-} from 'react-native'
+import { Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
@@ -15,7 +10,7 @@ const { hex: darkHex } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
-   const navigation = useNavigation()
+   const navigation = useNavigation<any>()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = () => {

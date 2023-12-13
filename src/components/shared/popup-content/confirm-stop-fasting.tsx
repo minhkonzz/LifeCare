@@ -1,51 +1,50 @@
-import { memo, useRef, Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction } from 'react'
+import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useDispatch } from 'react-redux'
-import { resetTimes } from '../../../store/fasting'
+import { resetTimes } from '@store/fasting'
 import { useNavigation } from '@react-navigation/native'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
-import Popup from '../popup'
-
-import {
-   Text,
-   StyleSheet, 
-   TouchableOpacity,
-   Animated
-} from 'react-native'
 
 const { hex: darkHex } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const navigation = useNavigation<any>()
+export default withPopupBehavior(
+   ({ 
+      setVisible, 
+      onConfirm
+   }: { 
+      setVisible: Dispatch<SetStateAction<any>>, 
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }) => {
+      const navigation = useNavigation<any>()
 
-   const onConfirm = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start(({ finished }) => {
-         navigation.navigate('fasting-result')
-      })
-   }
+      const onSave = async () => { 
+         setVisible(false)
+         navigation.navigate('fasting-result') 
+      }
 
-   return (
-      <Popup {...{ type: 'centered', title: 'Confirm', width: hS(300), animateValue, setVisible }}>
-         <Text style={styles.content}>Are you sure to end fasting?</Text>
-         <TouchableOpacity style={styles.button} activeOpacity={.7} onPress={onConfirm}>
-            <LinearGradient 
-               style={styles.buttonBg}
-               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .5, y: 1 }}>
-               <Text style={styles.buttonText}>End fasting now</Text>
-            </LinearGradient>
-         </TouchableOpacity>
-      </Popup>
-   )
-})
+      return (
+         <>
+            <Text style={styles.content}>Are you sure to end fasting?</Text>
+            <TouchableOpacity style={styles.button} activeOpacity={.7} onPress={() => onConfirm(onSave)}>
+               <LinearGradient 
+                  style={styles.buttonBg}
+                  colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                  start={{ x: .5, y: 0 }}
+                  end={{ x: .5, y: 1 }}>
+                  <Text style={styles.buttonText}>End fasting now</Text>
+               </LinearGradient>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'centered',
+   'Confirm',
+   hS(300)
+)
 
 const styles = StyleSheet.create({
    button: {

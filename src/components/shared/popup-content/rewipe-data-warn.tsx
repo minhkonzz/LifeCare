@@ -1,40 +1,40 @@
-import { memo, Dispatch, SetStateAction, useRef } from 'react'
-import { Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { Dispatch, SetStateAction } from 'react'
+import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import Popup from '@components/shared/popup'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+export default withPopupBehavior(
+   ({ 
+      setVisible, 
+      onConfirm
+   }: { 
+      setVisible: Dispatch<SetStateAction<any>>,
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }) => {
 
-   const onConfirm = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start()
-   }
+      const onSave = async () => {
+         setVisible(null)
+      }
 
-   return (
-      <Popup {...{
-         type: 'centered',
-         title: 'Warning',
-         width: hS(264),
-         animateValue, 
-         setVisible
-      }}>
-         <Text style={styles.title}>
-            Please backup or synchronize your all data before this action because you cannot recover current data after rewipe
-         </Text>
-         <TouchableOpacity
-            style={styles.rewipeButton}
-            onPress={onConfirm}
-            activeOpacity={.8}>
-            <Text style={styles.rewipeButtonText}>Rewipe all data</Text>
-         </TouchableOpacity>
-      </Popup>  
-   )
-})
+      return (
+         <>
+            <Text style={styles.title}>
+               Please backup or synchronize your all data before this action because you cannot recover current data after rewipe
+            </Text>
+            <TouchableOpacity
+               style={styles.rewipeButton}
+               onPress={() => onConfirm(onSave)}
+               activeOpacity={.8}>
+               <Text style={styles.rewipeButtonText}>Rewipe all data</Text>
+            </TouchableOpacity>
+         </>  
+      )
+   },
+   'centered', 
+   'Warning',
+   hS(264)
+)
 
 const styles = StyleSheet.create({
    title: {

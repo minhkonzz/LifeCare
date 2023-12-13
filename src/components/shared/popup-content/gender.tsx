@@ -1,33 +1,33 @@
-import { memo, useState, useRef } from 'react'
-import { View, Text, Pressable, Animated, StyleSheet, TouchableOpacity } from 'react-native'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../../../store'
+import { AppState } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { RadioOptionsPopupProps } from '@utils/interfaces'
-import { updateMetadata } from '../../../store/user'
+import { updateMetadata } from '@store/user'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import UserService from '@services/user'
-import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 
 const genders: string[] = ['Male', 'Female', 'Other']
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ setVisible }: RadioOptionsPopupProps): JSX.Element => {
-   const dispatch = useDispatch()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { session, metadata } = useSelector((state: AppState) => state.user)
-   const userId: string | null = session && session?.user.id || null
-   const { gender } = metadata
-   const [ currentGender, setCurrentGender ] = useState<string>(gender)
+export default withPopupBehavior(
+   ({ 
+      setVisible, 
+      onConfirm
+   }: {
+      setVisible: Dispatch<SetStateAction<any>>, 
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }): JSX.Element => {
+      const dispatch = useDispatch()
+      const { session, metadata } = useSelector((state: AppState) => state.user)
+      const userId: string | null = session && session?.user.id || null
+      const { gender } = metadata
+      const [ currentGender, setCurrentGender ] = useState<string>(gender)
 
-   const onSave = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start(async() => {
+      const onSave = async () => {
          const payload = { gender: currentGender }
          if (userId) {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
@@ -35,53 +35,50 @@ export default memo(({ setVisible }: RadioOptionsPopupProps): JSX.Element => {
          }
          dispatch(updateMetadata(payload))
          setVisible(false)
-      })
-   }
-
-   return (
-      <Popup {...{
-         type: 'centered',
-         width: hS(280),
-         title: 'Gender',
-         animateValue,
-         setVisible 
-      }}>
-      {
-         genders.map((e, i) => 
-            <Pressable 
-               key={i} 
-               style={{...styles.option, marginTop: i === 0 ? 0 : vS(33) }}
-               onPress={() => setCurrentGender(e)}>
-               <Text style={styles.optionText}>{e}</Text>
-               <View style={styles.circleBound}>
-               { 
-                  currentGender === e && 
-                  <LinearGradient 
-                     style={styles.primaryIndicator}
-                     colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-                     start={{ x: .5, y: 0 }}
-                     end={{ x: .5, y: 1 }}
-                  />
-               }
-               </View>
-            </Pressable>
-         )
       }
-         <TouchableOpacity
-            onPress={onSave}
-            activeOpacity={.7}
-            style={styles.button}>
-            <LinearGradient
-               style={styles.buttonBg}
-               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .5, y: 1 }}>
-               <Text style={styles.buttonText}>Save</Text>
-            </LinearGradient>
-         </TouchableOpacity>
-      </Popup>
-   )
-})
+
+      return (
+         <>
+            {
+               genders.map((e, i) => 
+                  <Pressable 
+                     key={i} 
+                     style={{...styles.option, marginTop: i === 0 ? 0 : vS(33) }}
+                     onPress={() => setCurrentGender(e)}>
+                     <Text style={styles.optionText}>{e}</Text>
+                     <View style={styles.circleBound}>
+                     { 
+                        currentGender === e && 
+                        <LinearGradient 
+                           style={styles.primaryIndicator}
+                           colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                           start={{ x: .5, y: 0 }}
+                           end={{ x: .5, y: 1 }}
+                        />
+                     }
+                     </View>
+                  </Pressable>
+               )
+            }
+            <TouchableOpacity
+               onPress={() => onConfirm(onSave)}
+               activeOpacity={.7}
+               style={styles.button}>
+               <LinearGradient
+                  style={styles.buttonBg}
+                  colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                  start={{ x: .5, y: 0 }}
+                  end={{ x: .5, y: 1 }}>
+                  <Text style={styles.buttonText}>Save</Text>
+               </LinearGradient>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'centered',
+   'Gender',
+   hS(280)
+)
 
 const styles = StyleSheet.create({
    option: {

@@ -1,14 +1,14 @@
-import { memo, useState, ReactNode, Dispatch, useRef, SetStateAction } from 'react'
-import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { useState, ReactNode, Dispatch, SetStateAction } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../../../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata } from '../../../store/user'
 import { poundsToKilograms, kilogramsToPounds, centimeterToInch, inchToCentimeter } from '@utils/fomular'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
-import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 
@@ -16,26 +16,22 @@ const options: Array<string> = ["cm/kg", "ft/lb"]
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { rgb: darkRgb } = Colors.darkPrimary
 
-const Main = ({ 
-   animateValue,
-   setVisible  
-}: { 
-   animateValue: Animated.Value, 
-   setVisible: Dispatch<SetStateAction<any>>
-}) => {
-   const dispatch = useDispatch()
-   const { currentHeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
-   const session = useSelector((state: AppState) => state.user.session) 
-   const userId: string | null = session && session.user.id || null
-   const [ height, setHeight ] = useState<number>(currentHeight)
-   const [ weight, setWeight ] = useState<number>(currentWeight)
+export default withPopupBehavior(
+   ({ 
+      setVisible,
+      onConfirm
+   }: { 
+      setVisible: Dispatch<SetStateAction<ReactNode>>,
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }) => {
+      const dispatch = useDispatch()
+      const { currentHeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+      const session = useSelector((state: AppState) => state.user.session) 
+      const userId: string | null = session && session.user.id || null
+      const [ height, setHeight ] = useState<number>(currentHeight)
+      const [ weight, setWeight ] = useState<number>(currentWeight)
 
-   const onSave = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start(async() => {
+      const onSave = async () => {
          const payload = { currentHeight: height, currentWeight: weight }
          if (userId) {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
@@ -43,69 +39,57 @@ const Main = ({
          }
          dispatch(updateMetadata(payload))
          setVisible(null)
-      })
-   }
-
-   const onChangeOption = (index: number) => {
-      if (index === 0) {
-         setHeight(inchToCentimeter(height))
-         setWeight(poundsToKilograms(weight))
-         return
       }
-      setHeight(centimeterToInch(height))
-      setWeight(kilogramsToPounds(weight))
-   }
 
-   return (
-      <>
-         <PrimaryToggleValue additionalStyles={styles.toggle} {...{ options, onChangeOption }} />
-         <View style={styles.input}>
-            <Text style={styles.inputTitle}>Height</Text>
-            <MeasureInput 
-               contentCentered
-               symb='cm' 
-               value={height}
-               onChangeText={t => setHeight(+t)} />
-         </View>
-         <View style={styles.input}>
-            <Text style={styles.inputTitle}>Weight</Text>
-            <MeasureInput
-               contentCentered 
-               symb='kg' 
-               value={weight} 
-               onChangeText={t => setWeight(+t)}/>
-         </View>
-         <TouchableOpacity
-            onPress={onSave}
-            activeOpacity={.7}
-            style={styles.button}>
-            <LinearGradient
-               style={styles.buttonBg}
-               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .5, y: 1 }}>
-               <Text style={styles.buttonText}>Save</Text>
-            </LinearGradient>
-         </TouchableOpacity>
-      </>
-   )
-}
+      const onChangeOption = (index: number) => {
+         if (index === 0) {
+            setHeight(inchToCentimeter(height))
+            setWeight(poundsToKilograms(weight))
+            return
+         }
+         setHeight(centimeterToInch(height))
+         setWeight(kilogramsToPounds(weight))
+      }
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }) => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+      return (
+         <>
+            <PrimaryToggleValue additionalStyles={styles.toggle} {...{ options, onChangeOption }} />
+            <View style={styles.input}>
+               <Text style={styles.inputTitle}>Height</Text>
+               <MeasureInput 
+                  contentCentered
+                  symb='cm' 
+                  value={height}
+                  onChangeText={t => setHeight(+t)} />
+            </View>
+            <View style={styles.input}>
+               <Text style={styles.inputTitle}>Weight</Text>
+               <MeasureInput
+                  contentCentered 
+                  symb='kg' 
+                  value={weight} 
+                  onChangeText={t => setWeight(+t)}/>
+            </View>
+            <TouchableOpacity
+               onPress={() => onConfirm(onSave)}
+               activeOpacity={.7}
+               style={styles.button}>
+               <LinearGradient
+                  style={styles.buttonBg}
+                  colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                  start={{ x: .5, y: 0 }}
+                  end={{ x: .5, y: 1 }}>
+                  <Text style={styles.buttonText}>Save</Text>
+               </LinearGradient>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'centered',
+   'Weight & Height',
+   hS(315)
 
-   return (
-      <Popup {...{
-         type: 'centered', 
-         width: hS(315),
-         title: 'Height & Weight', 
-         animateValue,
-         setVisible
-      }}>
-         <Main {...{ animateValue, setVisible }} />
-      </Popup>
-   )
-})
+)
 
 const styles = StyleSheet.create({
    button: {

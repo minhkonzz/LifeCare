@@ -1,107 +1,89 @@
-import { memo, useState, Dispatch, SetStateAction, useRef } from 'react'
-import { AppState } from '../../../store'
+import { useState, Dispatch, SetStateAction } from 'react'
+import { AppState } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
-import { updateWeightRemind } from '../../../store/setting'
+import { updateWeightRemind } from '@store/setting'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
-import Popup from '../popup'
 import TimeInput from '@components/time-input'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
-const Main = ({ 
-   animateValue, 
-   setVisible 
-}: {
-   animateValue: Animated.Value,
-   setVisible: Dispatch<SetStateAction<boolean>>
-}) => {
-   const repeatWeight = useSelector((state: AppState) => state.setting.reminders.repeatWeight)
-   const { days, h, m } = repeatWeight
-   const [ hours, setHours ] = useState<number>(h)
-   const [ mins, setMins ] = useState<number>(m)
-   const dispatch = useDispatch()
+export default withPopupBehavior(
+   ({ 
+      setVisible,
+      onConfirm
+   }: { 
+      setVisible: Dispatch<SetStateAction<any>>, 
+      onConfirm: (afterDisappear: () => Promise<void>) => void
+   }) => {
+      const repeatWeight = useSelector((state: AppState) => state.setting.reminders.repeatWeight)
+      const { days, h, m } = repeatWeight
+      const [ hours, setHours ] = useState<number>(h)
+      const [ mins, setMins ] = useState<number>(m)
+      const dispatch = useDispatch()
 
-   const onSave = () => {
-      Animated.timing(animateValue, {
-         toValue: 0,
-         duration: 320, 
-         useNativeDriver: true
-      }).start(({ finished }) => {
-         // missing validate input
+      const onSave = async () => {
          setVisible(false)
-         dispatch(updateWeightRemind({ days, h: hours, m: mins }))
-      })
-   }
-
-   const onSelectDay = (day: string) => {
-      if (days.includes(day)) {
-         const newDays = days.filter(e => e !== day)
-         dispatch(updateWeightRemind({ days: newDays, h, m }))
-         return
+         dispatch(updateWeightRemind({ days, h: hours, m: mins }))   
       }
-      const newDays = days.push(day)
-      dispatch(updateWeightRemind({ days: newDays, h, m }))
-   }
 
-   return (
-      <>
-         <View style={styles.days}>
-         {
-            ['Sun', 'Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat']
-            .map((e, i) => 
-               <Pressable key={i} onPress={() => onSelectDay(e)}>
-               {
-                  days.includes(e) && 
-                  <LinearGradient
-                     style={styles.day}
-                     colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
-                     start={{ x: .5, y: 0 }}
-                     end={{ x: .52, y: .5 }}>
-                     <Text style={{...styles.dayText, color: '#fff'}}>{e}</Text>
-                  </LinearGradient> || 
-                  <View style={styles.day}>
-                     <Text style={styles.dayText}>{e}</Text>
-                  </View>
-               }
-               </Pressable>
-            )
+      const onSelectDay = (day: string) => {
+         if (days.includes(day)) {
+            const newDays = days.filter(e => e !== day)
+            dispatch(updateWeightRemind({ days: newDays, h, m }))
+            return
          }
-         </View>
-         <TimeInput {...{ hours, setHours, mins, setMins }} />
-         <TouchableOpacity
-            onPress={onSave}
-            activeOpacity={.7}
-            style={styles.button}>
-            <LinearGradient
-               style={styles.buttonBg}
-               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .5, y: 1 }}>
-               <Text style={styles.buttonText}>Save</Text>
-            </LinearGradient>
-         </TouchableOpacity>
-      </>
-   )
-}
+         const newDays = days.push(day)
+         dispatch(updateWeightRemind({ days: newDays, h, m }))
+      }
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-
-   return (
-      <Popup {...{
-         type: 'bottomsheet',
-         title: 'Repeat current weight',
-         animateValue,
-         setVisible
-      }}>
-         <Main {...{ animateValue, setVisible }} />
-      </Popup>
-   )
-})
+      return (
+         <>
+            <View style={styles.days}>
+            {
+               ['Sun', 'Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat']
+               .map((e, i) => 
+                  <Pressable key={i} onPress={() => onSelectDay(e)}>
+                  {
+                     days.includes(e) && 
+                     <LinearGradient
+                        style={styles.day}
+                        colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
+                        start={{ x: .5, y: 0 }}
+                        end={{ x: .52, y: .5 }}>
+                        <Text style={{...styles.dayText, color: '#fff'}}>{e}</Text>
+                     </LinearGradient> || 
+                     <View style={styles.day}>
+                        <Text style={styles.dayText}>{e}</Text>
+                     </View>
+                  }
+                  </Pressable>
+               )
+            }
+            </View>
+            <TimeInput {...{ hours, setHours, mins, setMins }} />
+            <TouchableOpacity
+               onPress={() => onConfirm(onSave)}
+               activeOpacity={.7}
+               style={styles.button}>
+               <LinearGradient
+                  style={styles.buttonBg}
+                  colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                  start={{ x: .5, y: 0 }}
+                  end={{ x: .5, y: 1 }}>
+                  <Text style={styles.buttonText}>Save</Text>
+               </LinearGradient>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'bottomsheet',
+   'Repeat current weight'
+)
 
 const styles = StyleSheet.create({
    hrz: {

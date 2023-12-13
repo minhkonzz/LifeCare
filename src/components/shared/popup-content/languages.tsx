@@ -1,80 +1,70 @@
-import { memo, useState, useRef } from 'react'
-import Popup from '@components/shared/popup'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { RadioOptionsPopupProps } from '@utils/interfaces'
+import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 
-import {
-   View, 
-   Text,
-   Pressable,
-   Animated,
-   StyleSheet,
-   TouchableOpacity
-} from 'react-native'
-
+const options: string[] = ['Vietnamese', 'Korean', 'English']
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ options, setVisible }: RadioOptionsPopupProps): JSX.Element => {
-   const [ selectedIndex, setSelectedIndex ] = useState<number>(2)
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+export default withPopupBehavior(
+   ({ 
+      setVisible, 
+      onConfirm
+   }: {
+      setVisible: Dispatch<SetStateAction<any>>,
+      onConfirm: (afterDisappear: () => Promise<void>) => void 
+   }) => {
+      const [ selectedIndex, setSelectedIndex ] = useState<number>(2)
 
-   const onSave = () => {
-      Animated.timing(animateValue, {
-         toValue: 0, 
-         duration: 320, 
-         useNativeDriver: true
-      }).start(({ finished }) => {
-         // do something with selected language
-      })
-   }
-
-   return (
-      <Popup {...{
-         type: 'centered',
-         width: hS(280),
-         title: 'Language',
-         animateValue,
-         setVisible 
-      }}>
-      {
-         options.map((e, i) => 
-            <Pressable 
-               key={i} 
-               style={[styles.option, { marginTop: (i === 0 ? 0 : vS(33)) }]}
-               onPress={() => setSelectedIndex(i)}>
-               <Text style={styles.optionText}>{e}</Text>
-               <View style={styles.circleBound}>
-               { 
-                  selectedIndex === i && 
-                  <LinearGradient 
-                     style={styles.primaryIndicator}
-                     colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-                     start={{ x: .5, y: 0 }}
-                     end={{ x: .5, y: 1 }}
-                  />
-               }
-               </View>
-            </Pressable>
-         )
+      const onSave = async () => {
+         setVisible(null)
       }
-         <TouchableOpacity
-            onPress={onSave}
-            activeOpacity={.7}
-            style={styles.button}>
-            <LinearGradient
-               style={styles.buttonBg}
-               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .5, y: 1 }}>
-               <Text style={styles.buttonText}>Save</Text>
-            </LinearGradient>
-         </TouchableOpacity>
-      </Popup>
-   )
-})
+
+      return (
+         <>
+            {
+               options.map((e, i) => 
+                  <Pressable 
+                     key={i} 
+                     style={[styles.option, { marginTop: (i === 0 ? 0 : vS(33)) }]}
+                     onPress={() => setSelectedIndex(i)}>
+                     <Text style={styles.optionText}>{e}</Text>
+                     <View style={styles.circleBound}>
+                     { 
+                        selectedIndex === i && 
+                        <LinearGradient 
+                           style={styles.primaryIndicator}
+                           colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                           start={{ x: .5, y: 0 }}
+                           end={{ x: .5, y: 1 }}
+                        />
+                     }
+                     </View>
+                  </Pressable>
+               )
+            }
+            <TouchableOpacity
+               onPress={() => onConfirm(onSave)}
+               activeOpacity={.7}
+               style={styles.button}>
+               <LinearGradient
+                  style={styles.buttonBg}
+                  colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                  start={{ x: .5, y: 0 }}
+                  end={{ x: .5, y: 1 }}>
+                  <Text style={styles.buttonText}>Save</Text>
+               </LinearGradient>
+            </TouchableOpacity>
+         </>
+      )
+   },
+   'centered',
+   'Languages',
+   hS(280)
+)
 
 const styles = StyleSheet.create({
    option: {

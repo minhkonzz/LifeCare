@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
@@ -6,6 +6,7 @@ import { AppState } from '../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
+import { PopupContext } from '@contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
@@ -19,8 +20,7 @@ const settingRowValues = {}
 
 export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
-	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
+	const { setPopup } = useContext<any>(PopupContext)
 
 	const { 
 		notification,  
@@ -46,7 +46,7 @@ export default (): JSX.Element => {
 		settingRowCallbacks['notification'] = () => { dispatch(updateNotififcation()) }
 		settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
 		settingRowCallbacks['widgets'] = () => {}
-		settingRowCallbacks['language'] = () => { setLangPopupVisible(true) }
+		settingRowCallbacks['language'] = () => { setPopup(LanguagePopup) }
 		settingRowCallbacks['dark-mode'] = () => { dispatch(updateDarkMode()) }
 		settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
 		settingRowCallbacks['privacy-policy'] = () => {}
@@ -105,21 +105,19 @@ export default (): JSX.Element => {
 					Version 1.0.0
 				</Animated.Text>
 				<AnimatedTouchableOpacity 
-					onPress={() => setRewipeDataPopupVisible(true)}
+					onPress={() => setPopup(RewipeDataWarnPopup)}
 					activeOpacity={.7}
 					style={{
 						...styles.rewipeDataButton, 
 						opacity: animateValue,
 						transform: [{ translateX: animateValue.interpolate({
 							inputRange: [0, 1], 
-							outputRange: [-100, 0]
+							outputRange: [-50, 0]
 						}) }]
 					}}>
 					<Text style={styles.rewipeDataButtonText}>Rewipe all data</Text>
 				</AnimatedTouchableOpacity>
 			</View>
-			{ rewipeDataPopupVisible && <RewipeDataWarnPopup setVisible={setRewipeDataPopupVisible} /> }
-			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)
 }
