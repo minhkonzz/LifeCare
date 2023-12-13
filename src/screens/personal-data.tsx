@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useContext } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { useNavigation } from '@react-navigation/native'
+import { PopupContext } from '@contexts/popup'
 import GenderPopup from '@components/shared/popup-content/gender'
 import AgePopup from '@components/shared/popup-content/age'
 import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
@@ -19,11 +20,12 @@ const settingRowValues = {}
 // const options: string[] = ['cm/kg', 'in/lb']
 
 const Main = () => {
-	const [ genderPopupVisible, setGenderPopupVisible ] = useState<boolean>(false)
-	const [ agePopupVisible, setAgePopupVisible ] = useState<boolean>(false)
-	const [ currentWeightPopupVisible, setCurrentWeightPopupVisible ] = useState<boolean>(false)
-	const [ heightPopupVisible, setHeightPopupVisible ] = useState<boolean>(false)
-	const [ targetWeightPopupVisible, setTargetWeightPopupVisible ] = useState<boolean>(false)
+	// const [ genderPopupVisible, setGenderPopupVisible ] = useState<boolean>(false)
+	// const [ agePopupVisible, setAgePopupVisible ] = useState<boolean>(false)
+	// const [ currentWeightPopupVisible, setCurrentWeightPopupVisible ] = useState<boolean>(false)
+	// const [ heightPopupVisible, setHeightPopupVisible ] = useState<boolean>(false)
+	// const [ targetWeightPopupVisible, setTargetWeightPopupVisible ] = useState<boolean>(false)
+	const { setPopup } = useContext<any>(PopupContext)
 	const navigation = useNavigation<any>()
 
 	const {
@@ -36,11 +38,11 @@ const Main = () => {
 	} = useSelector((state: AppState) => state.user.metadata)
 
 	if (Object.keys(settingRowCallbacks).length === 0) {
-		settingRowCallbacks['gender'] = () => { setGenderPopupVisible(true) }
-		settingRowCallbacks['age'] = () => { setAgePopupVisible(true) }
-		settingRowCallbacks['current-height'] = () => { setHeightPopupVisible(true) }
-		settingRowCallbacks['current-weight'] = () => { setCurrentWeightPopupVisible(true) } 
-		settingRowCallbacks['target-weight'] = () => { setTargetWeightPopupVisible(true) }
+		settingRowCallbacks['gender'] = () => { setPopup(GenderPopup) }
+		settingRowCallbacks['age'] = () => { setPopup(AgePopup) }
+		settingRowCallbacks['current-height'] = () => { setPopup(HeightPopup) }
+		settingRowCallbacks['current-weight'] = () => { setPopup(CurrentWeightPopup) } 
+		settingRowCallbacks['target-weight'] = () => { setPopup(TargetWeightPopup) }
 		settingRowCallbacks['goal'] = () => { navigation.navigate('goal') }
 	}
 
@@ -82,11 +84,11 @@ const Main = () => {
 				)
 			}
 			</View>
-			{ genderPopupVisible && <GenderPopup setVisible={setGenderPopupVisible} /> }
+			{/* { genderPopupVisible && <GenderPopup setVisible={setGenderPopupVisible} /> }
 			{ agePopupVisible && <AgePopup setVisible={setAgePopupVisible} /> }
 			{ currentWeightPopupVisible && <CurrentWeightPopup setVisible={setCurrentWeightPopupVisible} /> }
 			{ heightPopupVisible && <HeightPopup setVisible={setHeightPopupVisible} /> }
-			{ targetWeightPopupVisible && <TargetWeightPopup setVisible={setTargetWeightPopupVisible} /> }
+			{ targetWeightPopupVisible && <TargetWeightPopup setVisible={setTargetWeightPopupVisible} /> } */}
 		</>
 	)
 }
@@ -110,7 +112,5 @@ const styles = StyleSheet.create({
 
 	wfull: { width: '100%' },
 
-	primaryToggle: {
-		marginBottom: vS(28)
-	}
+	primaryToggle: { marginBottom: vS(28) }
 })

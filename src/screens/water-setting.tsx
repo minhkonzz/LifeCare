@@ -1,4 +1,5 @@
-import { memo, useState, useRef, useEffect, Dispatch, SetStateAction } from 'react'
+import { memo, useState, useRef, useEffect, useContext } from 'react'
+import { View, Text, StyleSheet, Pressable, Animated, Platform, StatusBar } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
@@ -6,22 +7,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { updateCupsize } from '../store/water'
 import { formatNum } from '@utils/helpers'
+import { PopupContext } from '@contexts/popup'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
 import WaterGoalPopup from '@components/shared/popup-content/water-setting-goal'
 import WaterStartRemindPopup from '@components/shared/popup-content/water-setting-start-remind'
 import WaterEndRemindPopup from '@components/shared/popup-content/water-setting-end-remind'
 import WaterIntervalPopup from '@components/shared/popup-content/water-setting-interval'
-
-import {
-	View,
-	Text,
-	StyleSheet,
-	Pressable,
-	Animated,
-	Platform,
-	StatusBar
-} from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -60,17 +52,112 @@ const CupSizes = memo(() => {
 	)
 })
 
-const Main = memo(({
-	setWaterGoalPopupVisible,
-	setWaterStartRemindPopupVisible,
-	setWaterEndRemindPopupVisible,
-	setWaterIntervalPopupVisible
-}: {
-	setWaterGoalPopupVisible: Dispatch<SetStateAction<boolean>>,
-	setWaterStartRemindPopupVisible: Dispatch<SetStateAction<boolean>>,
-	setWaterEndRemindPopupVisible: Dispatch<SetStateAction<boolean>>,
-	setWaterIntervalPopupVisible: Dispatch<SetStateAction<boolean>>
-}) => {
+// const Main = memo(({
+// 	setWaterGoalPopupVisible,
+// 	setWaterStartRemindPopupVisible,
+// 	setWaterEndRemindPopupVisible,
+// 	setWaterIntervalPopupVisible
+// }: {
+// 	setWaterGoalPopupVisible: Dispatch<SetStateAction<boolean>>,
+// 	setWaterStartRemindPopupVisible: Dispatch<SetStateAction<boolean>>,
+// 	setWaterEndRemindPopupVisible: Dispatch<SetStateAction<boolean>>,
+// 	setWaterIntervalPopupVisible: Dispatch<SetStateAction<boolean>>
+// }) => {
+// 	const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+// 	const [ remindOn, setRemindOn ] = useState<boolean>(false)
+// 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+// 	const toggleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+
+// 	const {
+// 		startWater,
+// 		endWater,
+// 		waterInterval
+// 	} = useSelector((state: AppState) => state.setting.reminders)
+
+// 	const { h: startWaterHour, m: startWaterMin } = startWater
+// 	const { h: endWaterHour, m: endWaterMin } = endWater
+// 	const { h: waterIntervalHours, m: waterIntervalMins } = waterInterval
+
+// 	useEffect(() => {
+// 		Animated.timing(animateValue, {
+// 			toValue: 1,
+// 			duration: 920, 
+// 			useNativeDriver: true
+// 		}).start()
+// 	}, [])
+
+// 	const onToggleRemind = () => {
+// 		Animated.timing(toggleAnimateValue, {
+// 			toValue: !remindOn && 1 || 0,
+// 			duration: 450,
+// 			useNativeDriver: false
+// 		}).start(() => {
+// 			setRemindOn(!remindOn)
+// 		})
+// 	}
+
+// 	return (
+// 		<View style={styles.main}>
+// 			<StackHeader title='Hydration setting' />
+// 			<View style={styles.main}>
+// 				<SettingRow 
+// 					title='Goal' 
+// 					type='value' 
+// 					value={`${dailyWater} ml`} 
+// 					onPress={() => setWaterGoalPopupVisible(true)} />
+// 				<SettingRow 
+// 					title='Remind' 
+// 					type='toggleValue' 
+// 					value={['OFF', 'ON']} 
+// 					onPress={onToggleRemind} 
+// 					additionalStyles={styles.settingRowAdditional} />
+// 				<Animated.View style={{
+// 					opacity: toggleAnimateValue.interpolate({
+// 						inputRange: [0, .9, 1], 
+// 						outputRange: [0, 0, 1]
+// 					}), 
+// 					height: toggleAnimateValue.interpolate({
+// 						inputRange: [0, 1],
+// 						outputRange: [0, vS(168)]
+// 					})
+// 				}}>
+// 					<SettingRow 
+// 						title='Interval' 
+// 						type='value' 
+// 						value={`${waterIntervalHours && waterIntervalHours + ' hrs ' || ''}${waterIntervalMins && waterIntervalMins + ' mins' || ''}`}
+// 						additionalStyles={styles.settingRowAdditional} 
+// 						onPress={() => setWaterIntervalPopupVisible(true)} />
+// 					<SettingRow 
+// 						title='Start remind at' 
+// 						type='value' 
+// 						value={`${formatNum(startWaterHour)}:${formatNum(startWaterMin)}`} 
+// 						additionalStyles={styles.settingRowAdditional} 
+// 						onPress={() => setWaterStartRemindPopupVisible(true)} />
+// 					<SettingRow 
+// 						title='End remind at' 
+// 						type='value' 
+// 						value={`${formatNum(endWaterHour)}:${formatNum(endWaterMin)}`}
+// 						additionalStyles={styles.settingRowAdditional} 
+// 						onPress={() => setWaterEndRemindPopupVisible(true)} />
+// 				</Animated.View>
+// 				<View style={styles.cupSizes}>
+// 					<Text style={styles.settingRowTitle}>Size of cup</Text>
+// 					<View style={styles.cupSizeList}>
+// 						<CupSizes />
+// 					</View>
+// 				</View>
+// 			</View>
+// 		</View>
+// 	)
+// })
+
+export default (): JSX.Element => {
+	const bottomBarHeight = useDeviceBottomBarHeight()
+	// const [ waterGoalPopupVisible, setWaterGoalPopupVisible ] = useState<boolean>(false)
+	// const [ waterStartRemindPopupVisible, setWaterStartRemindPopupVisible ] = useState<boolean>(false)
+	// const [ waterEndRemindPopupVisible, setWaterEndRemindPopupVisible ] = useState<boolean>(false)
+	// const [ waterIntervalPopupVisible, setWaterIntervalPopupVisible ] = useState<boolean>(false)	
+	const { setPopup } = useContext<any>(PopupContext)
 	const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
 	const [ remindOn, setRemindOn ] = useState<boolean>(false)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -99,20 +186,32 @@ const Main = memo(({
 			toValue: !remindOn && 1 || 0,
 			duration: 450,
 			useNativeDriver: false
-		}).start(({ finished }) => {
+		}).start(() => {
 			setRemindOn(!remindOn)
 		})
 	}
 
 	return (
-		<View style={styles.main}>
+		<View style={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
+			{/* <Main {...{
+				setWaterGoalPopupVisible,
+				setWaterStartRemindPopupVisible,
+				setWaterEndRemindPopupVisible,
+				setWaterIntervalPopupVisible
+			}} />
+			{ waterGoalPopupVisible && <WaterGoalPopup setVisible={setWaterGoalPopupVisible} /> }
+			{ waterStartRemindPopupVisible && <WaterStartRemindPopup setVisible={setWaterStartRemindPopupVisible} /> }
+			{ waterEndRemindPopupVisible && <WaterEndRemindPopup setVisible={setWaterEndRemindPopupVisible} /> }
+			{ waterIntervalPopupVisible && <WaterIntervalPopup setVisible={setWaterIntervalPopupVisible} /> } */}
 			<StackHeader title='Hydration setting' />
 			<View style={styles.main}>
 				<SettingRow 
 					title='Goal' 
 					type='value' 
 					value={`${dailyWater} ml`} 
-					onPress={() => setWaterGoalPopupVisible(true)} />
+					// onPress={() => setWaterGoalPopupVisible(true)} 
+					onPress={() => setPopup(WaterGoalPopup)}
+				/>
 				<SettingRow 
 					title='Remind' 
 					type='toggleValue' 
@@ -134,19 +233,25 @@ const Main = memo(({
 						type='value' 
 						value={`${waterIntervalHours && waterIntervalHours + ' hrs ' || ''}${waterIntervalMins && waterIntervalMins + ' mins' || ''}`}
 						additionalStyles={styles.settingRowAdditional} 
-						onPress={() => setWaterIntervalPopupVisible(true)} />
+						// onPress={() => setWaterIntervalPopupVisible(true)} 
+						onPress={() => setPopup(WaterIntervalPopup)}
+					/>
 					<SettingRow 
 						title='Start remind at' 
 						type='value' 
 						value={`${formatNum(startWaterHour)}:${formatNum(startWaterMin)}`} 
 						additionalStyles={styles.settingRowAdditional} 
-						onPress={() => setWaterStartRemindPopupVisible(true)} />
+						// onPress={() => setWaterStartRemindPopupVisible(true)} 
+						onPress={() => setPopup(WaterStartRemindPopup)}
+					/>
 					<SettingRow 
 						title='End remind at' 
 						type='value' 
 						value={`${formatNum(endWaterHour)}:${formatNum(endWaterMin)}`}
 						additionalStyles={styles.settingRowAdditional} 
-						onPress={() => setWaterEndRemindPopupVisible(true)} />
+						// onPress={() => setWaterEndRemindPopupVisible(true)} 
+						onPress={() => setPopup(WaterEndRemindPopup)}
+					/>
 				</Animated.View>
 				<View style={styles.cupSizes}>
 					<Text style={styles.settingRowTitle}>Size of cup</Text>
@@ -155,29 +260,6 @@ const Main = memo(({
 					</View>
 				</View>
 			</View>
-		</View>
-	)
-})
-
-export default (): JSX.Element => {
-	const bottomBarHeight = useDeviceBottomBarHeight()
-	const [ waterGoalPopupVisible, setWaterGoalPopupVisible ] = useState<boolean>(false)
-	const [ waterStartRemindPopupVisible, setWaterStartRemindPopupVisible ] = useState<boolean>(false)
-	const [ waterEndRemindPopupVisible, setWaterEndRemindPopupVisible ] = useState<boolean>(false)
-	const [ waterIntervalPopupVisible, setWaterIntervalPopupVisible ] = useState<boolean>(false)	
-
-	return (
-		<View style={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
-			<Main {...{
-				setWaterGoalPopupVisible,
-				setWaterStartRemindPopupVisible,
-				setWaterEndRemindPopupVisible,
-				setWaterIntervalPopupVisible
-			}} />
-			{ waterGoalPopupVisible && <WaterGoalPopup setVisible={setWaterGoalPopupVisible} /> }
-			{ waterStartRemindPopupVisible && <WaterStartRemindPopup setVisible={setWaterStartRemindPopupVisible} /> }
-			{ waterEndRemindPopupVisible && <WaterEndRemindPopup setVisible={setWaterEndRemindPopupVisible} /> }
-			{ waterIntervalPopupVisible && <WaterIntervalPopup setVisible={setWaterIntervalPopupVisible} /> }
 		</View>
 	)
 }

@@ -1,4 +1,5 @@
-import { memo, Dispatch, SetStateAction, useState, useRef, useEffect } from 'react'
+import { memo, useRef, useEffect, useContext } from 'react'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
@@ -7,21 +8,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { resetTimes } from '../store/fasting'
 import { toDateTimeV1 } from '@utils/datetimes'
+import { PopupContext } from '@contexts/popup'
+import { BackIcon, WhiteEditIcon } from '@assets/icons'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
-import { BackIcon, WhiteEditIcon } from '@assets/icons'
 import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
-import {
-	View,
-	Text,
-	StyleSheet,
-	Animated,
-	Platform,
-	StatusBar,
-	TouchableOpacity,
-	ScrollView
-} from 'react-native'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -42,7 +34,7 @@ const TimeSetting = memo(() => {
 	}, [])
 
 	return (
-		<Animated.View style={{...styles.fastingTimes, opacity: animateValue}}>
+		<Animated.View style={{...styles.fastingTimes, opacity: animateValue }}>
 			<Animated.View style={{
 				...styles.planName,
 				opacity: animateValue,
@@ -73,9 +65,10 @@ const TimeSetting = memo(() => {
 	)
 })
 
-const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
+const TrackWeight = memo((): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { setPopup } = useContext<any>(PopupContext)
 	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
 
 	useEffect(() => {
@@ -132,7 +125,7 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 				</View>
 				<TouchableOpacity
 					activeOpacity={.7}
-					onPress={() => setVisible(true)}>
+					onPress={() => setPopup(CurrentWeightPopup)}>
 					<LinearGradient
 						style={styles.trackWeightButton}
 						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
@@ -189,18 +182,15 @@ export default (): JSX.Element => {
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const bottomBarHeight = useDeviceBottomBarHeight()
-	const [ visible, setVisible ] = useState<boolean>(false)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
 	const session = useSelector((state: AppState) => state.user.session) 
-   	const userId: string | null = session && session.user.id || null
+   const userId: string | null = session && session.user.id || null
 	const { name: planName } = currentPlan
 	const endTimeStamp: number = Date.now()
 	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
 	const hours: number = Math.floor(totalMins / 60)
 	const mins: number = totalMins % 60
-
-	console.log('mins:', mins)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -260,7 +250,7 @@ export default (): JSX.Element => {
 				</Animated.View>
 			</View>
 			<TimeSetting />
-			<TrackWeight {...{ setVisible }} />
+			<TrackWeight />
 			<View style={styles.bottom}>
 				<TouchableOpacity
 					activeOpacity={.7}
@@ -285,7 +275,6 @@ export default (): JSX.Element => {
 					</LinearGradient>
 				</TouchableOpacity>
 			</View>
-			{ visible && <CurrentWeightPopup {...{ setVisible }} /> }
 		</ScrollView>
 	)
 }

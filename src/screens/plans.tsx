@@ -1,4 +1,4 @@
-import { FC, useContext } from 'react'
+import { FC } from 'react'
 import {
 	View,
 	Text,
@@ -8,15 +8,11 @@ import {
 	Pressable,
 	Platform,
 	StatusBar,
-	ScrollView,
-	Image
+	ScrollView
 } from 'react-native'
-import { PopupContext } from '../contexts/popup'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { CustomIcon } from '@assets/icons'
-import PopupProvider from '../contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
@@ -65,9 +61,8 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 	)
 }
 
-const Plans = () => {
+export default (): JSX.Element => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
@@ -94,16 +89,7 @@ const Plans = () => {
 					</View>
 				</View> */}
 			</ScrollView>
-			{ Popup && <Popup setVisible={setPopup} /> }
 		</View>
-	)
-}
-
-export default (): JSX.Element => {
-	return (
-		<PopupProvider>
-			<Plans />
-		</PopupProvider>
 	)
 }
 

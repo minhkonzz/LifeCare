@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
@@ -10,27 +11,16 @@ import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
 import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
 import LanguagePopup from '@components/shared/popup-content/gender'
-import withSync from '@hocs/withSync'
-
-import {
-	View,
-	Text,
-	StyleSheet,
-	FlatList,
-	TouchableOpacity,
-	Animated
-} from 'react-native'
 
 const { hex: darkHex } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const settingRowCallbacks = {}
 const settingRowValues = {}
 
-export default withSync((): JSX.Element => {
+export default (): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
 	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
-	console.log('render Setting')
 
 	const { 
 		notification,  
@@ -76,16 +66,14 @@ export default withSync((): JSX.Element => {
 				['About me', 'General', 'Contact us'].map((e, i) => (
 					<View key={i} style={{ marginTop: vS(i > 0 ? 24 : 0) }}>
 						<Animated.Text 
-							style={[
-								styles.settingSectionTitle, 
-								{
-									opacity: animateValue,
-									transform: [{ translateX: animateValue.interpolate({
-										inputRange: [0, 1], 
-										outputRange: [-150, 0]
-									}) }]
-								}
-							]}>
+							style={{
+								...styles.settingSectionTitle, 
+								opacity: animateValue,
+								transform: [{ translateX: animateValue.interpolate({
+									inputRange: [0, 1], 
+									outputRange: [-150, 0]
+								}) }]
+							}}>
 							{e}
 						</Animated.Text>
 						<FlatList
@@ -106,16 +94,14 @@ export default withSync((): JSX.Element => {
 			}
 			<View style={styles.bottom}>
 				<Animated.Text 
-					style={[
-						styles.versionText, 
-						{
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-150, 0]
-							}) }]
-						}
-					]}>
+					style={{
+						...styles.versionText, 
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-150, 0]
+						}) }]
+					}}>
 					Version 1.0.0
 				</Animated.Text>
 				<AnimatedTouchableOpacity 
@@ -136,7 +122,7 @@ export default withSync((): JSX.Element => {
 			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)
-})
+}
 
 const styles = StyleSheet.create({
 	container: {

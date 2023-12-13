@@ -17,7 +17,8 @@ module.exports = {
 					'@controllers': './src/controllers',
 					'@configs': './src/configs', 
 					'@services': './src/services', 
-					'@hocs': './src/hocs'
+					'@hocs': './src/hocs',
+					'@store': './src/store'
 				}
 			}
 		],

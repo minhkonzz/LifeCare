@@ -1,27 +1,15 @@
-import { memo, useEffect, useRef, useContext } from 'react'
 import { View, Text, FlatList, StyleSheet, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { handleTimelineData } from '@utils/helpers'
-import PopupProvider, { PopupContext } from '@contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import TimelineItem from '@components/timeline-item'
 import timeline from '@assets/data/timeline.json'
 
-const MainContent = memo(() => {
+export default (): JSX.Element => {
    const timelineData = handleTimelineData(timeline.waterRecords, timeline.bodyRecords)
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1, 
-         duration: 840,
-         useNativeDriver: true,
-      }).start()
-   }, [])
-
    return (
-      <>
+      <View style={styles.container}>
          <StackHeader title='Timeline' />
          <FlatList
             contentContainerStyle={styles.timeline}
@@ -29,26 +17,6 @@ const MainContent = memo(() => {
             data={timelineData}
             keyExtractor={item => item.id.toString()}
             renderItem={({ item, index }) => <TimelineItem {...{ item, index }} />} />
-      </>
-   )  
-})
-
-const Main = () => {
-   const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-   return (
-      <>
-         <MainContent />
-         { Popup && <Popup setVisible={setPopup} /> }
-      </>
-   )
-}
-
-export default (): JSX.Element => {
-   return (
-      <View style={styles.container}>
-         <PopupProvider>
-            <Main />
-         </PopupProvider>
       </View>
    )
 }

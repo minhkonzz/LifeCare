@@ -88,7 +88,7 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 	const navigation = useNavigation<any>()
 	const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
 	const { session } = useSelector((state: AppState) => state.user)
-	const userId: string | null = session?.user?.id
+	const userId: string | null = session && session.user.id || null
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
