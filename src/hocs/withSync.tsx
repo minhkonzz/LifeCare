@@ -8,9 +8,7 @@ export default (BaseComponent: FC) => {
       const changes = useSelector((state: AppState) => state.user.changes)
 
       useEffect(() => {
-         if (isOnline && changes) {
-            // perform sync
-         }
+         if (isOnline && changes) {}
       }, [isOnline])
 
       return <BaseComponent {...props} />

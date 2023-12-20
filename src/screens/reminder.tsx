@@ -8,12 +8,12 @@ import { PopupContext } from '@contexts/popup'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
 import reminderData from '@assets/data/reminder.json'
-import WeightRepeatPopup from '@components/shared/popup-content/weight-remind'
-import RemindStartFastPopup from '@components/shared/popup-content/start-fast-remind'
-import RemindEndFastPopup from '@components/shared/popup-content/end-fast-remind'
-import WaterStartRemindPopup from '@components/shared/popup-content/water-start-remind'
-import WaterEndRemindPopup from '@components/shared/popup-content/water-end-remind'
-import WaterRemindIntervalPopup from '@components/shared/popup-content/water-interval-remind'
+import WeightRepeatPopup from '@components/shared/popup/weight-remind'
+import RemindStartFastPopup from '@components/shared/popup/start-fast-remind'
+import RemindEndFastPopup from '@components/shared/popup/end-fast-remind'
+import WaterStartRemindPopup from '@components/shared/popup/water-start-remind'
+import WaterEndRemindPopup from '@components/shared/popup/water-end-remind'
+import WaterRemindIntervalPopup from '@components/shared/popup/water-interval-remind'
 
 interface ReminderSectionProps {
 	title: string,
@@ -68,12 +68,6 @@ const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) 
 }
 
 export default (): JSX.Element => {
-	// const [ repeatWeightPopupVisible, setRepeatWeightPopupVisible ] = useState<boolean>(false)
-	// const [ remindStartFastPopupVisible, setRemindStartFastPopupVisible ] = useState<boolean>(false)
-	// const [ remindEndFastPopupVisible, setRemindEndFastPopupVisible ] = useState<boolean>(false)
-	// const [ waterStartRemindPopupVisible, setWaterStartRemindPopupVisible ] = useState<boolean>(false)
-	// const [ waterEndRemindPopupVisible, setWaterEndRemindPopupVisible ] = useState<boolean>(false)
-	// const [ waterRemindIntervalPopupVisible, setWaterRemindIntervalPopupVisible ] = useState<boolean>(false)
 	const { setPopup } = useContext<any>(PopupContext)
 	
 	const {
@@ -123,12 +117,6 @@ export default (): JSX.Element => {
 				].map((e, i) => <ReminderSection key={`r${i}`} title={e} settingList={reminderData[e]} />)
 			}
 			</View>
-			{/* { repeatWeightPopupVisible && <WeightRepeatPopup setVisible={setRepeatWeightPopupVisible} /> }
-			{ remindStartFastPopupVisible && <RemindStartFastPopup setVisible={setRemindStartFastPopupVisible} /> }
-			{ remindEndFastPopupVisible && <RemindEndFastPopup setVisible={setRemindEndFastPopupVisible} /> }
-			{ waterStartRemindPopupVisible && <WaterStartRemindPopup setVisible={setWaterStartRemindPopupVisible} /> }
-			{ waterEndRemindPopupVisible && <WaterEndRemindPopup setVisible={setWaterEndRemindPopupVisible} /> }
-			{ waterRemindIntervalPopupVisible && <WaterRemindIntervalPopup setVisible={setWaterRemindIntervalPopupVisible} /> } */}
 		</View>
 	)
 }

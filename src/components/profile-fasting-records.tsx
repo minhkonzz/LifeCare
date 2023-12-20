@@ -24,7 +24,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
 
 		return (
-			<Pressable key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
+			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
 				{ !hideDetail && <Text style={styles.recText}>Nov</Text> }
 				<View style={styles.recProg}>
 					<AnimatedLinearGradient
@@ -43,7 +43,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		)
 	}
 
-	return <View key={index} style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0}} />
+	return <View style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0}} />
 }
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
@@ -109,7 +109,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				}
 				</View>
 				<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records}>
-					{ chartData.map((e, i) => <Record {...{ item: e, index: i, hideDetail: noDataFound }}/>) }
+					{ chartData.map((e, i) => <Record key={i} {...{ item: e, index: i, hideDetail: noDataFound }}/>) }
 				</ScrollView>
 			</View>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>

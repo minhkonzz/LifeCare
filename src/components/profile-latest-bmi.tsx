@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useContext } from 'react'
+import { useRef, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { PopupContext } from '@contexts/popup'
 import { Colors } from '@utils/constants/colors'
@@ -10,7 +10,7 @@ import { getBMIStatus } from '@utils/helpers'
 import { EditIcon, PolygonIcon } from '@assets/icons'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
+import UpdateBMIPopup from '@components/shared/popup/bmi-update'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary

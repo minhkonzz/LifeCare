@@ -83,11 +83,22 @@ export const getLocalTimeV1 = (utcDate: Date): Date => {
    return new Date(`${year}-${month}-${day} ${hours}:${mins}:${secs}`)
 }
 
+export const getLocalDatetimeV2 = () => {
+   return new Intl.DateTimeFormat('en', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+   }).format(new Date())
+}
+
 // moi update cho nay, can sua toan bo cac cho lien quan
-export const getDatesRange = (limit: number) => {
+export const getDatesRange = (limit: number, inWeeks = false) => {
    const dateArray: Array<{ title: string, value: string, date: number, month: number, year: number }> = []
    const currentDate = new Date()
-   for (let i = -limit; i <= 10; i++) {
+   for (let i = -limit; i <= 10; i += (inWeeks ? 7 : 1)) {
       const newDate = new Date(currentDate)
       newDate.setDate(currentDate.getDate() + i)
       const month = newDate.getMonth()

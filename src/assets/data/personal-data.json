@@ -15,7 +15,7 @@
 		{
 			"id": "r3",
 			"title": "Height",
-			"key": "height"
+			"key": "current-height"
 		},
 		{
 			"id": "r4",
@@ -24,8 +24,8 @@
 		},
 		{
 			"id": "r5",
-			"title": "Target weight",
-			"key": "target-weight"
+			"title": "Goal weight",
+			"key": "goal-weight"
 		},
 		{
 			"id": "r6",

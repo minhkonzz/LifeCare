@@ -19,11 +19,13 @@ export const userSlice = createSlice({
          state.metadata = state.metadata && {...state.metadata, ...action.payload } || { ...action.payload }
       },
 
-      cache: (state, action) => {
-         state.changes
-      } 
+      addRec: (state, action) => {
+         const { key, rec } = action.payload
+         const collection = state.metadata[key]
+         collection.push(rec)
+      }
    }
 })
 
-export const { updateMetadata, updateSession, cache } = userSlice.actions
+export const { updateMetadata, updateSession, addRec } = userSlice.actions
 export default userSlice.reducer

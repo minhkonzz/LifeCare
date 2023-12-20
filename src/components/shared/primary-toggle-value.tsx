@@ -5,20 +5,24 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-
-// const options: Array<string> = ["cm/ft", "kg/lb"]
-const OPTION_WIDTH: number = hS(98)
+const OPTION_WIDTH: number = hS(92)
 
 const { rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface PrimaryToggleValue {
    options: string[],
+   toggleColor?: string[],
    onChangeOption?: (selectedIndex: number) => void
    additionalStyles?: any
 }
 
-export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.Element => {
+export default ({ 
+   options, 
+   onChangeOption, 
+   additionalStyles, 
+   toggleColor = [`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex] 
+}: PrimaryToggleValue): JSX.Element => {
    const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
@@ -37,7 +41,7 @@ export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValu
       <View style={additionalStyles && {...styles.container, ...additionalStyles} || styles.container}>
          <AnimatedLinearGradient
             style={{...styles.toggleButton, transform: [{ translateX }] }}
-            colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+            colors={toggleColor}
             start={{ x: .5, y: 0 }}
             end={{ x: .52, y: 1 }} />
          {

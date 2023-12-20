@@ -5,13 +5,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
+import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '@store/setting'
 import { PopupContext } from '@contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
-import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
-import LanguagePopup from '@components/shared/popup-content/gender'
+import RewipeDataWarnPopup from '@components/shared/popup/rewipe-data-warn'
+import LanguagePopup from '@components/shared/popup/languages'
 
 const { hex: darkHex } = Colors.darkPrimary
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)

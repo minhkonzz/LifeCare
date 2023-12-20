@@ -1,7 +1,7 @@
-import { memo, useCallback, useState, useRef, Dispatch, SetStateAction } from 'react'
+import { memo, useCallback, useMemo, useState, useRef, Dispatch, SetStateAction } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { getDatesRange } from '@utils/datetimes'
+import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { Colors } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
@@ -47,9 +47,19 @@ const Main = ({
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }): JSX.Element => {
 
-   const [ date, setDate ] = useState<string>('')
-   const [ hours, setHours ] = useState<number>(0)
-   const [ mins, setMins ] = useState<number>(0)
+   const memorizedDatetime = useMemo(() => {
+      const d: Date = new Date()
+      const hour: number = d.getHours()
+      const min: number = d.getMinutes()
+      const date: string = `${d.toLocaleString('en-US', { month: 'short' })} ${d.getDate()}`
+      return { currentDate: date, currentHour: hour, currentMin: min }
+   }, [])
+
+   const { currentDate, currentHour, currentMin } = memorizedDatetime
+
+   const [ date, setDate ] = useState<string>(currentDate)
+   const [ hours, setHours ] = useState<number>(currentHour)
+   const [ mins, setMins ] = useState<number>(currentMin)
 
    const onConfirm = () => {
       Animated.timing(animateValue, {
@@ -63,7 +73,8 @@ const Main = ({
    }
 
    const setNewDate = useCallback((i: number) => {
-      setDate(dateOpts[i]['value'])
+      const { month, date: dateOpt } = dateOpts[i]
+      setDate(`${getMonthTitle(month, true)} ${dateOpt}`)
    }, [])
 
    const setNewHours = useCallback((i: number) => {
@@ -75,14 +86,13 @@ const Main = ({
    }, [])
 
    const WheelPickers = useCallback(memo(() => {
-      const d: Date = new Date()
-      const hour: number = d.getHours()
-      const min: number = d.getMinutes()
-      const date: number = d.getDate()
-      const formattedDate: string = `${d.toLocaleString('en-US', { month: 'short' })} ${date}`
-      const currentDateIndex: number = dateOpts.findIndex(e => e.value === formattedDate)
-      const currentHourIndex: number = hoursOpts.findIndex(e => e === hour)
-      const currentMinIndex: number = minsOpts.findIndex(e => e === min)
+      const currentDateIndex: number = dateOpts.findIndex(e => {
+         const { month, date: dateOpt } = e
+         return `${getMonthTitle(month, true)} ${dateOpt}` === date
+      })
+
+      const currentHourIndex: number = hoursOpts.findIndex(e => e === hours)
+      const currentMinIndex: number = minsOpts.findIndex(e => e === mins)
 
       return (
          <>

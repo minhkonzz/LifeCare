@@ -1,4 +1,4 @@
-import { memo, useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -47,7 +47,6 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				
 				const currentStageIndex = stages.findIndex((e: any) => e.id === currentStage.id)
 				setData({ timeElapsed, stage: currentStage, nextStageIndex: currentStageIndex === stages.length - 1 && -1 || currentStageIndex + 1 })
-
 			}, 999)
 		}
 		return () => { if (interval) clearInterval(interval) }
@@ -58,15 +57,16 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 	if (data && isFasting) {
 		const { timeElapsed, stage, nextStageIndex } = data
 		const CurrentStageIcon = stage.icon
-		const nextStage = stages[nextStageIndex]
+		const nextStage = stages[nextStageIndex] || stage
 		const { icon: NextStageIcon, title: nextStageTitle } = nextStage
 		const elapsedPercent: number = Math.floor(timeElapsed / (endTimeStamp - startTimeStamp) * 100)
 		const timeText: string = timestampToDateTime(timeElapsed)
 		
-		const timeExceeded: boolean = timeElapsed - endTimeStamp > 0
+		const timeExceededValue: number = timeElapsed - endTimeStamp + startTimeStamp
+		const timeExceeded: boolean = timeExceededValue > 0
 		
 		if (timeExceeded) {
-			const timeExceededText: string = timestampToDateTime(timeElapsed - endTimeStamp)
+			const timeExceededText: string = timestampToDateTime(timeExceededValue)
 			return (
 				<Animated.View
 					style={{
@@ -82,7 +82,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 					<View style={styles.main}>
 						<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedPercent}%)`}</Text>
 						<Text style={{...styles.time, fontSize: hS(36) }}>{timeText}</Text>
-						<Text style={styles.elapsedTime}>{`+${timeExceededText}`}</Text>
+						<Text style={styles.elapsedTime}>{`Exceeded: +${timeExceededText}`}</Text>
 						{ nextStageIndex !== -1 && <>
 						<Text style={styles.nextStageTitle}>Next stage</Text>
 						<View style={styles.horz}>
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
 
 	elapsedTime: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: hS(12),
+		fontSize: hS(13),
 		color: darkHex
 	},
 

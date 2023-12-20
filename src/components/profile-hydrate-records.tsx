@@ -1,4 +1,4 @@
-import { memo, useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -9,6 +9,7 @@ import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { formatNum } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
+import { useNavigation } from '@react-navigation/native'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -22,7 +23,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		if (typeof item === 'string') {
 			const [ month, date ] = item.split(' ')
 			return (
-				<View key={index} style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', justifyContent: 'center' }}>
+				<View key={index} style={{ marginLeft: hS(18), alignItems: 'center', justifyContent: 'center' }}>
 					<Text style={styles.recText}>{month}</Text>
 					<View style={styles.recProg} />
 					<Text style={styles.recText}>{date}</Text>
@@ -48,11 +49,10 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 
 		return (
 			<Pressable 
-				key={`${id}-${index}`} 
 				style={{ 
 					position: 'relative',
-					marginLeft: index > 0 ? hS(18) : 0, 
 					alignItems: 'center', 
+					marginLeft: hS(18),
 					justifyContent: 'center'
 				}}
 				{...{ onPress }}>
@@ -92,11 +92,12 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			</Pressable>
 		)
 	}
-	return <View key={index} style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0 }} />
+	return <View style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0 }} />
 }
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const waterRecords = useSelector((state: AppState) => state.user.metadata.waterRecords)
+	const navigation = useNavigation<any>()
 
 	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
 		const { id, date, value, goal } = cur
@@ -150,12 +151,12 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				<AnimatedTouchableOpacity 
 					style={{...styles.hydrateRecsUpdateButton, transform: [{ scale: animateValue }] }} 
 					activeOpacity={.8}
-					onPress={() => console.log('clicked')}>
+					onPress={() => navigation.navigate('water')}>
 					<BluePlusIcon width={hS(14)} height={vS(15.3)} />
 				</AnimatedTouchableOpacity>
 			</View>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records} contentContainerStyle={{ alignItems: 'center' }}>
-				{ chartData.map((e, i) => <Record {...{ item: e, index: i, hideDetail: noDataFound }} />) }
+				{ chartData.map((e, i) => <Record key={i} {...{ item: e, index: i, hideDetail: noDataFound }} />) }
 			</ScrollView>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
 			{ noDataFound && 

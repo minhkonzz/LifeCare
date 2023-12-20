@@ -1,4 +1,4 @@
-import { memo, FC, useState, useEffect, useContext } from 'react'
+import { memo, FC, useState, useCallback, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
@@ -11,10 +11,10 @@ import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/date
 import { getCurrentTimestamp } from '@utils/datetimes'
 import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
-import StartFastingPopup from '@components/shared/popup-content/start-fasting'
+import StartFastingPopup from '@components/shared/popup/start-fasting'
 import fastingStagesData from '@assets/data/fasting-stages.json'
 import LinearGradient from 'react-native-linear-gradient'
-import ConfirmStopFastingPopup from '@components/shared/popup-content/confirm-stop-fasting'
+import ConfirmStopFastingPopup from '@components/shared/popup/confirm-stop-fasting'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -30,19 +30,31 @@ const stageIcons = [
 const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
 
 interface ActivateTimeProps {
-	activate?: boolean
+	title: string
+	editable?: boolean
 	current?: boolean
 	value?: string
 }
 
-const FastingActivateTime: FC<ActivateTimeProps> = ({ activate, current, value = '' }) => {
+const FastingActivateTime: FC<ActivateTimeProps> = ({ title, editable, current, value = '' }) => {
+	
+	const EditButton = useCallback(() => {
+		const { setPopup } = useContext<any>(PopupContext)
+
+		return (
+			<Pressable onPress={() => setPopup(StartFastingPopup)}>
+				<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+			</Pressable>
+		)
+	}, [])
+
 	return (
 		<View style={styles.fastingActivateTime}>
 			<View style={styles.fastingActivateTimeMain}>
-				<View style={{...styles.boundaryC, borderColor: activate && primaryHex || '#ff9b85' }}>
+				<View style={{...styles.boundaryC, borderColor: current && primaryHex || '#ff9b85' }}>
 					<View style={styles.coreC} />
 				</View>
-				<Text style={styles.text}>{activate && 'Start:' || 'Stop:'}</Text>
+				<Text style={styles.text}>{title}</Text>
 				<Text style={{
 					...styles.text,
 					marginTop: 2,
@@ -52,12 +64,7 @@ const FastingActivateTime: FC<ActivateTimeProps> = ({ activate, current, value =
 					{value}
 				</Text>
 			</View>
-			{
-				current &&
-				<Pressable>
-					<PrimaryEditIcon width={hS(20)} height={vS(20)} />
-				</Pressable>
-			}
+			{ editable && <EditButton /> }
 		</View>
 	)
 }
@@ -158,41 +165,51 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 		setPopup(StartFastingPopup)
 	}
 
-	return (
-		isFasting && 
-		<View style={styles.container}>
-			<Animated.View style={{
-				...styles.header, 
-				opacity: animateValue, 
-				transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1], 
-					outputRange: [-50, 0]
-				}) }]
-			}}>
-				<FastingActivateTime activate current value={toDateTimeV1(startTimeStamp)} />
-				<View style={styles.line} />
-				<FastingActivateTime value={toDateTimeV1(endTimeStamp)} />
-			</Animated.View> 
-			<AnimatedTouchableOpacity 
-				activeOpacity={.7} 
-				onPress={handleFastingButton}
-				style={{ 
+	if (isFasting) {
+		const currentDate: number = new Date().getDate()
+		const isOnStartDate: boolean = new Date(startTimeStamp).getDate() === currentDate
+		const isOnEndDate: boolean = new Date(endTimeStamp).getDate() === currentDate
+
+		return (
+			isViewable && 
+			<View style={styles.container}>
+				<Animated.View style={{
+					...styles.header, 
 					opacity: animateValue, 
-					transform: [{ translateY: animateValue.interpolate({
+					transform: [{ translateX: animateValue.interpolate({
 						inputRange: [0, 1], 
-						outputRange: [-30, 0]
-					}) }]	
+						outputRange: [-50, 0]
+					}) }]
 				}}>
-				<LinearGradient
-					style={styles.startStopButton}
-					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }}>
-					<Text style={styles.startStopButtonText}>Stop fasting</Text>
-				</LinearGradient>
-			</AnimatedTouchableOpacity>
-			<CurrentFastingStage {...{ animateValue, navigation }} />
-		</View> || 
+					<FastingActivateTime title='Start' editable current={isOnStartDate} value={toDateTimeV1(startTimeStamp)} />
+					<View style={styles.line} />
+					<FastingActivateTime title='End' current={isOnEndDate} value={toDateTimeV1(endTimeStamp)} />
+				</Animated.View> 
+				<AnimatedTouchableOpacity 
+					activeOpacity={.7} 
+					onPress={handleFastingButton}
+					style={{ 
+						opacity: animateValue, 
+						transform: [{ translateY: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-30, 0]
+						}) }]	
+					}}>
+					<LinearGradient
+						style={styles.startStopButton}
+						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }}>
+						<Text style={styles.startStopButtonText}>Finish fasting</Text>
+					</LinearGradient>
+				</AnimatedTouchableOpacity>
+				<CurrentFastingStage {...{ animateValue, navigation }} />
+			</View> || <View style={styles.container} /> 
+		)
+	}
+
+	return (
+		isViewable && 
 		<AnimatedTouchableOpacity 
 			activeOpacity={.7} 
 			onPress={handleFastingButton}
@@ -210,7 +227,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				end={{ x: .5, y: 1 }}>
 				<Text style={styles.startStopButtonText}>Start Fasting</Text>
 			</LinearGradient>
-		</AnimatedTouchableOpacity>
+		</AnimatedTouchableOpacity> || <View style={styles.startStopButton} /> 
 	)
 })
 

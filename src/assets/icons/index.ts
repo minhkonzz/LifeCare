@@ -51,6 +51,8 @@ import EyeHidedIcon from './eye-hided.svg'
 import CornerArrowUpRightIcon from './corner-arrow-up-right.svg'
 import SpoonForkIcon from './spoon-fork.svg'
 import CustomIcon from './custom.svg'
+import SymptomsIcon from './symptoms.svg'
+import PrimaryBookIcon from './primary-book.svg'
 
 export {
    AtIcon,
@@ -105,6 +107,8 @@ export {
    EyeHidedIcon,
    CornerArrowUpRightIcon,
    SpoonForkIcon, 
-   CustomIcon
+   CustomIcon, 
+   PrimaryBookIcon,
+   SymptomsIcon
 }
 

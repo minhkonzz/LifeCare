@@ -10,6 +10,7 @@
       "@components/*": ["src/components/*"],
       "@contexts/*": ["src/contexts/*"],
       "@screens/*": ["src/screens/*"],
+      "@popup/*": ["src/components/shared/popup/*"],
       "@navigations/*": ["src/navigations/*"],
       "@utils/*": ["src/utils/*"],
       "@hooks/*": ["src/hooks/*"],

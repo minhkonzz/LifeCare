@@ -1,26 +1,17 @@
 import { useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { NavigationProp } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
 import { updateLiquid, resetSpecs } from '../store/water'
 import { BackIcon, SettingIcon, WhitePlusIcon, StrongBlueMinusIcon } from '@assets/icons'
-import { WaveSvg } from '@assets/images'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
-
-import {
-   View,
-   Text,
-   StyleSheet,
-   Animated,
-   TouchableOpacity, 
-   Pressable, 
-   Easing
-} from 'react-native'
+import WaterWave from '@components/water-wave'
 
 const darkPrimary: string = Colors.darkPrimary.hex
 const lightBlue: string = Colors.lightBlue.hex
@@ -29,15 +20,11 @@ const strongBlue: string = Colors.strongBlue.hex
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppState) => state.water)
    const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
    const { session } = useSelector((state: AppState) => state.user)
    const userId: string = session?.user?.id
    const dispatch = useDispatch()
-
-   console.log('changes:', changes)
-   console.log('specs:', specs)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -56,14 +43,6 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
       ).start()
    }, [])
 
-   useEffect(() => {
-      Animated.timing(waterTranslateY, {
-         toValue: vS(SCREEN_HEIGHT - SCREEN_HEIGHT * liquidDrinked / dailyWater - 20),
-         duration: 1500,
-         useNativeDriver: true
-      }).start()
-   }, [liquidDrinked])
-
    const increaseLiquid = () => {
       dispatch(updateLiquid(INCREASE))
    }
@@ -81,22 +60,12 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          goal: dailyWater,
          specs
       })
-      console.log('daily water sync success')
       dispatch(resetSpecs())
    }
 
    return (
       <View style={styles.container}>
-         <Animated.View style={{
-            ...styles.waveContainer,
-            opacity: animateValue,
-            transform: [
-               { translateX: waveAnimateValue.interpolate({ inputRange: [0, 1], outputRange: [0, hS(-378)] }) },
-               { translateY: waterTranslateY }
-            ]
-         }}>
-            <WaveSvg width={hS(792)} height='100%' />
-         </Animated.View>
+         <WaterWave w={hS(792)} full />
          <View style={styles.interacts}>
             <View style={styles.header}>
                <BackIcon width={hS(14)} height={vS(14)} />

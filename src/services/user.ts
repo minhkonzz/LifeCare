@@ -1,10 +1,7 @@
 import { supabase } from "@configs/supabase"
 import { WaterRecordsPayload } from "@utils/types"
 import { InitialPersonalData } from "@utils/interfaces"
-import { PersonalData } from "@utils/interfaces"
 import { convertObjectKeysToSnakeCase, convertObjectKeysToCamelCase } from "@utils/helpers"
-import { autoId } from "@utils/helpers"
-import { PostgrestError } from "@supabase/supabase-js"
 
 export default {
    signInPassword: async (email: string, password: string) => {
@@ -29,11 +26,11 @@ export default {
       if (error) throw new Error('Something went wrong when sign out')
    },
 
-   checkUserSurveyed: async (userId: string): Promise<boolean> => {
+   checkUserSurveyed: async (userId: string): Promise<{ isSurveyed?: boolean, error: string }> => {
       const { data, error } = await supabase.from('users').select('is_surveyed').eq('id', userId)
-      if (error) throw new Error('Something went wrong when get is_surveyed')
+      if (error) return { error: error.message }
       const { is_surveyed } = data[0]
-      return is_surveyed
+      return { isSurveyed: is_surveyed, error: '' }
    },
 
    getPersonalData: async (userId: string): Promise<any> => {
@@ -96,7 +93,7 @@ export default {
       const fastingRecords = fastingRecordsResponse.map(e => convertObjectKeysToCamelCase(e))
 
       return {
-         response: {
+         res: {
             ...userData,
             waterRecords,
             bodyRecords,
@@ -122,23 +119,22 @@ export default {
       return ''
    },
 
-   savePrevWaterRecords: async (payload: WaterRecordsPayload): Promise<void> => {
-      const { userId, value, goal, changes } = payload
-      const { data: d1, error: err1 } = await supabase.from('water_records')
-         .insert({ user_id: userId, value, goal: goal })
-         .select('id')
-
-      if (err1) throw new Error('Something went wrong when create new water record')
+   savePrevWaterRecords: async (userId: string, payload: WaterRecordsPayload): Promise<{ waterRecordId?: string, error: string }> => {
+      const { value, goal, times, date, createdAt, updatedAt } = payload
+      const { data: d1, error: saveWaterRecordError } = await supabase.from('water_records').insert(convertObjectKeysToSnakeCase({ userId, value, goal, date, createdAt, updatedAt })).select('id')
+      if (saveWaterRecordError) return { error: saveWaterRecordError.message }
       const waterRecordId = d1[0].id
-      const { error: err2 } = await supabase.from('water_record_times')
-         .insert(changes.map(e => ({
-            water_record_id: waterRecordId,
-            value: e.liquid,
-            created_at: e.time
-         })))
-
-      if (err2) throw new Error('Something went wrong when create new water record time')
-   }, 
+      const { error: saveWaterRecordTimesError } = await supabase.from('water_record_times').insert(times.map(e => ({
+         ...e, 
+         user_id: userId,
+         water_record_id: waterRecordId
+      })))
+      if (saveWaterRecordTimesError) return { error: saveWaterRecordTimesError.message }
+      return {
+         waterRecordId,
+         error: ''
+      }
+   },
 
    syncDailyWater: async (payload: { userId: string, date: string, drinked: number, goal: number, specs: any[] }): Promise<void> => {
       const { userId, drinked, date, goal, specs } = payload
@@ -195,21 +191,10 @@ export default {
       })
    },
 
-   saveFastingRecord: async (payload: any, offlineCallback?: () => void): Promise<void> => {
-      const { userId, startTimeStamp, endTimeStamp, planName } = payload 
-      if (!userId) {
-         if (offlineCallback) offlineCallback()
-         return
-      } 
-      const { error } = await supabase.from('fasting_records')
-         .insert([convertObjectKeysToSnakeCase({
-            userId, planName, startTimeStamp, endTimeStamp, notes: ''
-         })])
-
-      if (error) {
-         console.error(error)
-         throw new Error('Something went wrong when create new fasting record')
-      }
+   saveFastingRecord: async (userId: string, payload: any): Promise<string> => {
+      const { startTimeStamp, endTimeStamp, planName } = payload 
+      const { error } = await supabase.from('fasting_records').insert(convertObjectKeysToSnakeCase({ userId, planName, startTimeStamp, endTimeStamp, notes: '' }))
+      return error ? error.message : ''
    },
 
    updateWeightTimeline: async (userId: string, payload: any): Promise<string> => {

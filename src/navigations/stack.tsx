@@ -1,6 +1,5 @@
 import { memo, useState, useEffect, useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import PopupProvider, { PopupContext } from '@contexts/popup'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { updateTimes, updateCurrentPlan } from '../store/fasting'
@@ -8,7 +7,7 @@ import { updateNetworkOnline } from '../store/network'
 import { updateMetadata, updateSession } from '../store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
-import { resetDailyWater } from '../store/water'
+import PopupProvider, { PopupContext } from '@contexts/popup'
 import plansData from '@assets/data/plans.json'
 import UserService from '@services/user'
 import NetInfo from '@react-native-community/netinfo'
@@ -80,30 +79,16 @@ const Main = () => {
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
    const [ initialized, setInitialized ] = useState<boolean>(false)
-   const prevSession = useSelector((state: AppState) => state.user.session)
-   const userId: string | null = prevSession && prevSession.user.id || null
-   const { drinked, changes, date: prevDate } = useSelector((state: AppState) => state.water)
-   const dailyWater: number = useSelector((state: AppState) => state.user.metadata.dailyWater)
+   const { session: prevSession, metadata } = useSelector((state: AppState) => state.user)
+   const { isOnline } = useSelector((state: AppState) => state.network)
 
-   const resetWaterTrack = async() => {
-		const todayDate: string = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric' })
-		if (!drinked || todayDate === prevDate) return
-		await UserService.savePrevWaterRecords({
-			userId, 
-			value: drinked,
-			goal: dailyWater, 
-			changes
-		})
-		dispatch(resetDailyWater(todayDate))
-	}
+   const fetchPersonalData = async (userId: string): Promise<void> => {
+      const { res, error } = await UserService.getPersonalData(userId)
+      if (res && !error) initializeUserData(res)
+   }
 
-   const initializeUserData = async (userId: string): Promise<void> => {
-      const isSurveyed = await UserService.checkUserSurveyed(userId)
-      if (!isSurveyed) return 
-      const { response, error } = await UserService.getPersonalData(userId)
-      if (error) console.log('error when get user data (1)')
-
-      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = response
+   const initializeUserData = (res: any) => {
+      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = res
 
       if (startTimeStamp && endTimeStamp) 
          dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
@@ -118,7 +103,6 @@ const Main = () => {
 
    useEffect(() => {
       let channel: any
-      resetWaterTrack()
 
       const netInfoUnsubscribe = NetInfo.addEventListener(state => {
          dispatch(updateNetworkOnline(state.isConnected))
@@ -128,35 +112,32 @@ const Main = () => {
          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
             if (session) {
                const userId: string = session.user.id
-               await initializeUserData(userId)
+               const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
+               if (isSurveyed && !error) await fetchPersonalData(userId)
             }
             dispatch(updateSession(session))
          }
          if (prevSession) {
-            const userId: string = prevSession?.user?.id 
-            await initializeUserData(userId)
+            const { isSurveyed } = metadata
+            if (isSurveyed && isOnline) {
+               const userId: string = prevSession.user.id 
+               await fetchPersonalData(userId)
+            }
          }
-         if ((prevSession || session) && !channel) {
+         const currentSession = prevSession || session
+         if (currentSession && !channel) {
+            const userId: string = currentSession.user.id
             channel = supabase.channel('schema-db-changes')
             .on('postgres_changes', {
                event: 'UPDATE',
                schema: 'public',
-               table: 'users'
+               table: 'users',
+               filter: `id=eq.${userId}`
             }, (payload: any) => { 
                const convertedResponse = convertObjectKeysToCamelCase(payload.new)
-               const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = convertedResponse
-
-               if (startTimeStamp && endTimeStamp) {
-                  dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
-               }
-
-               if (currentPlanId) {
-                  const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
-                  dispatch(updateCurrentPlan(convertObjectKeysToCamelCase(currentPlan)))
-               }
-               
-               dispatch(updateMetadata(personalData))
-            }).subscribe()
+               initializeUserData(convertedResponse)
+            })
+            .subscribe()
          }
          setInitialized(true)
       })

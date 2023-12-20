@@ -1,4 +1,3 @@
-import { memo, useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -144,7 +143,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 			</AnimatedPressable>
 			{ noDataFound && 
 			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={12} />
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={6} />
 				<Text style={styles.noDataText}>No data found</Text>
 			</View> }
 		</Animated.View>

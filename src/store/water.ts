@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { autoId } from '@utils/helpers'
 import { DailyWaterState } from '@utils/types'
-import { getCurrentDate } from '@utils/datetimes'
+import { getCurrentDate, getLocalDatetimeV2 } from '@utils/datetimes'
 
 const initialState: DailyWaterState = {
    date: getCurrentDate(),
@@ -26,14 +26,7 @@ const WaterSlice = createSlice({
             const newChange = { 
                id: newId,
                liquid: state.cupsize, 
-               time: new Intl.DateTimeFormat('en', {
-                  year: '2-digit',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-               }).format(new Date())
+               time: getLocalDatetimeV2()
             }
             state.changes = [...state.changes, newChange]
             state.specs = [...state.specs, { ...newChange, type }]

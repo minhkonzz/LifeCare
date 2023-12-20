@@ -5,7 +5,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { WatercupIcon, OrangeWeightIcon } from '@assets/icons'
 import { getMonthTitle } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
-import TimelineWeightUpdate from '@components/shared/popup-content/timeline-weight-update'
+import TimelineWeightUpdate from '@components/shared/popup/timeline-weight-update'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 

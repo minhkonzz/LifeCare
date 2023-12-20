@@ -1,5 +1,4 @@
-import { Text, StyleSheet, Pressable, Image, Animated } from 'react-native'
-import { useEffect, useRef } from 'react'
+import { Text, StyleSheet, Pressable, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -12,32 +11,13 @@ type InsightItemProps = {
 	index: number
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
 export default ({ item, index }: InsightItemProps): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const navigation = useNavigation()
-
-	useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1,
-         duration: 920,
-         useNativeDriver: false
-      }).start()
-   }, [])
+	const navigation = useNavigation<any>()
 
 	return (
-		<AnimatedPressable 
-			style={{
-				...styles.container, 
-				opacity: animateValue,
-				marginLeft: animateValue.interpolate({
-					inputRange: [0, 1],
-					outputRange: [300, (index > 0 ? hS(11) : hS(24))]
-				}) 
-			}}
-			onPress={() => navigation.navigate('insight-reading', item)}
-		>
+		<Pressable 
+			style={{...styles.container, marginHorizontal: hS(12), marginLeft: index === 0 ? hS(24) : 0 }}
+			onPress={() => navigation.navigate('insight-reading', item)}>
 			<Image style={styles.background} source={item.banner} />
 			<LinearGradient
 				style={styles.titleWrapper}
@@ -46,14 +26,14 @@ export default ({ item, index }: InsightItemProps): JSX.Element => {
 				colors={[`rgba(0, 0, 0, .002)`, `rgba(${darkRgb.join(', ')}, .8)`]}>
 				<Text style={styles.title}>{item.title}</Text>
 			</LinearGradient>
-		</AnimatedPressable>
+		</Pressable>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: {
-		width: hS(280),
-		height: vS(163),
+		width: hS(346),
+		height: vS(212),
 		elevation: 12,
 		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
 	},
@@ -78,7 +58,7 @@ const styles = StyleSheet.create({
 
 	title: {
 		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(12),
+		fontSize: hS(14),
 		color: '#fff',
 		lineHeight: vS(20)
 	}

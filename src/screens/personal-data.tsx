@@ -5,26 +5,19 @@ import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
-import GenderPopup from '@components/shared/popup-content/gender'
-import AgePopup from '@components/shared/popup-content/age'
-import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
-import HeightPopup from '@components/shared/popup-content/height'
-import TargetWeightPopup from '@components/shared/popup-content/target-weight' 
+import GenderPopup from '@components/shared/popup/gender'
+import AgePopup from '@components/shared/popup/age'
+import CurrentWeightPopup from '@components/shared/popup/current-weight'
+import HeightPopup from '@components/shared/popup/height'
+import TargetWeightPopup from '@components/shared/popup/target-weight' 
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
-// import PrimaryToggleValue from '@components/shared/primary-toggle-value'
 import personalData from '@assets/data/personal-data.json'
 
 const settingRowCallbacks = {}
 const settingRowValues = {}
-// const options: string[] = ['cm/kg', 'in/lb']
 
 const Main = () => {
-	// const [ genderPopupVisible, setGenderPopupVisible ] = useState<boolean>(false)
-	// const [ agePopupVisible, setAgePopupVisible ] = useState<boolean>(false)
-	// const [ currentWeightPopupVisible, setCurrentWeightPopupVisible ] = useState<boolean>(false)
-	// const [ heightPopupVisible, setHeightPopupVisible ] = useState<boolean>(false)
-	// const [ targetWeightPopupVisible, setTargetWeightPopupVisible ] = useState<boolean>(false)
 	const { setPopup } = useContext<any>(PopupContext)
 	const navigation = useNavigation<any>()
 
@@ -84,11 +77,6 @@ const Main = () => {
 				)
 			}
 			</View>
-			{/* { genderPopupVisible && <GenderPopup setVisible={setGenderPopupVisible} /> }
-			{ agePopupVisible && <AgePopup setVisible={setAgePopupVisible} /> }
-			{ currentWeightPopupVisible && <CurrentWeightPopup setVisible={setCurrentWeightPopupVisible} /> }
-			{ heightPopupVisible && <HeightPopup setVisible={setHeightPopupVisible} /> }
-			{ targetWeightPopupVisible && <TargetWeightPopup setVisible={setTargetWeightPopupVisible} /> } */}
 		</>
 	)
 }

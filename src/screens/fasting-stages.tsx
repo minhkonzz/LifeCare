@@ -5,10 +5,7 @@ import { AppState } from '../store'
 import StackHeader from '@components/shared/stack-header'
 import FastingStage from '@components/fasting-stage'
 import fastingStagesData from '@assets/data/fasting-stages.json'
-import BloodSugarIncreaseIcon from '@assets/icons/blood-sugar-increase.svg'
-import BloodSugarDecreaseIcon from '@assets/icons/blood-sugar-decrease.svg'
-import BloodSugarNormalIcon from '@assets/icons/blood-sugar-normal.svg'
-import FireColorIcon from '@assets/icons/fire-color.svg'
+import { BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, FireColorIcon } from '@assets/icons'
 
 const stageIcons = [
    BloodSugarIncreaseIcon,

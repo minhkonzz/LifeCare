@@ -1,18 +1,10 @@
-import { FC, useState, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { BackIcon } from '@assets/icons'
 import SettingToggle from '@components/shared/setting-toggle'
 import SettingToggleValue from './shared/setting-toggle-value'
-import BackIcon from '@assets/icons/goback.svg'
-
-import {
-    View,
-    Text,
-    StyleSheet,
-    Animated,
-    Easing,
-    Pressable
-} from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
@@ -25,17 +17,17 @@ interface SettingRowProps {
     additionalStyles?: any
 }
 
-const SettingRedirect: FC<{ onPress?: () => void }> = ({ onPress }) => (
-    <Pressable style={styles.redirectWrapper} {...{ onPress }}>
+const SettingRedirect = () => (
+    <Pressable style={styles.redirectWrapper}>
         <BackIcon style={{ transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
     </Pressable>
 )
 
-const SettingValue: FC<{ value: string | number, onPress?: () => void }> = ({ value, onPress }) => (
-    <Pressable style={styles.settingValue} {...{ onPress }}>
+const SettingValue: FC<{ value: string | number}> = ({ value }) => (
+    <View style={styles.settingValue}>
         <Text style={[styles.text, styles.valueTitle]}>{value}</Text>
         <BackIcon style={{ marginTop: -1, transform: [{ rotate: '-180deg' }] }} width={hS(7)} height={vS(12)} />
-    </Pressable>
+    </View>
 )
 
 const settingTypes: any = {
@@ -57,32 +49,22 @@ export default ({ title, type, value, boldTitle, onPress, additionalStyles }: Se
         }).start()
     }, [])
 
+    const hasToggles: boolean = ['toggle', 'toggleValue'].includes(type)
+    const Wrapper = hasToggles && View || Pressable
     const TargetView = settingTypes[type]
     return (
-        <View style={{...styles.container, ...additionalStyles}}>
-            <Animated.Text 
-                style={{
-                    ...styles.text, 
-                    ...styles.title,
-                    fontFamily: `Poppins-${boldTitle && 'SemiBold' || 'Regular'}`,
-                    opacity: animateValue, 
-                    transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-150, 0]
-                    }) }]
-                }}>
-                {title}
-            </Animated.Text>
-            <Animated.View style={{
-                opacity: animateValue,
-                transform: [{ translateX: animateValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [150, 0]
-                }) }]
+        <Wrapper 
+            {...(!hasToggles && { onPress } || {})} 
+            style={{...styles.container, ...additionalStyles}}>
+            <Text style={{
+                ...styles.text, 
+                ...styles.title,
+                fontFamily: `Poppins-${boldTitle && 'SemiBold' || 'Regular'}`
             }}>
-                <TargetView {...{ value, onPress }} />
-            </Animated.View>
-        </View>
+                {title}
+            </Text>
+            <TargetView {...{ value, ...(hasToggles && { onPress } || {}) }} />
+        </Wrapper>
     )
 }
 

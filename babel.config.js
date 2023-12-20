@@ -9,6 +9,7 @@ module.exports = {
 					'@components': './src/components',
 					'@contexts': './src/contexts',
 					'@screens': './src/screens',
+					'@popup': './src/components/shared/popup-content',
 					'@navigations': './src/navigations',
 					'@utils': './src/utils',
 					'@hooks': './src/hooks',

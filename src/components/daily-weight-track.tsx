@@ -11,7 +11,7 @@ import { AppState } from '../store'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
-import UpdateWeightsPopup from '@components/shared/popup-content/weights'
+import UpdateWeightsPopup from '@components/shared/popup/weights'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)

@@ -7,31 +7,48 @@ import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { kilogramsToPounds } from '@utils/fomular'
 import { BackIcon, EditIcon } from '@assets/icons'
+import AnimatedText from './shared/animated-text'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import ProfileWeightChart from './profile-weight-chart'
-import UpdateWeightsPopup from '@components/shared/popup-content/weights'
+import UpdateWeightsPopup from '@components/shared/popup/weights'
 import LinearGradient from 'react-native-linear-gradient'
 
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { setPopup } = useContext<any>(PopupContext)
-
    const {
       currentWeight, 
       goalWeight, 
       startWeight
    } = useSelector((state: AppState) => state.user.metadata)
 
+   const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
+
    return (
       isViewable && 
-      <LinearGradient
-         style={styles.container}
+      <AnimatedLinearGradient
+         style={{
+            ...styles.container,
+            opacity: animateValue,
+            transform: [{ translateX: animateValue.interpolate({
+               inputRange: [0, 1],
+               outputRange: [-50, 0]
+            }) }]
+         }}
          colors={[`rgba(255, 211, 110, .2)`, `rgba(255, 211, 110, .8)`]}
          start={{ x: .5, y: 0 }}
          end={{ x: 1, y: 1 }}>
          <View style={[styles.horz, styles.header]}>
-            <View style={styles.horz}>
+            <Animated.View style={{
+               ...styles.horz,
+               opacity: animateValue,
+               transform: [{ translateY: animateValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [30, 0]
+               }) }]
+            }}>
                <Text style={styles.title}>Weight</Text>
                <TouchableOpacity
                   activeOpacity={.8} 
@@ -39,7 +56,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                   <Text style={styles.symbTitle}>lb</Text>
                   <BackIcon style={styles.symbIndicator} width={hS(5)} height={vS(8.5)} />
                </TouchableOpacity>
-            </View>
+            </Animated.View>
             <TouchableOpacity 
                style={styles.editButton} 
                activeOpacity={.8} 
@@ -47,21 +64,39 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>
-         <View>
+         <View style={styles.main}>
             <View style={styles.horz}>
-               <Text style={styles.weightValue}>{`${kilogramsToPounds(currentWeight)}`}</Text>
+               <AnimatedText style={styles.weightValue} value={kilogramsToPounds(currentWeight)} />
                <Text style={styles.weightSymb}>lb</Text>
             </View>
             <View style={styles.progressBar}>
-               <View style={styles.activeBar} />
+               <View style={{...styles.activeBar, width: `${percent}%`}} />
             </View>
             <View style={[styles.horz, styles.progressDesc]}>
-               <Text style={styles.progressText}>{`Starting: ${kilogramsToPounds(startWeight)} lb`}</Text>
-               <Text style={styles.progressText}>{`Goal: ${kilogramsToPounds(goalWeight)} lb`}</Text>
+               <Animated.Text style={{
+                  ...styles.progressText,
+                  opacity: animateValue,
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1],
+                     outputRange: [-30, 0]
+                  }) }] 
+               }}>
+                  {`Start: ${kilogramsToPounds(startWeight)} lb`}
+               </Animated.Text>
+               <Animated.Text style={{
+                  ...styles.progressText,
+                  opacity: animateValue,
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [30, 0]
+                  }) }]
+               }}>
+                  {`Goal: ${kilogramsToPounds(goalWeight)} lb`}
+               </Animated.Text>
             </View>
          </View>
          <ProfileWeightChart />
-      </LinearGradient> || <View style={styles.container} />
+      </AnimatedLinearGradient> || <View style={styles.container} />
    )
 })
 
@@ -69,11 +104,16 @@ const styles = StyleSheet.create({
    container: {
       marginTop: vS(24),
       width: hS(370),
-      height: vS(465), 
+      height: vS(560), 
       borderRadius: hS(24),
+      alignItems: 'center',
       paddingRight: hS(12),
       paddingVertical: vS(16), 
       paddingLeft: hS(24)
+   },
+
+   main: {
+      width: '100%',
    },
 
    horz: {
@@ -82,6 +122,7 @@ const styles = StyleSheet.create({
    },
 
    header: {
+      width: '100%',
       justifyContent: 'space-between', 
       marginBottom: vS(16)
    },
@@ -144,13 +185,15 @@ const styles = StyleSheet.create({
       width: '100%', 
       height: vS(10), 
       borderRadius: 50, 
-      backgroundColor: '#fff'
+      backgroundColor: '#fff',
+      overflow: 'hidden'
    }, 
 
    activeBar: {
       width: '63%', 
       height: '100%', 
-      borderRadius: 50
+      borderRadius: 100,
+      backgroundColor: 'rgba(255, 183, 43, .6)'
    },
 
    progressText: {

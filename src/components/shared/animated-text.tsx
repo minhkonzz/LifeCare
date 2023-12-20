@@ -20,5 +20,5 @@ export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
     return () => clearInterval(interval)
   }, [value])
 
-  return <Text {...{ style }}>{number}</Text>
+  return <Text {...{ style }}>{Number(number.toFixed(2))}</Text>
 }

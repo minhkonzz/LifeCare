@@ -5,10 +5,10 @@ import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { BackIcon } from '@assets/icons'
+import { BackIcon, PrimaryBookIcon, SymptomsIcon } from '@assets/icons'
 import { PopupContext } from '@contexts/popup'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
-import FastingSymptoms from '@components/shared/popup-content/fasting-symptons'
+import FastingSymptoms from '@components/shared/popup/fasting-symptons'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
@@ -68,7 +68,10 @@ const Tips = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: bo
 					outputRange: [-50, 0]
 				}) }]
 			}}>
-				<Text style={styles.tipText}>What should I do during fasting period</Text>
+				<View style={styles.hrz}>
+					<PrimaryBookIcon style={styles.Ic} width={hS(28)} height={vS(28)} />
+					<Text style={styles.tipText}>Tips during fasting period</Text>
+				</View>
 				<BackIcon style={styles.redirectIcon} width={10} height={10} />
 			</AnimatedPressable>
 			<AnimatedPressable onPress={() => setPopup(FastingSymptoms)} style={{
@@ -76,10 +79,13 @@ const Tips = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: bo
 				opacity: animateValue,
 				transform: [{ translateX: animateValue.interpolate({
 					inputRange: [0, 1],
-					outputRange: [-150, 0]
+					outputRange: [-300, 0]
 				}) }]
 			}}>
-				<Text style={styles.tipText}>Symptoms during fasting</Text>
+				<View style={styles.hrz}>
+					<SymptomsIcon style={styles.Ic} width={hS(36)} height={vS(36)} />
+					<Text style={styles.tipText}>Symptoms during fasting</Text>
+				</View>
 				<BackIcon style={styles.redirectIcon} width={10} height={10} />
 			</AnimatedPressable>
 		</View> || <View style={styles.tips} />
@@ -99,6 +105,16 @@ export default memo((): JSX.Element => {
 })
 
 const styles = StyleSheet.create({
+	hrz: {
+		flexDirection: 'row', 
+		alignItems: 'center',
+		marginBottom: vS(-7)
+	},
+
+	Ic: {
+		marginBottom: vS(5)
+	},
+
 	tips: {
 		width: hS(370),
 		marginTop: vS(16),
@@ -109,7 +125,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		paddingVertical: vS(30),
 		paddingHorizontal: hS(24),
-		elevation: 8,
+		elevation: 5,
 		shadowColor: `rgba(${darkRgb.join(', ')}, .3)`,
 		borderRadius: hS(24),
 		marginTop: vS(8),
@@ -119,14 +135,16 @@ const styles = StyleSheet.create({
 	},
 
 	tipText: {
-		fontFamily: 'Poppins-Medium', 
+		fontFamily: 'Poppins-SemiBold', 
 		fontSize: hS(12),
 		color: darkHex,
 		letterSpacing: .2,
+		marginLeft: hS(12)
 	},	
 
 	redirectIcon: {
-		transform: [{ rotate: '180deg' }]
+		transform: [{ rotate: '180deg' }],
+		marginBottom: vS(-4)
 	},
 
 	mainTop: {

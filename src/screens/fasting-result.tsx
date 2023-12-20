@@ -6,13 +6,15 @@ import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
-import { resetTimes } from '../store/fasting'
-import { toDateTimeV1 } from '@utils/datetimes'
+import { resetTimes } from '@store/fasting'
+import { addRec } from '@store/user'
+import { getLocalDatetimeV2, toDateTimeV1 } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
 import { BackIcon, WhiteEditIcon } from '@assets/icons'
+import { autoId } from '@utils/helpers'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
-import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
+import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
@@ -195,13 +197,29 @@ export default (): JSX.Element => {
    useEffect(() => {
       Animated.timing(animateValue, {
          toValue: 1,
-         duration: 920, 
+         duration: 840, 
          useNativeDriver: true
       }).start()
    }, [])
 
 	const onSave = async () => {
-		await UserService.saveFastingRecord({ userId, startTimeStamp, endTimeStamp, planName })
+		let payload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
+		if (userId) {
+			const errorMessage: string = await UserService.saveFastingRecord(userId, payload)
+			if (errorMessage) {
+				console.log('something wrong:', errorMessage)
+				return
+			}
+		} else {
+			const createdAt: string = getLocalDatetimeV2()
+			payload = {
+				...payload, 
+				id: autoId('frec'),
+				createdAt,
+				updatedAt: createdAt 
+			}
+			dispatch(addRec({ key: 'fastingRecords', rec: payload }))
+		}
 		dispatch(resetTimes())
 		navigation.goBack()
 	}

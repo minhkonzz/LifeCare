@@ -1,5 +1,5 @@
-import { memo, useEffect, useRef, useContext } from 'react'
-import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { useContext } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { ClockIcon, LogoutIcon, SettingIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
@@ -17,7 +17,7 @@ import Weight from '@components/profile-weight'
 import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
-import LogoutPopup from '@components/shared/popup-content/logout'
+import LogoutPopup from '@components/shared/popup/logout'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
@@ -33,6 +33,7 @@ const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 	if (userId) {
 		const { name, email } = metadata
 		return (
+			isViewable && 
 			<Animated.View style={{...styles.profileUser, ...styles.horz, opacity: animateValue}}>
 				<View style={styles.horz}>
 					<Animated.Image 
@@ -71,7 +72,7 @@ const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 					<LogoutIcon width={hS(18)} height={vS(20)} />
 					<Text style={styles.logoutText}>Logout</Text>
 				</AnimatedTouchableOpacity>
-			</Animated.View>
+			</Animated.View> || <View style={styles.profileUser} />
 		)
 	}
 

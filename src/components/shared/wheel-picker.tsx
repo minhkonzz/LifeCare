@@ -11,7 +11,7 @@ import {
 import { Colors } from '@utils/constants/colors'
 import { WheelPickerProps } from '@utils/interfaces'
 
-let valueScrolledTo: string | number = -1
+let valueScrolledTo: string | number = 0
 
 export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex }: WheelPickerProps): JSX.Element => {
 	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current

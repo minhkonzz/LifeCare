@@ -8,8 +8,8 @@ import { Colors } from '@utils/constants/colors'
 import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { ElectroIcon, RestaurantIcon } from '@assets/icons'
-import RequireEndFastingPopup from '@components/shared/popup-content/require-end-fasting'
-import ConfirmPopup from '@components/shared/popup-content/ask-start-fasting'
+import RequireEndFastingPopup from '@components/shared/popup/require-end-fasting'
+import ConfirmPopup from '@components/shared/popup/ask-start-fasting'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 

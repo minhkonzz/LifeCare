@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { View, Text, FlatList, Animated, StyleSheet } from 'react-native'
+import { View, FlatList, Animated, StyleSheet } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BackIcon from '@assets/icons/goback.svg'
+import { BackIcon } from '@assets/icons'
 import InsightItem from './insight-item'
 
 const darkPrimary: string = Colors.darkPrimary.hex
@@ -14,13 +14,22 @@ export default ({ item, index }: { item: any, index: number }): JSX.Element => {
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1,
-			duration: 920, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [])
 
 	return (
-		<View style={{...styles.container, marginTop: index > 0 ? vS(28) : 0}}>
+		<Animated.View 
+			style={{
+				...styles.container, 
+				marginTop: index > 0 ? vS(28) : 0,
+				opacity: animateValue,
+				transform: [{ translateY: animateValue.interpolate({
+					inputRange: [0, 1],
+					outputRange: [50, 0]
+				}) }]
+			}}>
 			<View style={styles.header}>
 				<Animated.Text 
 					style={{
@@ -33,10 +42,6 @@ export default ({ item, index }: { item: any, index: number }): JSX.Element => {
 					}}>
 					{ category }
 				</Animated.Text>
-				<View style={styles.viewall}>
-					<Text style={styles.viewallText}>See all</Text>
-					<BackIcon style={styles.viewallIcon} width={hS(5)} height={vS(8)} />
-				</View>
 			</View>
 			<FlatList 
 				horizontal
@@ -46,7 +51,7 @@ export default ({ item, index }: { item: any, index: number }): JSX.Element => {
 				keyExtractor={item => item.id} 
 				renderItem={({ item: insight, index }) => <InsightItem {...{ item: {...insight, category }, index }}/>}
 			/>
-		</View>
+		</Animated.View>
 	)
 }
 
@@ -68,22 +73,5 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(18),
 		letterSpacing: .2
-	},
-
-	viewall: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
-
-	viewallText: {
-		marginRight: hS(10),
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(12),
-		color: darkPrimary
-	},
-
-	viewallIcon: {
-		transform: [{ rotate: '180deg' }],
-		marginBottom: vS(3)
 	}
 })

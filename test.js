@@ -77,17 +77,13 @@
 // // console.log(handleFastingRecords(1701570543000, 1701729003000))
 // console.log(new Date().toLocaleDateString())
 
-const SERVER_URL = 'https://lifecareserver.onrender.com'
+const d = new Intl.DateTimeFormat('en', {
+   month: '2-digit',
+   day: '2-digit',
+   hour: '2-digit',
+   minute: '2-digit',
+   second: '2-digit'
+}).format(new Date())
 
-const tryPost = async () => {
-   const botResponse = await fetch(`${SERVER_URL}/chat/q`, {
-      method: 'POST',
-      body: JSON.stringify({ question: 'what is mental health' }),
-      headers: { 'Content-type': 'application/json; charset=UTF-8' }
-   })
-   const data = await botResponse.json()
-   console.log('data:', data)
-}
-
-tryPost()
+console.log(d)
 

@@ -29,7 +29,7 @@ export default ({ value, w, onPress }: SettingToggleValueProps): JSX.Element => 
    }
 
    return (
-      <Pressable 
+      <Pressable
          style={{
             ...styles.toggle,
             ...w ? {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
    toggle: {
       width: hS(120),
       height: vS(30),
-      backgroundColor: `rgba(${darkRgb.join(', ')}, .18)`,
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .14)`,
       borderRadius: hS(12),
       justifyContent: 'center'
    },

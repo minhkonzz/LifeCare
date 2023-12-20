@@ -81,9 +81,12 @@ export type UserState = {
 }
 
 export type WaterRecordsPayload = {
-   userId: string,
+   id: string,
    goal: number, 
    value: number,
-   changes: Array<{ liquid: number, time: string }>
+   createdAt: string,
+   updatedAt: string,
+   times: Array<{ id: string, value: number, createdAt: string, updatedAt: string }>,
+   date: string
 }
 
