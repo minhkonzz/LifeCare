@@ -4,6 +4,7 @@ import { supabase } from "@configs/supabase"
 import { convertObjectKeysToSnakeCase } from '@utils/helpers'
 import { getLocalDatetimeV2, getCurrentDate } from '@utils/datetimes'
 import { autoId } from '@utils/helpers'
+import UserService from '@services/user'
 
 const userId: string = '47f8b2fd-a410-4094-bcd5-5588991faafc'
 
@@ -15,15 +16,15 @@ export default function TestPostgreFn() {
       const savePrevWater = async () => {
          const date: string = getCurrentDate()
          const currentDatetime: string = getLocalDatetimeV2()
-         const { data, error } = await supabase.rpc('save_prev_water_records', {
+         const { data, error } = await supabase.rpc('save_prev_water_records', { 
             user_id: userId,
-            payload: JSON.stringify({
+            payload: {
                value: 1250,
                goal: 2500, 
                date, 
                createdAt: currentDatetime,
                updatedAt: currentDatetime, 
-               times: JSON.stringify([
+               times: [
                   {
                      id: autoId('wrt'),
                      value: 260,
@@ -42,11 +43,11 @@ export default function TestPostgreFn() {
                      createdAt: currentDatetime,
                      updatedAt: currentDatetime
                   }
-               ])
-            })
+               ]
+            }
          })
          console.log('data:', data, 'error:', error)
-         setSuccess(true)
+         setSuccess(!!data)
       }
 
       savePrevWater()

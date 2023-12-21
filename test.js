@@ -77,13 +77,14 @@
 // // console.log(handleFastingRecords(1701570543000, 1701729003000))
 // console.log(new Date().toLocaleDateString())
 
-const d = new Intl.DateTimeFormat('en', {
+const d = new Date(new Intl.DateTimeFormat('en', {
+   year: '2-digit',
    month: '2-digit',
    day: '2-digit',
    hour: '2-digit',
    minute: '2-digit',
    second: '2-digit'
-}).format(new Date())
+}).format(new Date()))
 
 console.log(d)
 

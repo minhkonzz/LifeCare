@@ -3,7 +3,8 @@ import { Animated } from 'react-native'
 import Popup from '@components/shared/popup'
 
 export default <P extends object>(MainPopup: ComponentType<P>, type: 'bottomsheet' | 'centered', title: string, width?: number) => {
-   return memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+   return memo((props: any) => {
+      const { setVisible } = props
       const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
       const onConfirm = (afterDisappear: () => Promise<void>) => {

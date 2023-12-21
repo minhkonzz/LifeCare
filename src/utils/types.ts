@@ -81,7 +81,6 @@ export type UserState = {
 }
 
 export type WaterRecordsPayload = {
-   id: string,
    goal: number, 
    value: number,
    createdAt: string,

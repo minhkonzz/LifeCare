@@ -66,7 +66,6 @@ export default (): JSX.Element => {
 		const currentDatetime: string = getLocalDatetimeV2()
 
 		let newWaterRecords = {
-			id: autoId('wr'),
 			value: drinked,
 			goal: dailyWater,
 			date,
@@ -87,6 +86,8 @@ export default (): JSX.Element => {
 				return
 			}
 			newWaterRecords['id'] = waterRecordId
+		} else {
+			newWaterRecords['id'] = autoId('wr')
 		}
 		dispatch(addRec({ key: 'waterRecords', rec: newWaterRecords }))
 		dispatch(resetDailyWater(todayDate))

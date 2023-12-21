@@ -134,9 +134,13 @@ export const calculateAmountBetweenTimes = ({
 }
 
 export const timestampToDateTime = (time: number) => {
-   const s = formatNum(Math.floor((time / 1000) % 60))
-   const m = formatNum(Math.floor((time / 1000 / 60) % 60))
-   const h = formatNum(Math.floor((time / 1000 / 60 / 60) % 24))
+   // const s = formatNum(Math.floor((time / 1000) % 60))
+   // const m = formatNum(Math.floor((time / 1000 / 60) % 60))
+   // const h = formatNum(Math.floor((time / 1000 / 60 / 60) % 24))
+
+   const h = formatNum(Math.floor(time / (1000 * 60 * 60)))
+   const m = formatNum(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)))
+   const s = formatNum(Math.floor((time % (1000 * 60)) / 1000))
    return `${h}:${m}:${s}`
 }
 

@@ -35,7 +35,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 			interval = setInterval(() => {
 				const currentTimeStamp = getCurrentTimestamp()
 				const timeElapsed = currentTimeStamp - startTimeStamp
-				const elapsedHours = Math.floor((timeElapsed / 1000 / 60 / 60) % 24)
+				const elapsedHours: number = Math.floor(timeElapsed / (1000 * 60 * 60))
 				let currentStage: any
 
 				if (data && data.stage) {
@@ -82,7 +82,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 					<View style={styles.main}>
 						<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedPercent}%)`}</Text>
 						<Text style={{...styles.time, fontSize: hS(36) }}>{timeText}</Text>
-						<Text style={styles.elapsedTime}>{`Exceeded: +${timeExceededText}`}</Text>
+						<Text style={{...styles.elapsedTime, marginBottom: vS(10), marginTop: vS(-8)}}>{`Exceeded: +${timeExceededText}`}</Text>
 						{ nextStageIndex !== -1 && <>
 						<Text style={styles.nextStageTitle}>Next stage</Text>
 						<View style={styles.horz}>

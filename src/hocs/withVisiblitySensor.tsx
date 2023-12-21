@@ -2,7 +2,8 @@ import { memo, useRef, useEffect, ComponentType } from 'react'
 import { Animated } from 'react-native'
 
 export default <P extends object>(BaseComponent: ComponentType<P>) => {
-   return memo(({ isViewable }: { isViewable: boolean }) => {
+   return memo((props: any) => {
+      const { isViewable } = props
       const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
    
 
@@ -14,6 +15,6 @@ export default <P extends object>(BaseComponent: ComponentType<P>) => {
          }).start()
       }, [isViewable])
 
-      return <BaseComponent {...({ isViewable, animateValue } as P)} />
+      return <BaseComponent {...{...({ isViewable, animateValue } as P), ...props}} />
    })
 }
