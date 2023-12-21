@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { BackIcon, SpoonForkIcon } from '@assets/icons'
-import { useSelector } from 'react-redux'
-import { AppState } from '../store'
-import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
+import { getCurrentTimestamp } from '@utils/datetimes'
+import withFastingState from '@hocs/withFastingState'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -15,29 +13,21 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { rgb: primaryRgb } = Colors.primary
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-let interval: NodeJS.Timeout | undefined
 
-export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
+export default withVisiblitySensor(withFastingState(({ 
+	isViewable, 
+	animateValue,
+	stageData 
+}: { 
+	isViewable: boolean, 
+	animateValue: Animated.Value,
+	stageData: any 
+}): JSX.Element => {
 	const navigation = useNavigation<any>()
-	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
-	const isFasting: boolean = !!(startTimeStamp && endTimeStamp)
-	const [ timeElapsed, setTimeElapsed ] = useState<number>(0)
-
-	useEffect(() => {
-		if (isFasting) {
-			interval = setInterval(() => {
-				const currentTimestamp = getCurrentTimestamp()
-				const elapsedTime = currentTimestamp - startTimeStamp
-				setTimeElapsed(elapsedTime)
-			}, 999)
-		}
-
-		return () => { if (interval) clearInterval(interval) }
-	}, [startTimeStamp])
 
 	if (isViewable) {
-		if (isFasting) {
-			const elapsedPercent: number = Math.floor(timeElapsed / (endTimeStamp - startTimeStamp) * 100)
+		if (stageData) {
+			const { elapsedTimePercent, endTimeStamp, elapsedTimeText } = stageData
 			const currentTimestamp: number = getCurrentTimestamp()
 			const currentDate: number = new Date(currentTimestamp).getDate()
 			const endDatetime: Date = new Date(endTimeStamp)
@@ -63,13 +53,13 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						style={styles.container}>
 						<View style={styles.main}>
 							<View style={styles.circle}>
-								{ isFasting && <Text style={styles.progressText}>{`${elapsedPercent}%`}</Text> }
+								<Text style={styles.progressText}>{`${elapsedTimePercent}%`}</Text>
 								<AnimatedCircularProgress 
 									lineCap='round' 
 									width={hS(8)}
 									size={hS(105)}
 									rotation={360}
-									fill={elapsedPercent}
+									fill={elapsedTimePercent}
 									tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
 									backgroundColor={`rgba(255, 255, 255, .4)`}
 								/>
@@ -77,7 +67,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 							<View style={styles.mainTexts}>
 								<Text style={styles.t1}>You're fasting</Text>
 								<Text style={styles.t2}>Elapsed time</Text>
-								<Text style={styles.t3}>{timestampToDateTime(timeElapsed)}</Text>
+								<Text style={styles.t3}>{elapsedTimeText}</Text>
 								<Text style={styles.t4}>{notificationString}</Text>
 							</View>
 						</View>
@@ -123,7 +113,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 		)
 	}
 	return <View style={styles.blank} />
-})
+}, true))
 
 const styles = StyleSheet.create({
 	blank: { height: vS(132) },

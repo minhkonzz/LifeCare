@@ -10,7 +10,7 @@ import { convertObjectKeysToCamelCase } from '@utils/helpers'
 import PopupProvider, { PopupContext } from '@contexts/popup'
 import plansData from '@assets/data/plans.json'
 import UserService from '@services/user'
-import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
+import NetInfo from '@react-native-community/netinfo'
 import BottomTabs from '@navigations/bottom-tabs'
 import FastAIOverview from '@screens/fastai-overview'
 import FastAIMainChat from '@screens/fastai-mainchat'
@@ -41,6 +41,7 @@ import Auth from '@screens/auth'
 const Stack = createStackNavigator()
 
 const StackNav = memo((): JSX.Element => {
+   console.log('render Stack')
    return (
       <Stack.Navigator
          initialRouteName='splash'
@@ -76,13 +77,11 @@ const StackNav = memo((): JSX.Element => {
 })
 
 const Main = () => {
+   console.log('render Main')
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
    const [ initialized, setInitialized ] = useState<boolean>(false)
    const { session: prevSession, metadata } = useSelector((state: AppState) => state.user)
-   const { isOnline } = useSelector((state: AppState) => state.network)
-   const netInfo = useNetInfo()
-   console.log('netInfo:', netInfo)
 
    const fetchPersonalData = async (userId: string): Promise<void> => {
       const { res, error } = await UserService.getPersonalData(userId)
@@ -90,61 +89,59 @@ const Main = () => {
    }
 
    const initializeUserData = (res: any) => {
-      console.log('res:', res)
       const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = res
-
-      if (startTimeStamp && endTimeStamp) 
-         dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
-
-      if (currentPlanId) {
-         const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
-         dispatch(updateCurrentPlan(convertObjectKeysToCamelCase(currentPlan)))
-      }
-      
+      dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
+      const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
+      dispatch(updateCurrentPlan(currentPlan && convertObjectKeysToCamelCase(currentPlan) || null))
       dispatch(updateMetadata(personalData))
    }
 
    useEffect(() => {
       let channel: any
+      let supabaseAuthListener: any
 
       const netInfoUnsubscribe = NetInfo.addEventListener(state => {
          dispatch(updateNetworkOnline(state.isConnected))
       })
 
-      const { data: supabaseAuthListener } = supabase.auth.onAuthStateChange(async(event, session) => {
-         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-            if (session) {
-               const userId: string = session.user.id
-               const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
-               if (isSurveyed && !error) await fetchPersonalData(userId)
+      NetInfo.fetch().then(state => {
+         const isOnline: boolean = !!state.isConnected
+         dispatch(updateNetworkOnline(isOnline))
+         const { data } = supabase.auth.onAuthStateChange(async(event, session) => {
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+               if (session) {
+                  const userId: string = session.user.id
+                  const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
+                  if (isSurveyed && !error) await fetchPersonalData(userId)
+               }
+               dispatch(updateSession(session))
             }
-            dispatch(updateSession(session))
-         }
-         if (prevSession) {
-            const { isSurveyed } = metadata
-            console.log(isSurveyed, isOnline)
-            if (isSurveyed && isOnline) {
-               console.log('reach here k')
-               const userId: string = prevSession.user.id 
-               await fetchPersonalData(userId)
+            if (prevSession) {
+               const { isSurveyed } = metadata
+               if (isSurveyed && isOnline) {
+                  console.log('reach here k1')
+                  const userId: string = prevSession.user.id 
+                  await fetchPersonalData(userId)
+               }
             }
-         }
-         const currentSession = prevSession || session
-         if (currentSession && !channel) {
-            const userId: string = currentSession.user.id
-            channel = supabase.channel('schema-db-changes')
-            .on('postgres_changes', {
-               event: 'UPDATE',
-               schema: 'public',
-               table: 'users',
-               filter: `id=eq.${userId}`
-            }, (payload: any) => { 
-               const convertedResponse = convertObjectKeysToCamelCase(payload.new)
-               initializeUserData(convertedResponse)
-            })
-            .subscribe()
-         }
-         setInitialized(true)
+            const currentSession = prevSession || session
+            if (currentSession && !channel) {
+               const userId: string = currentSession.user.id
+               channel = supabase.channel('schema-db-changes')
+               .on('postgres_changes', {
+                  event: 'UPDATE',
+                  schema: 'public',
+                  table: 'users',
+                  filter: `id=eq.${userId}`
+               }, (payload: any) => { 
+                  const convertedResponse = convertObjectKeysToCamelCase(payload.new)
+                  initializeUserData(convertedResponse)
+               })
+               .subscribe()
+            }
+            setInitialized(true)
+         })
+         supabaseAuthListener = data
       })
 
       return () => {

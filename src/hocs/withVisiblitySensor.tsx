@@ -5,7 +5,6 @@ export default <P extends object>(BaseComponent: ComponentType<P>) => {
    return memo((props: any) => {
       const { isViewable } = props
       const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-   
 
       useEffect(() => {
          Animated.timing(animateValue, {
