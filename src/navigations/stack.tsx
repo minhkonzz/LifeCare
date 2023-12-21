@@ -37,41 +37,43 @@ import InsightReading from '@screens/insight-reading'
 import AddActivity from '@screens/add-activity'
 import AddFood from '@screens/add-food'
 import Auth from '@screens/auth'
+import TestPostgreFn from '@screens/test-postgre-fn'
 
 const Stack = createStackNavigator()
 
 const StackNav = memo((): JSX.Element => {
    return (
-      <Stack.Navigator
-         initialRouteName='splash'
-         screenOptions={{ headerShown: false }}>
-         <Stack.Screen name='auth' component={Auth}/>
-         <Stack.Screen name='welcome' component={Welcome} />
-         <Stack.Screen name='survey' component={Survey} />
-         <Stack.Screen name='water' component={Water} />
-         <Stack.Screen name='water-overview' component={WaterOverview} />
-         <Stack.Screen name='water-setting' component={WaterSetting} />
-         <Stack.Screen name='survey-loading' component={SurveyLoading} />
-         <Stack.Screen name='survey-suggest' component={SurveySuggest} />
-         <Stack.Screen name='splash' component={Splash} />
-         <Stack.Screen name='main' component={BottomTabs} />
-         <Stack.Screen name='fastai-overview' component={FastAIOverview} />
-         <Stack.Screen name='fastai-mainchat' component={FastAIMainChat} />
-         <Stack.Screen name='plans' component={FastingPlans} />
-         <Stack.Screen name='fasting-stages' component={FastingStages} />
-         <Stack.Screen name='fasting-result' component={FastingResult} />
-         <Stack.Screen name='day-plan' component={DayPlan} />
-         <Stack.Screen name='body-measures' component={BodyMeasures} />
-         <Stack.Screen name='timeline' component={Timeline} />
-         <Stack.Screen name='personal-data' component={PersonalData} />
-         <Stack.Screen name='reminder' component={Reminder} />
-         <Stack.Screen name='setting' component={Setting} />
-         <Stack.Screen name='feedback' component={Feedback} />
-         <Stack.Screen name='goal' component={Goal} />
-         <Stack.Screen name='insight-reading' component={InsightReading}/>
-         <Stack.Screen name='add-activity' component={AddActivity} />
-         <Stack.Screen name='add-food' component={AddFood} />
-      </Stack.Navigator>
+      // <Stack.Navigator
+      //    initialRouteName='splash'
+      //    screenOptions={{ headerShown: false }}>
+      //    <Stack.Screen name='auth' component={Auth}/>
+      //    <Stack.Screen name='welcome' component={Welcome} />
+      //    <Stack.Screen name='survey' component={Survey} />
+      //    <Stack.Screen name='water' component={Water} />
+      //    <Stack.Screen name='water-overview' component={WaterOverview} />
+      //    <Stack.Screen name='water-setting' component={WaterSetting} />
+      //    <Stack.Screen name='survey-loading' component={SurveyLoading} />
+      //    <Stack.Screen name='survey-suggest' component={SurveySuggest} />
+      //    <Stack.Screen name='splash' component={Splash} />
+      //    <Stack.Screen name='main' component={BottomTabs} />
+      //    <Stack.Screen name='fastai-overview' component={FastAIOverview} />
+      //    <Stack.Screen name='fastai-mainchat' component={FastAIMainChat} />
+      //    <Stack.Screen name='plans' component={FastingPlans} />
+      //    <Stack.Screen name='fasting-stages' component={FastingStages} />
+      //    <Stack.Screen name='fasting-result' component={FastingResult} />
+      //    <Stack.Screen name='day-plan' component={DayPlan} />
+      //    <Stack.Screen name='body-measures' component={BodyMeasures} />
+      //    <Stack.Screen name='timeline' component={Timeline} />
+      //    <Stack.Screen name='personal-data' component={PersonalData} />
+      //    <Stack.Screen name='reminder' component={Reminder} />
+      //    <Stack.Screen name='setting' component={Setting} />
+      //    <Stack.Screen name='feedback' component={Feedback} />
+      //    <Stack.Screen name='goal' component={Goal} />
+      //    <Stack.Screen name='insight-reading' component={InsightReading}/>
+      //    <Stack.Screen name='add-activity' component={AddActivity} />
+      //    <Stack.Screen name='add-food' component={AddFood} />
+      // </Stack.Navigator>
+      <TestPostgreFn />
    )
 })
 
