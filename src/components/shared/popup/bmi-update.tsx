@@ -4,8 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateMetadata } from '@store/user'
+import { updateMetadata, enqueueAction } from '@store/user'
+import { getCurrentUTCDateV2 } from '@utils/datetimes'
 import { poundsToKilograms, kilogramsToPounds, centimeterToInch, inchToCentimeter } from '@utils/fomular'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { autoId } from '@utils/helpers'
+import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
@@ -17,29 +21,65 @@ const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { rgb: darkRgb } = Colors.darkPrimary
 
 export default withPopupBehavior(
-   ({ 
+   withSync(({ 
       setVisible,
-      onConfirm
+      onConfirm,
+      isOnline 
    }: { 
       setVisible: Dispatch<SetStateAction<ReactNode>>,
-      onConfirm: (afterDisappear: () => Promise<void>) => void
+      onConfirm: (afterDisappear: () => Promise<void>) => void,
+      isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { currentHeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
       const session = useSelector((state: AppState) => state.user.session) 
       const userId: string | null = session && session.user.id || null
+      const { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppState) => state.user.metadata)
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ weight, setWeight ] = useState<number>(currentWeight)
-      const [ optionIndex, setOptionIndex ] = useState<number>(0)
+      const [ optionIndex, setOptionIndex ] = useState<number>(0) 
       const symbSplits = options[optionIndex].split('/')
 
       const onSave = async () => {
          const payload = { currentHeight: height, currentWeight: weight }
-         if (userId) {
-            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-            return
+         const currentDate: string = getCurrentUTCDateV2()
+         const newBodyRecId: string = autoId('br')
+
+         const cache = (beQueued = false) => {
+            dispatch(updateMetadata(payload))
+            const i: number = bodyRecords.findIndex((e: any) => {
+               const createdAt: Date = new Date(e.createdAt)
+               return createdAt.toLocaleDateString() === currentDate
+            })
+
+            if (i === -1) {
+               const currentDatetime: string = getUTCDatetimeV1()
+               bodyRecords.push({
+                  id: newBodyRecId,
+                  value: weight,
+                  type: 'weight',
+                  createdAt: currentDatetime,
+                  updatedAt: currentDatetime
+               })
+               
+            } else {
+               bodyRecords[i].value = weight
+            }
+            updateMetadata({ bodyRecords })
+            if (beQueued) {
+               dispatch(enqueueAction({
+                  actionId: autoId('qaid'),
+                  invoker: UserService.updateBMI,
+                  name: 'UPDATE_BMI',
+                  params: [userId, { ...payload, newBodyRecId, currentDate }]
+               }))
+            }
          }
-         dispatch(updateMetadata(payload))
+
+         if (!userId || !isOnline) cache() 
+         else {
+            const errorMessage: string = await UserService.updateBMI(userId, { ...payload, newBodyRecId, currentDate })
+            if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+         } 
          setVisible(null)
       }
 
@@ -87,11 +127,10 @@ export default withPopupBehavior(
             </TouchableOpacity>
          </>
       )
-   },
+   }),
    'centered',
    'Weight & Height',
    hS(315)
-
 )
 
 const styles = StyleSheet.create({

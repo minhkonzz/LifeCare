@@ -77,14 +77,17 @@
 // // console.log(handleFastingRecords(1701570543000, 1701729003000))
 // console.log(new Date().toLocaleDateString())
 
-const d = new Date(new Intl.DateTimeFormat('en', {
-   year: '2-digit',
-   month: '2-digit',
-   day: '2-digit',
-   hour: '2-digit',
-   minute: '2-digit',
-   second: '2-digit'
-}).format(new Date()))
+const getUTCDatetimeV1 = () => {
+   const d = new Date()
+   const year = d.getUTCFullYear()
+   const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+   const day = String(d.getUTCDate()).padStart(2, '0')
+   const hours = String(d.getUTCHours()).padStart(2, '0')
+   const minutes = String(d.getUTCMinutes()).padStart(2, '0')
+   const seconds = String(d.getUTCSeconds()).padStart(2, '0')
+   const milliseconds = String(d.getUTCMilliseconds()).padStart(3, '0')
+   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`
+}
 
-console.log(d)
-
+const dt = new Date(getUTCDatetimeV1())
+console.log(dt.toLocaleDateString())

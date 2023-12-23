@@ -4,7 +4,7 @@ import { UserState } from '@utils/types'
 const initialState: UserState = {
    session: null,
    metadata: null,
-   changes: null
+   queuedActions: null
 }
 
 export const userSlice = createSlice({
@@ -23,9 +23,22 @@ export const userSlice = createSlice({
          const { key, rec } = action.payload
          const collection = state.metadata[key]
          collection.push(rec)
+      },
+
+      enqueueAction: (state, action) => {
+         state.queuedActions = [...state.queuedActions, action.payload]
+      },
+
+      dequeueAction: (state) => {
+         const [, ...restActions] = state.queuedActions
+         state.queuedActions = restActions
+      },
+
+      updateQueuedActions: (state, action) => {
+         state.queuedActions = action.payload
       }
    }
 })
 
-export const { updateMetadata, updateSession, addRec } = userSlice.actions
+export const { updateMetadata, updateSession, addRec, enqueueAction, dequeueAction, updateQueuedActions } = userSlice.actions
 export default userSlice.reducer

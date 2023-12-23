@@ -13,6 +13,22 @@ export const getCurrentDate = (): string => {
    return `${year}-${month}-${date}`
 }
 
+export const getCurrentUTCDate = (): string => {
+   const d: Date = new Date()
+   const y: number = d.getUTCFullYear()
+   const m: string = (d.getUTCMonth() + 1).toString().padStart(2, '0')
+   const _d: string = (d.getUTCDate()).toString().padStart(2, '0')
+   return `${y}-${m}-${_d}`
+}
+
+export const getCurrentUTCDateV2 = (): string => {
+   const d: Date = new Date()
+   const y: number = d.getUTCFullYear()
+   const m: string = (d.getUTCMonth() + 1).toString().padStart(2, '0')
+   const _d: string = (d.getUTCDate()).toString().padStart(2, '0')
+   return `${m}/${_d}/${y}`
+}
+
 export const isSameDay = (d1: Date, d2: Date): boolean => {
    const yearD1: number = d1.getFullYear()
    const monthD1: number = d1.getMonth()
@@ -169,5 +185,17 @@ export const toDateTimeV1 = (timestamp: number): string => {
       minute: 'numeric',
       hour12: true
    }).format(d)
+}
+
+export const getUTCDatetimeV1 = () => {
+   const d = new Date()
+   const year = d.getUTCFullYear()
+   const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+   const day = String(d.getUTCDate()).padStart(2, '0')
+   const hours = String(d.getUTCHours()).padStart(2, '0')
+   const minutes = String(d.getUTCMinutes()).padStart(2, '0')
+   const seconds = String(d.getUTCSeconds()).padStart(2, '0')
+   const milliseconds = String(d.getUTCMilliseconds()).padStart(3, '0')
+   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`
 }
 

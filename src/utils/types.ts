@@ -77,7 +77,7 @@ export type SettingState = {
 export type UserState = {
    session: any,
    metadata: any,
-   changes: any
+   queuedActions: any
 }
 
 export type WaterRecordsPayload = {

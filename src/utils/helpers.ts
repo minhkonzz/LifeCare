@@ -1,5 +1,10 @@
 import { getLocalTimeV1, getDayTitle, getMonthTitle } from "./datetimes"
 
+export const handleErrorMessage = (message: string) => {
+   const splits: string[] = message.split(': ')
+   return splits[splits.length === 1 && 0 || 1].toUpperCase()
+}
+
 export const getBMIStatus = (value: number): string => {
    return (
       value < 16 && 'Severe Thinness' ||

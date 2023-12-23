@@ -1,7 +1,7 @@
 import { supabase } from "@configs/supabase"
 import { WaterRecordsPayload } from "@utils/types"
 import { InitialPersonalData } from "@utils/interfaces"
-import { convertObjectKeysToSnakeCase, convertObjectKeysToCamelCase } from "@utils/helpers"
+import { convertObjectKeysToSnakeCase, convertObjectKeysToCamelCase, handleErrorMessage } from "@utils/helpers"
 
 export default {
    signInPassword: async (email: string, password: string) => {
@@ -112,11 +112,15 @@ export default {
       payload: any
    ): Promise<string> => {
       const { error } = await supabase.from('users').update(convertObjectKeysToSnakeCase(payload)).eq('id', userId)
-      if (error) {
-         const splits: string[] = error.message.split(': ')
-         return splits[splits.length === 1 && 0 || 1].toUpperCase()
-      }
-      return ''
+      return error ? handleErrorMessage(error.message) : ''
+   },
+
+   updateBMI: async (
+      userId: string,
+      payload: any
+   ): Promise<string> => {
+      const { error } = await supabase.rpc('update_bmi', convertObjectKeysToSnakeCase({ userId, payload }))
+      return error ? handleErrorMessage(error.message) : ''
    },
 
    savePrevWaterRecords: async (userId: string, payload: WaterRecordsPayload): Promise<{ waterRecordId?: string, error: string }> => {
@@ -134,7 +138,7 @@ export default {
       //    waterRecordId,
       //    error: ''
       // }
-      const { data: waterRecordId, error } = await supabase.rpc('save_prev_water_records', convertObjectKeysToSnakeCase(payload))
+      const { data: waterRecordId, error } = await supabase.rpc('save_prev_water_records', convertObjectKeysToSnakeCase({ userId, payload }))
       return error && { error: error.message } || { waterRecordId, error: '' }
    },
 
@@ -196,12 +200,12 @@ export default {
    saveFastingRecord: async (userId: string, payload: any): Promise<string> => {
       const { startTimeStamp, endTimeStamp, planName } = payload 
       const { error } = await supabase.from('fasting_records').insert(convertObjectKeysToSnakeCase({ userId, planName, startTimeStamp, endTimeStamp, notes: '' }))
-      return error ? error.message : ''
+      return error ? handleErrorMessage(error.message) : ''
    },
 
    updateWeightTimeline: async (userId: string, payload: any): Promise<string> => {
       const { id, value } = payload
       const { error } = await supabase.from('body_records').update({ value }).eq('user_id', userId).eq('id', id)
-      return error ? error.message : '' 
+      return error ? handleErrorMessage(error.message) : '' 
    }
 }

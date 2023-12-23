@@ -9,7 +9,7 @@ export default <P extends object>(MainPopup: ComponentType<P>, type: 'bottomshee
 
       const onConfirm = (afterDisappear: () => Promise<void>) => {
          Animated.timing(animateValue, {
-            toValue: 1,
+            toValue: 0,
             duration: 320,
             useNativeDriver: true
          }).start(() => {
@@ -25,7 +25,7 @@ export default <P extends object>(MainPopup: ComponentType<P>, type: 'bottomshee
             animateValue,
             setVisible
          }}>
-            <MainPopup {...({ setVisible, onConfirm }) as P} />
+            <MainPopup {...{...({ onConfirm }) as P, ...props}} />
          </Popup>
       )
    })
