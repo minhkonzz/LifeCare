@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateQueuedActions } from '@store/user'
 import { AppState } from '../store'
 
-let processedActionIds: any = []
+let processedActionIds: string[] = []
 
 export default <P extends object>(BaseComponent: ComponentType<P>) => {
    return (props: any) => {

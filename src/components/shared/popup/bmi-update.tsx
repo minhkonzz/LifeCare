@@ -52,6 +52,7 @@ export default withPopupBehavior(
             })
 
             if (i === -1) {
+               console.log('reach here 222')
                const currentDatetime: string = getUTCDatetimeV1()
                bodyRecords.push({
                   id: newBodyRecId,
@@ -62,10 +63,12 @@ export default withPopupBehavior(
                })
                
             } else {
+               console.log('reach here 333')
                bodyRecords[i].value = weight
             }
-            updateMetadata({ bodyRecords })
+            dispatch(updateMetadata({ bodyRecords }))
             if (beQueued) {
+               console.log('reach here 333')
                dispatch(enqueueAction({
                   actionId: autoId('qaid'),
                   invoker: UserService.updateBMI,
@@ -78,7 +81,10 @@ export default withPopupBehavior(
          if (!userId || !isOnline) cache() 
          else {
             const errorMessage: string = await UserService.updateBMI(userId, { ...payload, newBodyRecId, currentDate })
-            if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+            if (errorMessage === NETWORK_REQUEST_FAILED) {
+               console.log('reach here 111')
+               cache(true)
+            }
          } 
          setVisible(null)
       }
