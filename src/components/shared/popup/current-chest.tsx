@@ -49,7 +49,8 @@ export default withPopupBehavior(
             }
          }
 
-         if (!userId || !isOnline) cache() 
+         if (!userId) cache()
+         else if (!isOnline) cache(true)
          else {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
             if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)

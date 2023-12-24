@@ -2,6 +2,7 @@ import { ComponentType, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateQueuedActions } from '@store/user'
 import { AppState } from '../store'
+import UserService from '@services/user'
 
 let processedActionIds: string[] = []
 
@@ -14,7 +15,8 @@ export default <P extends object>(BaseComponent: ComponentType<P>) => {
       const performSync = async () => {
          for (const action of queuedActions) {
             const { actionId, invoker, params } = action
-            const errorMessage: string = await invoker(...params)
+            const caller = UserService[invoker]
+            const errorMessage: string = await caller(...params)
             if (errorMessage) continue
             processedActionIds.push(actionId)
          }

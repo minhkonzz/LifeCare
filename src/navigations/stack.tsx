@@ -7,6 +7,7 @@ import { updateNetworkOnline } from '../store/network'
 import { updateMetadata, updateSession } from '../store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
+import SyncDetector from '@components/shared/sync-detect'
 import PopupProvider, { PopupContext } from '@contexts/popup'
 import plansData from '@assets/data/plans.json'
 import UserService from '@services/user'
@@ -154,6 +155,7 @@ const Main = () => {
 
    return (
       <>
+         <SyncDetector />
          <StackNav />
          { Popup && <Popup setVisible={setPopup} /> }
       </>

@@ -4,7 +4,7 @@ import { UserState } from '@utils/types'
 const initialState: UserState = {
    session: null,
    metadata: null,
-   queuedActions: null
+   queuedActions: []
 }
 
 export const userSlice = createSlice({

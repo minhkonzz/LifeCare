@@ -124,20 +124,6 @@ export default {
    },
 
    savePrevWaterRecords: async (userId: string, payload: WaterRecordsPayload): Promise<{ waterRecordId?: string, error: string }> => {
-      // const { value, goal, times, date, createdAt, updatedAt } = payload
-      // const { data: d1, error: saveWaterRecordError } = await supabase.from('water_records').insert(convertObjectKeysToSnakeCase({ userId, value, goal, date, createdAt, updatedAt })).select('id')
-      // if (saveWaterRecordError) return { error: saveWaterRecordError.message }
-      // const waterRecordId = d1[0].id
-      // const { error: saveWaterRecordTimesError } = await supabase.from('water_record_times').insert(times.map(e => ({
-      //    ...e, 
-      //    user_id: userId,
-      //    water_record_id: waterRecordId
-      // })))
-      // if (saveWaterRecordTimesError) return { error: saveWaterRecordTimesError.message }
-      // return {
-      //    waterRecordId,
-      //    error: ''
-      // }
       const { data: waterRecordId, error } = await supabase.rpc('save_prev_water_records', convertObjectKeysToSnakeCase({ userId, payload }))
       return error && { error: error.message } || { waterRecordId, error: '' }
    },

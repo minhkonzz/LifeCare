@@ -5,7 +5,7 @@ import { AppState } from '@store/index'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
-import { getCurrentUTCDateV2 } from '@utils/datetimes'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 import { poundsToKilograms, kilogramsToPounds, centimeterToInch, inchToCentimeter } from '@utils/fomular'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { autoId } from '@utils/helpers'
@@ -33,7 +33,7 @@ export default withPopupBehavior(
       const dispatch = useDispatch()
       const session = useSelector((state: AppState) => state.user.session) 
       const userId: string | null = session && session.user.id || null
-      const { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppState) => state.user.metadata)
+      let { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppState) => state.user.metadata)
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ weight, setWeight ] = useState<number>(currentWeight)
       const [ optionIndex, setOptionIndex ] = useState<number>(0) 
@@ -52,33 +52,31 @@ export default withPopupBehavior(
             })
 
             if (i === -1) {
-               console.log('reach here 222')
-               const currentDatetime: string = getUTCDatetimeV1()
-               bodyRecords.push({
+               const currentDatetime: string = getCurrentUTCDatetimeV1()
+               bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
                   value: weight,
                   type: 'weight',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
-               })
+               }]
                
             } else {
-               console.log('reach here 333')
                bodyRecords[i].value = weight
             }
             dispatch(updateMetadata({ bodyRecords }))
             if (beQueued) {
-               console.log('reach here 333')
                dispatch(enqueueAction({
                   actionId: autoId('qaid'),
-                  invoker: UserService.updateBMI,
+                  invoker: 'updateBMI',
                   name: 'UPDATE_BMI',
                   params: [userId, { ...payload, newBodyRecId, currentDate }]
                }))
             }
          }
 
-         if (!userId || !isOnline) cache() 
+         if (!userId) cache()
+         else if (!isOnline) cache(true)
          else {
             const errorMessage: string = await UserService.updateBMI(userId, { ...payload, newBodyRecId, currentDate })
             if (errorMessage === NETWORK_REQUEST_FAILED) {

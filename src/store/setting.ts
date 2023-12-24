@@ -68,42 +68,42 @@ const SettingSlice = createSlice({
          })
       },
 
-      // updateStartFastRemind: (state, action) => {
-      //    const { startFast, beforeStartFast } = action.payload
-      //    configPushStartFastNotification({ startFast, beforeStartFast })
-      //    state.reminders.beforeStartFast = beforeStartFast
-      // },
+      updateStartFastRemind: (state, action) => {
+         const { startFast, beforeStartFast } = action.payload
+         configPushStartFastNotification({ startFast, beforeStartFast })
+         state.reminders.beforeStartFast = beforeStartFast
+      },
 
-      // updateEndFastRemind: (state, action) => {
-      //    const { endFast, beforeEndFast } = action.payload
-      //    configPushEndFastNotification({ endFast, beforeEndFast })
-      //    state.reminders.beforeEndFast = action.payload
-      // },
+      updateEndFastRemind: (state, action) => {
+         const { endFast, beforeEndFast } = action.payload
+         configPushEndFastNotification({ endFast, beforeEndFast })
+         state.reminders.beforeEndFast = action.payload
+      },
 
-      // updateWeightRemind: (state, action) => {
-      //    const { days, h, m } = action.payload
-      //    state.reminders.repeatWeight.days = [...days]
-      //    state.reminders.repeatWeight.h = h
-      //    state.reminders.repeatWeight.m = m
-      // },
+      updateWeightRemind: (state, action) => {
+         const { days, h, m } = action.payload
+         state.reminders.repeatWeight.days = [...days]
+         state.reminders.repeatWeight.h = h
+         state.reminders.repeatWeight.m = m
+      },
 
-      // updateStartWaterRemind: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.startWater.h = h
-      //    state.reminders.startWater.m = m
-      // }, 
+      updateStartWaterRemind: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.startWater.h = h
+         state.reminders.startWater.m = m
+      }, 
 
-      // updateEndWaterRemind: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.endWater.h = h
-      //    state.reminders.endWater.m = m
-      // }, 
+      updateEndWaterRemind: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.endWater.h = h
+         state.reminders.endWater.m = m
+      }, 
 
-      // updateWaterInterval: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.waterInterval.h = h
-      //    state.reminders.waterInterval.m = m
-      // }
+      updateWaterInterval: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.waterInterval.h = h
+         state.reminders.waterInterval.m = m
+      }
    }
 })
 
@@ -113,8 +113,12 @@ export const {
    updateNotififcation,
    updateSyncGoogleFit,
    initReminders,
-   // updateStartFastRemind, 
-   // updateEndFastRemind
+   updateStartFastRemind,
+   updateEndFastRemind,
+   updateWeightRemind,
+   updateStartWaterRemind,
+   updateEndWaterRemind,
+   updateWaterInterval
 } = SettingSlice.actions
 
 export default SettingSlice.reducer

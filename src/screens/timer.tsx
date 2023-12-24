@@ -7,6 +7,7 @@ import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon, PrimaryBookIcon, SymptomsIcon } from '@assets/icons'
 import { PopupContext } from '@contexts/popup'
+import SyncDetector from '@components/shared/sync-detect'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import FastingSymptoms from '@components/shared/popup/fasting-symptons'
 import FastingClock from '@components/fasting-clock'
@@ -24,6 +25,7 @@ const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable:
 	return (
 		isViewable && 
 		<View style={styles.mainTop}>
+			<SyncDetector />
 			<Animated.Text style={{
 				...styles.mainTopTitle, 
 				opacity: animateValue, 

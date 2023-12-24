@@ -4,24 +4,29 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateMetadata } from '@store/user'
+import { updateMetadata, enqueueAction } from '@store/user'
 import { poundsToKilograms, kilogramsToPounds } from '@utils/fomular'
+import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const options = ['kg', 'lb']
 
 export default withPopupBehavior(
-   ({ 
+   withSync(({ 
       setVisible, 
-      onConfirm
+      onConfirm,
+      isOnline
    }: { 
       setVisible: Dispatch<SetStateAction<boolean>>, 
-      onConfirm: (afterDisappear: () => Promise<void>) => void
+      onConfirm: (afterDisappear: () => Promise<void>) => void,
+      isOnline: boolean
    }) => {
       const dispatch = useDispatch()
       const { session, metadata } = useSelector((state: AppState) => state.user)
@@ -32,11 +37,25 @@ export default withPopupBehavior(
 
       const onSave = async () => {
          const payload = { currentWeight: weight }
-         if (userId) {
+         
+         const cache = (beQueued = false) => {
+            dispatch(updateMetadata(payload))
+            if (beQueued) {
+               dispatch(enqueueAction({
+                  actionId: autoId('qaid'),
+                  invoker: 'updatePersonalData',
+                  name: 'UPDATE_WEIGHT',
+                  params: [userId, payload]
+               }))
+            }
+         } 
+
+         if (!userId) cache()
+         else if (!isOnline) cache(true)
+         else {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-            return
+            if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
          }
-         dispatch(updateMetadata(payload))
          setVisible(false)
       }
 
@@ -69,7 +88,7 @@ export default withPopupBehavior(
             </TouchableOpacity>
          </>
       )
-   },
+   }),
    'centered',
    'Current weight', 
    hS(315)
