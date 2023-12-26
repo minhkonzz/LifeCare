@@ -42,7 +42,6 @@ export default (): JSX.Element => {
 
 	if (Object.keys(settingRowCallbacks).length === 0) {
 		settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
-		settingRowCallbacks['meal-time'] = () => {}
 		settingRowCallbacks['notification'] = () => { dispatch(updateNotififcation()) }
 		settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
 		settingRowCallbacks['widgets'] = () => {}
@@ -50,7 +49,6 @@ export default (): JSX.Element => {
 		settingRowCallbacks['dark-mode'] = () => { dispatch(updateDarkMode()) }
 		settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
 		settingRowCallbacks['privacy-policy'] = () => {}
-		settingRowCallbacks['rate-us'] = () => {}
 		settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
 	}
 

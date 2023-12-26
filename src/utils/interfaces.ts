@@ -21,10 +21,9 @@ export interface WheelPickerProps {
 }
 
 export interface OptionProps {
-   item: string, 
-   index: number, 
-   stateKey: string, 
-   action: any
+   item: string 
+   index: number
+   stateKey: string
 }
 
 export interface AnimatedNumberProps {
@@ -52,7 +51,11 @@ export interface SurveyState {
    age: number
    currentHeight: number
    currentWeight: number
-   goalWeight: number  
+   goalWeight: number
+   firstMealTime: string
+   lastMealTime: string
+   healthConcerns: string[]
+   sleepHours: string
 }
 
 export interface InitialPersonalData {
@@ -66,6 +69,9 @@ export interface InitialPersonalData {
    fastingFamiliar?: string
    goal?: string[]
    firstTimeTrackWater?: boolean
+   firstMealTime?: string
+   lastMealTime?: string
+   healthConcerns?: string[]
    isSurveyed?: boolean
 }
 

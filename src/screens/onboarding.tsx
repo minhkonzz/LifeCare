@@ -1,18 +1,8 @@
-import { 
-	useState, 
-	useRef, 
-	useEffect
-} from 'react'
-import {
-	View,
-	StyleSheet, 
-	Animated, 
-	Platform, 
-	StatusBar, 
-	Easing
-} from 'react-native'
+import { useState, useRef, useEffect } from 'react'
+import { View, StyleSheet, Animated, Platform, StatusBar, Easing } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -40,6 +30,7 @@ const onboardingData: Array<any> = [
 ]
 
 export default (): JSX.Element => {
+	const navigation = useNavigation<any>()
 	const [ index, setIndex ] = useState<number>(0)
 	const titleEffectValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const descriptionEffectValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -61,7 +52,11 @@ export default (): JSX.Element => {
 		]).start()	
 	}, [index])
 
-	const changeOnboarding = () => {
+	const changeOnboarding = (index: number) => {
+		if (index === onboardingData.length - 1) {
+			navigation.navigate('auth')
+			return
+		}
 		Animated.parallel([
 			Animated.timing(titleEffectValue, {
 				toValue: 0, 
@@ -75,32 +70,28 @@ export default (): JSX.Element => {
 				easing: Easing.bounce,
 				useNativeDriver: true
 			})
-		]).start(({ finished }) => {
-			setIndex(index + 1)
-		})
+		]).start(() => { setIndex(index) })
 	}
 
 	return (
 		<View style={styles.container}>
 			<Animated.Image 
-				style={[styles.storySet, { transform: [{ scale: descriptionEffectValue }]}]} 
+				style={{...styles.storySet, transform: [{ scale: descriptionEffectValue }]}} 
 				source={onboardingData[index].storyset} 
 			/>
 			<View style={styles.centerChildHorizontal}>
 				<Animated.Text 
-					style={[
-						styles.mainTitle, 
-						{ 
-							opacity: titleEffectValue, 
-							transform: [{ translateX: titleEffectValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [300, 0]
-							}) }] 
-						}
-					]}>
+					style={{
+						...styles.mainTitle, 
+						opacity: titleEffectValue, 
+						transform: [{ translateX: titleEffectValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [300, 0]
+						}) }] 
+					}}>
 					{onboardingData[index].title}
 				</Animated.Text>
-				<Animated.Text style={[styles.description, { opacity: descriptionEffectValue }]}>
+				<Animated.Text style={{...styles.description, opacity: descriptionEffectValue }}>
 					{ onboardingData[index].description }
 				</Animated.Text>
 			</View>
@@ -108,7 +99,7 @@ export default (): JSX.Element => {
 				title='Next' 
 				size='large' 
 				bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} 
-				onPress={changeOnboarding} 
+				onPress={() => changeOnboarding(index + 1)} 
 			/>
 		</View>
 	)

@@ -1,15 +1,19 @@
 import { View, Text, StyleSheet } from 'react-native'
-import Button from '@components/shared/button/Button'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useNavigation } from '@react-navigation/native'
+import Button from '@components/shared/button/Button'
 
 const darkPrimary: string = Colors.darkPrimary.rgb.join(', ')
 
 export default (): JSX.Element => {
+	const navigation = useNavigation<any>()
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>What else do you want to know?</Text>
 			<Button 
+				onPress={() => navigation.navigate('feedback')}
 				title='Feedback' 
 				size='medium' 
 				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}

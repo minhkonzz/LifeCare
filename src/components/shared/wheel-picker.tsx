@@ -70,7 +70,7 @@ export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex 
 	return (
 		<Animated.FlatList
 			{...{ initialScrollIndex }}
-			style={{...styles.container, height: itemHeight * 5 }}
+			style={{...styles.container, height: itemHeight * 5}}
 			data={['', '', ...items, '', '']}
 			renderItem={({ item, index }) => <WheelPickerItem {...{ item, index }} />}
 			showsVerticalScrollIndicator={false}

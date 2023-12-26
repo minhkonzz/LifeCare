@@ -1,23 +1,24 @@
 import { Pressable, Text, StyleSheet } from 'react-native'
-import CheckmarkIcon from '@assets/icons/checkmark.svg'
+import { CheckmarkIcon } from '@assets/icons'
 import { OptionProps } from '@utils/interfaces'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
+import { submitSurveyOption } from '@store/survey'
 
-export default ({ item, index, stateKey, action }: OptionProps) => {
+export default ({ item, index, stateKey }: OptionProps) => {
    const dispatch = useDispatch()
    const value = useSelector((state: AppState) => state.survey[stateKey])
    const isChecked = Array.isArray(value) && value.includes(item) || value === item
 
    const onPress = () => {
       if (typeof value === 'string') {
-         dispatch(action(item))
+         dispatch(submitSurveyOption({ k: stateKey, v: item }))
          return
       }
       if (Array.isArray(value)) 
-         dispatch(action(value.includes(item) && value.filter(e => e !== item) || [...value, item]))
+         dispatch(submitSurveyOption({ k: stateKey, v: value.includes(item) && value.filter(e => e !== item) || [...value, item] }))
    }
 
    return (

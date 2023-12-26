@@ -22,7 +22,6 @@ import Water from '@screens/water'
 import WaterOverview from '@screens/water-overview'
 import WaterSetting from '@screens/water-setting'
 import SurveyLoading from '@screens/survey-loading'
-import SurveySuggest from '@screens/survey-suggest'
 import Setting from '@screens/setting'
 import Timeline from '@screens/timeline'
 import PersonalData from '@screens/personal-data'
@@ -38,11 +37,12 @@ import InsightReading from '@screens/insight-reading'
 import AddActivity from '@screens/add-activity'
 import AddFood from '@screens/add-food'
 import Auth from '@screens/auth'
+import FastingDefinitions from '@screens/fasting-definitions'
+import Onboarding from '@screens/onboarding'
 
 const Stack = createStackNavigator()
 
 const StackNav = memo((): JSX.Element => {
-   console.log('render Stack')
    return (
       <Stack.Navigator
          initialRouteName='splash'
@@ -54,7 +54,6 @@ const StackNav = memo((): JSX.Element => {
          <Stack.Screen name='water-overview' component={WaterOverview} />
          <Stack.Screen name='water-setting' component={WaterSetting} />
          <Stack.Screen name='survey-loading' component={SurveyLoading} />
-         <Stack.Screen name='survey-suggest' component={SurveySuggest} />
          <Stack.Screen name='splash' component={Splash} />
          <Stack.Screen name='main' component={BottomTabs} />
          <Stack.Screen name='fastai-overview' component={FastAIOverview} />
@@ -62,6 +61,8 @@ const StackNav = memo((): JSX.Element => {
          <Stack.Screen name='plans' component={FastingPlans} />
          <Stack.Screen name='fasting-stages' component={FastingStages} />
          <Stack.Screen name='fasting-result' component={FastingResult} />
+         <Stack.Screen name='fasting-definitions' component={FastingDefinitions} />
+         <Stack.Screen name='onboarding' component={Onboarding} />
          <Stack.Screen name='day-plan' component={DayPlan} />
          <Stack.Screen name='body-measures' component={BodyMeasures} />
          <Stack.Screen name='timeline' component={Timeline} />
@@ -78,7 +79,6 @@ const StackNav = memo((): JSX.Element => {
 })
 
 const Main = () => {
-   console.log('render Main')
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
    const [ initialized, setInitialized ] = useState<boolean>(false)
@@ -120,7 +120,6 @@ const Main = () => {
             if (prevSession) {
                const { isSurveyed } = metadata
                if (isSurveyed && isOnline) {
-                  console.log('reach here k1')
                   const userId: string = prevSession.user.id 
                   await fetchPersonalData(userId)
                }

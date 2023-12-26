@@ -29,7 +29,9 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          exercisePerformance: survey.exercisePerformance,
          fastingFamiliar: survey.fastingFamiliar,
          goal: survey.goal,
-         firstTimeTrackWater: false, 
+         firstMealTime: survey.firstMealTime,
+         lastMealTime: survey.lastMealTime,
+         healthConcerns: survey.healthConcerns,
          isSurveyed: true
       }   
 
@@ -37,6 +39,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          // user logged in as guest
          const personalData: PersonalData = {
             ...initPersonalData,
+            firstTimeTrackWater: false, 
             chestMeasure: 0,
             thighMeasure: 0,
             waistMeasure: 0,
@@ -64,14 +67,18 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
             fastingRecords: [],
             bodyRecords: []
          }))
-         initPersonalData['waterRecords']
+         // initPersonalData['waterRecords']
          if (status === 204) isOk = true
       }
-      if (isOk) navigation.navigate('main')
+      if (isOk) navigation.navigate('fasting-definitions')
    }
 
    useEffect(() => {
-      initPersonalData()
+      const timeoutId = setTimeout(() => {
+         initPersonalData()
+      }, 5000)
+     
+      return () => { clearTimeout(timeoutId) }
    }, [])
 
    return (

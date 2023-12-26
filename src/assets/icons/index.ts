@@ -53,6 +53,12 @@ import SpoonForkIcon from './spoon-fork.svg'
 import CustomIcon from './custom.svg'
 import SymptomsIcon from './symptoms.svg'
 import PrimaryBookIcon from './primary-book.svg'
+import PrimaryWeightIcon from './primary-weight.svg'
+import DontEatTimeIcon from './dont-eat-time.svg'
+import EatTimeIcon from './eat-time.svg'
+import WomenEatIcon from './women-eat.svg'
+import StayHydratedIcon from './stay-hydrated.svg'
+import MedicalCheckupIcon from './medical-checkup.svg'
 
 export {
    AtIcon,
@@ -109,6 +115,12 @@ export {
    SpoonForkIcon, 
    CustomIcon, 
    PrimaryBookIcon,
-   SymptomsIcon
+   PrimaryWeightIcon,
+   SymptomsIcon,
+   WomenEatIcon,
+   StayHydratedIcon,
+   DontEatTimeIcon,
+   EatTimeIcon,
+   MedicalCheckupIcon
 }
 
