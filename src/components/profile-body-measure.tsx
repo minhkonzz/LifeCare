@@ -108,7 +108,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 
 const styles = StyleSheet.create({
    container: {
-      marginTop: vS(32), 
+      marginTop: vS(24), 
       width: hS(370),
       height: vS(193),
       borderRadius: hS(24), 

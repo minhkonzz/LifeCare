@@ -17,7 +17,7 @@ export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.El
          start={{ x: .5, y: 0 }}
          end={{ x: .52, y: .5 }}>
          <View>
-            <Text style={{
+            <Animated.Text style={{
                ...styles.title,
                opacity: animateValue, 
                transform: [{ translateX: animateValue.interpolate({
@@ -26,8 +26,8 @@ export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.El
                }) }]
             }}>
                Backup & Restore
-            </Text>
-            <Text style={{
+            </Animated.Text>
+            <Animated.Text style={{
                ...styles.desc,
                opacity: animateValue, 
                transform: [{ translateY: animateValue.interpolate({
@@ -36,7 +36,7 @@ export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.El
                }) }]
             }}>
                Sign in and synchronize your data
-            </Text>
+            </Animated.Text>
             <TouchableOpacity style={styles.syncDataButton} activeOpacity={.8}>
                <Text style={styles.syncDataButtonText}>SYNC DATA</Text>
             </TouchableOpacity>
