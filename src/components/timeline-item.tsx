@@ -40,9 +40,9 @@ const WaterDrinkTimeline = ({ item }) => {
 const WeightTimeline = ({ item }) => {
    const { setPopup } = useContext<any>(PopupContext)
 
-   const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
-      return <TimelineWeightUpdate {...{ setVisible, timelineTimeRecord: item }} />
-   }), [])
+   const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) =>
+      <TimelineWeightUpdate {...{ setVisible, timelineTimeRecord: item }} />
+   ), [])
 
    return (
       <>

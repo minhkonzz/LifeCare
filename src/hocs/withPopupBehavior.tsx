@@ -1,4 +1,4 @@
-import { memo, ComponentType, Dispatch, SetStateAction, useRef } from 'react'
+import { memo, ComponentType, useRef } from 'react'
 import { Animated } from 'react-native'
 import Popup from '@components/shared/popup'
 

@@ -43,6 +43,7 @@ import Onboarding from '@screens/onboarding'
 const Stack = createStackNavigator()
 
 const StackNav = memo((): JSX.Element => {
+   console.log('render Stack')
    return (
       <Stack.Navigator
          initialRouteName='splash'
@@ -79,6 +80,7 @@ const StackNav = memo((): JSX.Element => {
 })
 
 const Main = () => {
+   console.log('render Main')
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
    const [ initialized, setInitialized ] = useState<boolean>(false)

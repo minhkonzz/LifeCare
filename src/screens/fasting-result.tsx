@@ -7,15 +7,17 @@ import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { resetTimes } from '@store/fasting'
-import { addRec } from '@store/user'
+import { addRec, enqueueAction } from '@store/user'
 import { getLocalDatetimeV2, toDateTimeV1 } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
 import { BackIcon, WhiteEditIcon } from '@assets/icons'
 import { autoId } from '@utils/helpers'
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
@@ -77,12 +79,12 @@ const TrackWeight = memo((): JSX.Element => {
 		Animated.parallel([
 			Animated.timing(animateValue, {
 				toValue: 1, 
-				duration: 920, 
+				duration: 840, 
 				useNativeDriver: true
 			}),
 			Animated.timing(progressAnimateValue, {
 				toValue: 1, 
-				duration: 920, 
+				duration: 840, 
 				useNativeDriver: false
 			})
 		]).start()
@@ -180,7 +182,7 @@ const TrackWeight = memo((): JSX.Element => {
 	)
 })
 
-export default (): JSX.Element => {
+export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const bottomBarHeight = useDeviceBottomBarHeight()
@@ -203,24 +205,52 @@ export default (): JSX.Element => {
    }, [])
 
 	const onSave = async () => {
-		let payload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
-		if (userId) {
-			const errorMessage: string = await UserService.saveFastingRecord(userId, payload)
-			if (errorMessage) {
-				console.log('something wrong:', errorMessage)
-				return
+		let fastingRecPayload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
+		const resetPayload = { startTimeStamp: 0, endTimeStamp: 0 }
+
+		const cache1 = (beQueued = false) => {
+			dispatch(resetTimes())
+			if (beQueued) {
+				dispatch(enqueueAction({
+					actionId: autoId('qaid'),
+					invoker: 'updatePersonalData',
+					name: 'UPDATE_FASTING_TIMES',
+					params: [userId, resetPayload]
+				}))
 			}
-		} else {
+		}
+		
+		const cache2 = (beQueued = false) => {
 			const createdAt: string = getLocalDatetimeV2()
-			payload = {
-				...payload, 
+			fastingRecPayload = {
+				...fastingRecPayload, 
 				id: autoId('frec'),
 				createdAt,
-				updatedAt: createdAt 
+				updatedAt: createdAt
 			}
-			dispatch(addRec({ key: 'fastingRecords', rec: payload }))
+			dispatch(addRec({ key: 'fastingRecords', rec: fastingRecPayload }))
+			if (beQueued) {
+				dispatch(enqueueAction({
+					actionId: autoId('qaid'),
+					invoker: 'saveFastingRecord',
+					name: 'ADD_FASTING_REC',
+					params: [userId, fastingRecPayload]
+				}))
+			}
 		}
-		dispatch(resetTimes())
+
+		if (!userId) {
+			cache2()
+			cache1()
+		} else if (!isOnline) {
+			cache2(true)
+			cache1(true)
+		} else {
+			const addFastingRecErrorMessage: string = await UserService.saveFastingRecord(userId, fastingRecPayload)
+			if (addFastingRecErrorMessage === NETWORK_REQUEST_FAILED) cache2(true)
+			const resetFastingTimesErrorMessage: string = await UserService.updatePersonalData(userId, resetPayload)
+			if (resetFastingTimesErrorMessage === NETWORK_REQUEST_FAILED) cache1(true)
+		}
 		navigation.goBack()
 	}
 
@@ -295,7 +325,7 @@ export default (): JSX.Element => {
 			</View>
 		</ScrollView>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	wfull: { width: '100%' },

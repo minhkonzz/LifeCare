@@ -1,24 +1,34 @@
-import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
+import { memo, SetStateAction, useRef, Dispatch } from 'react'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppState } from '../../../store'
-import { updateCurrentPlan, updateNewPlan } from '../../../store/fasting'
+import { AppState } from '@store/index'
+import { enqueueAction } from '@store/user'
+import { updateCurrentPlan, updateNewPlan } from '@store/fasting'
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
-export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
+export default memo(withSync(({ 
+   setVisible,
+   isOnline 
+}: { 
+   setVisible: Dispatch<SetStateAction<any>>,
+   isOnline: boolean 
+}): JSX.Element => {
    const navigation = useNavigation<any>()
    const dispatch = useDispatch()
    const { newPlan } = useSelector((state: AppState) => state.fasting)
    const { session } = useSelector((state: AppState) => state.user)
-   const userId: string | null = session?.user?.id
+   const userId: string | null = session && session.user.id || null
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = (isAllowed: boolean) => {
@@ -26,14 +36,33 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          toValue: 0, 
          duration: 300, 
          useNativeDriver: true
-      }).start(async () => {
+      }).start(async() => {
          const targetRoute = isAllowed && 'day-plan' || 'main'
          if (targetRoute === 'main') {
-            // dispatch(updateCurrentPlan())
             const currentPlanId = newPlan.id
-            await UserService.updatePersonalData(userId, { currentPlanId })
+            const payload = { currentPlanId }
+            
+            const cache = (beQueued = false) => {
+               dispatch(updateCurrentPlan())
+               if (beQueued) {
+                  dispatch(enqueueAction({
+                     actionId: autoId('qaid'),
+                     invoker: 'updatePersonalData',
+                     name: 'UPDATE_CURRENT_PLAN',
+                     params: [userId, payload]
+                  }))
+               }
+            }
+
+            if (!userId) cache()
+            else if (!isOnline) cache(true)
+            else {
+               const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+               if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+            }
          }
          navigation.navigate(targetRoute)
+         setVisible(null)
       })
    }
 
@@ -75,7 +104,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          </View>
       </Popup>
    )
-})
+}))
 
 const styles = StyleSheet.create({
    buttons: {

@@ -1,14 +1,20 @@
-import { memo, FC, useCallback, useContext } from 'react'
+import { memo, useCallback, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { PopupContext } from '@contexts/popup'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
-import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/datetimes'
+import { toDateTimeV1, hoursToTimestamp, timestampToDateTime, getCurrentTimestamp } from '@utils/datetimes'
 import { PrimaryEditIcon } from '@assets/icons'
+import { enqueueAction } from '@store/user'
+import { updateTimes } from '@store/fasting'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import UserService from '@services/user'
+import withSync from '@hocs/withSync'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import withFastingStage from '@hocs/withFastingState'
 import StartFastingPopup from '@components/shared/popup/start-fasting'
@@ -26,7 +32,7 @@ interface ActivateTimeProps {
 	value?: string
 }
 
-const FastingActivateTime: FC<ActivateTimeProps> = ({ title, editable, current, value = '' }) => {
+const FastingActivateTime = ({ title, editable, current, value = '' }: ActivateTimeProps): JSX.Element => {
 	
 	const EditButton = useCallback(() => {
 		const { setPopup } = useContext<any>(PopupContext)
@@ -106,22 +112,27 @@ const CurrentFastingStage = memo(withFastingStage(({ stageData: data }: { stageD
 	return <></>
 }, true))
 
-export default withVisiblitySensor(withFastingStage(({ 
+export default withSync(withVisiblitySensor(withFastingStage(({ 
 	isViewable, 
 	animateValue,
 	startTimeStamp,
 	endTimeStamp,
-	isFasting
+	isFasting,
+	isOnline
 }: { 
 	isViewable: boolean, 
 	animateValue: Animated.Value,
 	startTimeStamp: number,
 	endTimeStamp: number,
-	isFasting: boolean
+	isFasting: boolean,
+	isOnline: boolean
 }): JSX.Element => {
+	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const { setPopup } = useContext<any>(PopupContext)
 	const { currentPlan } = useSelector((state: AppState) => state.fasting)
+	const { session } = useSelector((state: AppState) => state.user)
+	const userId: string | null = session && session.user.id || null
 
 	const handleFastingButton = () => {
 		if (!currentPlan) {
@@ -136,6 +147,89 @@ export default withVisiblitySensor(withFastingStage(({
 	}
 
 	if (isFasting) {
+		const currentTimeStamp: number = getCurrentTimestamp()
+		const isOnFastingTime: boolean = startTimeStamp < currentTimeStamp
+		
+		if (!isOnFastingTime) {
+
+			const onEndPlan = async () => {
+				const payload = { startTimeStamp: 0, endTimeStamp: 0 }
+				const cache = (beQueued = false) => {
+					dispatch(updateTimes(payload))
+					if (beQueued) {
+						dispatch(enqueueAction({
+							actionId: autoId('qaid'),
+							invoker: 'updatePersonalData',
+							name: 'UPDATE_FASTING_TIMES',
+							params: [userId, payload]
+						}))
+					}
+				}
+
+				if (!userId) {
+					console.log('call onEndPlan 1')
+					cache()
+				}
+				else if (!isOnline) cache(true)
+				else {
+					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+				}
+			}
+
+			const onStartFastingNow = async () => {
+				const _ct = getCurrentTimestamp()
+				const { hrsFast } = currentPlan
+				const payload = { startTimeStamp: _ct, endTimeStamp: _ct + hrsFast * 60 * 60 * 1000 }
+				const cache = (beQueued = false) => {
+					dispatch(updateTimes(payload))
+					if (beQueued) {
+						dispatch(enqueueAction({
+							actionId: autoId('qaid'),
+							invoker: 'updatePersonalData',
+							name: 'UPDATE_FASTING_TIMES',
+							params: [userId, payload]
+						}))
+					}
+				}
+
+				if (!userId) cache()
+				else if (!isOnline) cache(true)
+				else {
+					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+				}
+			}
+
+			return (
+				isViewable && 
+				<Animated.View style={{ opacity: animateValue, flexDirection: 'row', alignItems: 'center', marginTop: vS(48), justifyContent: 'space-between', width: hS(366) }}>
+					<TouchableOpacity 
+						activeOpacity={.7} 
+						onPress={onStartFastingNow}>
+						<LinearGradient
+							style={{...styles.startStopButton, width: hS(172), height: vS(65) }}
+							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.startStopButtonText}>Start now</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+					<TouchableOpacity 
+						activeOpacity={.7} 
+						onPress={onEndPlan}>
+						<LinearGradient
+							style={{...styles.startStopButton, width: hS(172), height: vS(65) }}
+							colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.startStopButtonText}>End plan</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+				</Animated.View> || <View style={styles.startStopButton} /> 
+			)
+		}
+
 		const currentDate: number = new Date().getDate()
 		const isOnStartDate: boolean = new Date(startTimeStamp).getDate() === currentDate
 		const isOnEndDate: boolean = new Date(endTimeStamp).getDate() === currentDate
@@ -199,7 +293,7 @@ export default withVisiblitySensor(withFastingStage(({
 			</LinearGradient>
 		</AnimatedTouchableOpacity> || <View style={styles.startStopButton} /> 
 	)
-}))
+})))
 
 const styles = StyleSheet.create({
 	container: {

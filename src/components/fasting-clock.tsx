@@ -81,7 +81,7 @@ export default withVisiblitySensor(withFastingState(({
 					}]
 				}}>
 				<View style={styles.main}>
-					<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedTimePercent}%)`}</Text>
+					<Text style={styles.elapsedTime}>{elapsedTimePercent >= 0 && `Elapsed time (${elapsedTimePercent}%)` || 'Fasting period will start after'}</Text>
 					<Text style={{...styles.time, fontSize: hS(36) }}>{elapsedTimeText}</Text>
 					<NextStage />
 				</View>
@@ -90,10 +90,10 @@ export default withVisiblitySensor(withFastingState(({
 					width={hS(28)}
 					size={hS(320)}
 					rotation={360}
-					fill={elapsedTimePercent}
+					fill={elapsedTimePercent >= 0 ? elapsedTimePercent : 0}
 					tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
 					backgroundColor={`rgba(${darkRgb.join(', ')}, .08)`}
-					renderCap={({ center }) => <Circle cx={center.x} cy={center.y} r={hS(16)} fill={darkHex} />}
+					renderCap={({ center }) => elapsedTimePercent >= 0 && <Circle cx={center.x} cy={center.y} r={hS(16)} fill={darkHex} /> || <></>}
 				/>
 			</Animated.View>
 		)

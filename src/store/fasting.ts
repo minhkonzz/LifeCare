@@ -27,9 +27,9 @@ const FastingSlice = createSlice({
       },
 
       updateTimes: (state, action) => {
-         const { _start, _end } = action.payload
-         state.startTimeStamp = _start, 
-         state.endTimeStamp = _end
+         const { startTimeStamp, endTimeStamp } = action.payload
+         state.startTimeStamp = startTimeStamp, 
+         state.endTimeStamp = endTimeStamp
       },
 
       resetTimes: (state) => {

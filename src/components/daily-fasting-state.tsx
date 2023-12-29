@@ -53,13 +53,13 @@ export default withVisiblitySensor(withFastingState(({
 						style={styles.container}>
 						<View style={styles.main}>
 							<View style={styles.circle}>
-								<Text style={styles.progressText}>{`${elapsedTimePercent}%`}</Text>
+								<Text style={styles.progressText}>{`${elapsedTimePercent >= 0 ? elapsedTimePercent : 0}%`}</Text>
 								<AnimatedCircularProgress 
 									lineCap='round' 
 									width={hS(8)}
 									size={hS(105)}
 									rotation={360}
-									fill={elapsedTimePercent}
+									fill={elapsedTimePercent >= 0 ? elapsedTimePercent : 0}
 									tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
 									backgroundColor={`rgba(255, 255, 255, .4)`}
 								/>

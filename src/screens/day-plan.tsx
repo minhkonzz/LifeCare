@@ -1,16 +1,20 @@
-import { Dispatch, SetStateAction, useState, useEffect, useRef, memo } from 'react'
+import { Dispatch, SetStateAction, useState, useCallback, useEffect, useRef, memo, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { updateTimes, updateCurrentPlan, resetTimes } from '../store/fasting'
-import { toDateTimeV1, getCurrentTimestamp } from '@utils/datetimes'
+import { updateTimes, updateCurrentPlan } from '../store/fasting'
+import { toDateTimeV1, getCurrentTimestamp, toTimestampV1 } from '@utils/datetimes'
 import { AppState } from '../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
+import { enqueueAction } from '@store/user'
 import { BackIcon, WhiteBackIcon, PrimaryEditIcon, RestaurantIcon, ElectroIcon, LightIcon } from '@assets/icons'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { PopupContext } from '@contexts/popup'
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
-import DateTimePopup from '@components/shared/popup/start-fasting'
-import DayPlanItem from '@components/day-plan-item'
+import DatetimePicker from '@components/shared/datetime-picker'
 import Button from '@components/shared/button/Button'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -30,18 +34,31 @@ const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const TimeSetting = ({ 
-	setVisible, 
 	startTime, 
 	endTime,
 	hrsFast,
 	hrsEat
 }: { 
-	setVisible: Dispatch<SetStateAction<boolean>>, 
 	startTime: string, 
 	endTime: string,
 	hrsFast: number,
 	hrsEat: number
 }) => {
+	const dispatch = useDispatch()
+	const { setPopup } = useContext<any>(PopupContext)
+
+	const onSave = async (date: string, hours: number, mins: number) => {
+		const timestamp: number = toTimestampV1(date, hours, mins)
+		dispatch(updateTimes({
+			startTimeStamp: timestamp, 
+			endTimeStamp: 0
+		}))
+	}	
+
+	const DatetimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => 
+		<DatetimePicker {...{ setVisible, title: 'Start fasting time', onSave }} />
+	), [])
+
 	return (
 		<View style={styles.fastingTimes}>
 			<View style={styles.fastingTimesHeader}>
@@ -49,7 +66,7 @@ const TimeSetting = ({
 					<ElectroIcon width={hS(10)} height={vS(12.5)} />
 					<Text style={styles.hrsDesc}>{`${hrsFast} hours for fasting`}</Text>
 				</View>
-				<View style={[styles.horz, { marginTop: vS(12) }]}>
+				<View style={{...styles.horz, marginTop: vS(12) }}>
 					<RestaurantIcon width={hS(11)} height={vS(11)} />
 					<Text style={styles.hrsDesc}>{`${hrsEat} hours for eating`}</Text>
 				</View>
@@ -57,25 +74,22 @@ const TimeSetting = ({
 			<View style={styles.wfull}>
 				<View style={[styles.horz, styles.timeSetting]}>
 					<View style={styles.horz}>
-						<View style={[styles.timeSettingDecor, { backgroundColor: primaryHex }]} />
+						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
 					<View style={styles.horz}>
 						<Text style={styles.timeSettingValueText}>{startTime}</Text>
-						<Pressable onPress={() => setVisible(true)}>
+						<Pressable onPress={() => setPopup(DatetimePopup)}>
 							<PrimaryEditIcon width={hS(16)} height={vS(16)} />
 						</Pressable>
 					</View>
 				</View>
-				<View style={[styles.horz, styles.timeSetting, { marginTop: vS(28) }]}>
+				<View style={{...styles.horz, ...styles.timeSetting, marginTop: vS(28) }}>
 					<View style={styles.horz}>
-						<View style={[styles.timeSettingDecor, { backgroundColor: 'rgb(255, 155, 133)' }]} />
+						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
-					<View style={styles.horz}>
-						<Text style={styles.timeSettingValueText}>{endTime}</Text>
-						<PrimaryEditIcon width={hS(16)} height={vS(16)} />
-					</View>
+					<Text style={{...styles.timeSettingValueText, marginRight: hS(36) }}>{endTime}</Text>
 				</View>
 			</View>
 			<Text style={styles.timeNote}>Please select the time you start fasting</Text>
@@ -83,31 +97,45 @@ const TimeSetting = ({
 	)
 }
 
-const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }) => {
+const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
+	// console.log('rerender day-plan')
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
-	const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
+	// const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
 	const { session } = useSelector((state: AppState) => state.user)
 	const userId: string | null = session && session.user.id || null
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
+	// console.log('what is new plan:', newPlan)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
 	const endTimeStamp = _startTimeStamp + hrsFast * 60 * 60 * 1000
 
-	useEffect(() => {
-		dispatch(resetTimes())
-		setIsFirstRender(false)
-	}, [])
-
 	const onStartFasting = async () => {
-		await UserService.updatePersonalData(userId, { startTimeStamp: _startTimeStamp, endTimeStamp, currentPlanId: newPlan.id })
+		const payload = { startTimeStamp: _startTimeStamp, endTimeStamp, currentPlanId: newPlan.id }
+
+		const cache = (beQueued = false) => {
+			dispatch(updateTimes({ startTimeStamp: _startTimeStamp, endTimeStamp }))
+			dispatch(updateCurrentPlan())
+			if (beQueued) {
+				dispatch(enqueueAction({
+					actionId: autoId('qaid'),
+					invoker: 'updatePersonalData',
+					name: 'UPDATE_FASTING_TIMES',
+					params: [userId, payload]
+				}))
+			}
+		}
+
+		if (!userId) cache()
+		else if (!isOnline) cache(true)
+		else {
+			const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+			if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+		}
 		navigation.navigate('main')
-		// dispatch(updateTimes({ _start: _startTimeStamp, _end: endTimeStamp }))
-		// dispatch(updateCurrentPlan())
 	}
 
 	return (
-		!isFirstRender &&
 		<View style={styles.main}>
 			<LinearGradient
 				style={styles.primeDecor}
@@ -118,7 +146,6 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 			<View style={styles.mainContent}>
 				<Text style={styles.planNameTitle}>{newPlan.name}</Text>
 				<TimeSetting {...{ 
-					setVisible, 
 					startTime: toDateTimeV1(_startTimeStamp), 
 					endTime: toDateTimeV1(endTimeStamp),
 					hrsFast, 
@@ -129,7 +156,7 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 					colors={[`rgba(${lightRgb.join(', ')}, .3)`, lightHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .52, y: .5 }}>
-					<View style={[styles.horz, { marginBottom: vS(5) }]}>
+					<View style={{...styles.horz, marginBottom: vS(5) }}>
 						<LightIcon width={hS(12)} height={vS(16.5)} />
 						<Text style={styles.notesTitle}>PREPARE FOR FASTING</Text>
 					</View>
@@ -153,16 +180,14 @@ const Content = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<bool
 					size='large' 
 					onPress={onStartFasting} />
 			</View>
-		</View> || <></>
+		</View>
 	)
-})
+}))
 
 export default (): JSX.Element => {
-	const dispatch = useDispatch()
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const [headerStyles, setHeaderStyles] = useState<string>('')
-	const [ visible, setVisible ] = useState<boolean>(false)
 	const headerColor = useRef<Animated.Value>(new Animated.Value(0)).current
+	const [ headerStyles, setHeaderStyles ] = useState<string>('')
 
 	useEffect(() => {
 		Animated.timing(headerColor, {
@@ -184,22 +209,15 @@ export default (): JSX.Element => {
 		setHeaderStyles('')
 	}
 
-	const onConfirm = (timestamp: number) => {
-		dispatch(updateTimes({
-			_start: timestamp, 
-			_end: 0
-		}))
-		setVisible(false)
-	}
-
 	const GoBackIcon = headerStyles && BackIcon || WhiteBackIcon
+	console.log('render root day-plan')
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight}}>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				onScroll={handleScroll}>
-				<Content {...{ setVisible }} />
+				<Content />
 			</ScrollView>
 			<Animated.View
 				style={{
@@ -217,7 +235,7 @@ export default (): JSX.Element => {
 				<Text style={{...styles.headerTitle, color: headerStyles && darkHex || '#fff' }}>1 day plan</Text>
 				<View />
 			</Animated.View>
-			{ visible && <DateTimePopup {...{ setVisible, onConfirm }} /> }
+			{/* { visible && <DateTimePopup {...{ setVisible, onConfirm }} /> } */}
 		</View>
 	)
 }

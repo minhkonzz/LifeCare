@@ -11,8 +11,8 @@ const stageIcons = [
 	BloodSugarNormalIcon,
 	FireColorIcon
 ]
-const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
 
+const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
 
 export default <P extends object>(BaseComponent: ComponentType<P>, runInterval = false) => {
    return (props: any) => {
@@ -38,24 +38,31 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
          if (isFasting) {
             interval = setInterval(() => {
                const currentTimeStamp: number = getCurrentTimestamp()
-               const elapsedTime: number = currentTimeStamp - startTimeStamp
-               const elapsedTimePercent: number = Math.floor(elapsedTime / (endTimeStamp - startTimeStamp) * 100)
+               const isOnFastingTime: boolean = startTimeStamp < currentTimeStamp
+               const elapsedTime: number = Math.abs(currentTimeStamp - startTimeStamp)
+               const elapsedTimePercent: number = isOnFastingTime ? Math.floor(elapsedTime / (endTimeStamp - startTimeStamp) * 100) : -1
                const elapsedTimeText: string = timestampToDateTime(elapsedTime)
-               const elapsedHours: number = Math.floor(elapsedTime / (1000 * 60 * 60))
-               const timeExceededValue: number = elapsedTime - endTimeStamp + startTimeStamp
-               let currentStage: any
+               const elapsedHours: number = isOnFastingTime ? Math.floor(elapsedTime / (1000 * 60 * 60)) : 0
+               const timeExceededValue: number = isOnFastingTime ? elapsedTime - endTimeStamp + startTimeStamp : 0
+               let currentStage: any = null
+               let currentStageIndex: number = -1
+               let nextStage: any = null
+               let stageElapsedPercent: number = 0
 
-               if (stageData && stageData.stage) {
-                  const { to } = stageData.stage
-                  currentStage = elapsedHours >= to && stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stageData.stage
-               } else {
-                  currentStage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stages.at(-1)
-               }
+               if (isOnFastingTime) {
+                  if (stageData && stageData.stage) {
+                     const { to } = stageData.stage
+                     currentStage = elapsedHours >= to && stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stageData.stage
+                  } else {
+                     currentStage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stages.at(-1)
+                  }
 
-               const { from, to } = currentStage
-               const currentStageIndex = stages.findIndex((e: any) => e.id === currentStage.id)
-               const nextStage = currentStageIndex === stages.length - 1 ? null : stages[currentStageIndex + 1]
-               const stageElapsedPercent: number = (elapsedHours - from) / (to - from) * 100
+                  const { from, to } = currentStage
+                  currentStageIndex = stages.findIndex((e: any) => e.id === currentStage.id)
+                  nextStage = currentStageIndex === stages.length - 1 ? null : stages[currentStageIndex + 1]
+                  stageElapsedPercent = (elapsedHours - from) / (to - from) * 100
+               }               
+
                setStageData({ 
                   startTimeStamp,
                   endTimeStamp,
@@ -67,8 +74,8 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
                   stage: currentStage, 
                   nextStage 
                })
-            }, 999)
-         }
+            }, 1000)
+         } else setStageData(null)
          return () => { if (interval) clearInterval(interval) }
       }, [startTimeStamp])
 

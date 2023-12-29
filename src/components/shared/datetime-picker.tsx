@@ -141,7 +141,7 @@ const Main = ({
    )  
 }
 
-export default ({
+export default memo(({
    setVisible,
    title,
    onSave
@@ -163,7 +163,7 @@ export default ({
          <Main {...{ animateValue, setVisible, onSave }} />
       </Popup>
    )
-}
+})
 
 const styles = StyleSheet.create({
    main: {
