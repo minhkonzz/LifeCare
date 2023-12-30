@@ -18,8 +18,8 @@ export default ({
     size = 'medium',
     bgColor = Colors.primary.hex
 }: ButtonProps): JSX.Element => {
-    const buttonStyles = [styles.button]
-    const titleStyles = [styles.title]
+    const buttonStyles: any[] = [styles.button]
+    const titleStyles: any[] = [styles.title]
 
     if (size === 'small') {
         buttonStyles.push(styles.smallButton)

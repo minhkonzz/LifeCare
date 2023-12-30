@@ -4,6 +4,8 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Colors } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { BackIcon, DontEatTimeIcon, EatTimeIcon, PrimaryWeightIcon, StayHydratedIcon, WomenEatIcon } from '@assets/icons'
+import { LineChart, CurveType } from 'react-native-gifted-charts'
+import LinearGradient from 'react-native-linear-gradient'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
 
@@ -49,6 +51,44 @@ export default (): JSX.Element => {
                            </Text>
                         </View>
                      </View>
+                     <LineChart 
+                        color={primaryHex} 
+                        thickness={5} 
+                        dataPointsColor={primaryHex} 
+                        data={[
+                           { 
+                              value: 92, 
+                              dataPointText: '83 kg' 
+                           },
+                           { 
+                              value: 62.5, 
+                              dataPointLabelComponent: () => 
+                                 <LinearGradient 
+                                    style={styles.targetWeightDataPoint}
+                                    colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+                                    start={{ x: .5, y: 0 }}
+                                    end={{ x: .5, y: 1 }}>
+                                    <Text style={styles.targetWeightDataPointText}>62.5 kg</Text>
+                                 </LinearGradient>
+                           }
+                        ]} 
+                        disableScroll
+                        spacing={hS(220)} 
+                        xAxisColor={`rgba(${darkRgb.join(', ')}, .3)`}
+                        yAxisOffset={20}
+                        maxValue={102}
+                        noOfSections={3}
+                        yAxisTextNumberOfLines={500}
+                        animationDuration={1500}
+                        curved 
+                        isAnimated
+                        curveType={CurveType.QUADRATIC}
+                        yAxisThickness={0}
+                        xAxisThickness={0}
+                        textFontSize={hS(16)}
+                        dataPointsHeight={vS(36)}
+                        hideYAxisText />
+
                      <View style={styles.k3}>
                         <View style={styles.k4}>
                            <Text style={styles.f4}>Dec 2023</Text>
@@ -169,6 +209,22 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       height: vS(140)
+   },
+
+   targetWeightDataPoint: {
+      paddingHorizontal: hS(10),
+      paddingVertical: vS(5), 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      borderRadius: 8,
+      marginTop: vS(-50),
+      marginLeft: hS(-16)
+   },
+
+   targetWeightDataPointText: {
+      fontSize: hS(16),
+      fontFamily: 'Poppins-SemiBold',
+      color: '#fff'
    },
 
    k1: {

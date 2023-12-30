@@ -45,120 +45,120 @@ const Stack = createStackNavigator()
 const StackNav = memo((): JSX.Element => {
    console.log('render Stack')
    return (
-      <Stack.Navigator
-         initialRouteName='splash'
-         screenOptions={{ headerShown: false }}>
-         <Stack.Screen name='auth' component={Auth}/>
-         <Stack.Screen name='welcome' component={Welcome} />
-         <Stack.Screen name='survey' component={Survey} />
-         <Stack.Screen name='water' component={Water} />
-         <Stack.Screen name='water-overview' component={WaterOverview} />
-         <Stack.Screen name='water-setting' component={WaterSetting} />
-         <Stack.Screen name='survey-loading' component={SurveyLoading} />
-         <Stack.Screen name='splash' component={Splash} />
-         <Stack.Screen name='main' component={BottomTabs} />
-         <Stack.Screen name='fastai-overview' component={FastAIOverview} />
-         <Stack.Screen name='fastai-mainchat' component={FastAIMainChat} />
-         <Stack.Screen name='plans' component={FastingPlans} />
-         <Stack.Screen name='fasting-stages' component={FastingStages} />
-         <Stack.Screen name='fasting-result' component={FastingResult} />
-         <Stack.Screen name='fasting-definitions' component={FastingDefinitions} />
-         <Stack.Screen name='onboarding' component={Onboarding} />
-         <Stack.Screen name='day-plan' component={DayPlan} />
-         <Stack.Screen name='body-measures' component={BodyMeasures} />
-         <Stack.Screen name='timeline' component={Timeline} />
-         <Stack.Screen name='personal-data' component={PersonalData} />
-         <Stack.Screen name='reminder' component={Reminder} />
-         <Stack.Screen name='setting' component={Setting} />
-         <Stack.Screen name='feedback' component={Feedback} />
-         <Stack.Screen name='goal' component={Goal} />
-         <Stack.Screen name='insight-reading' component={InsightReading}/>
-         <Stack.Screen name='add-activity' component={AddActivity} />
-         <Stack.Screen name='add-food' component={AddFood} />
-      </Stack.Navigator>
+      // <Stack.Navigator
+      //    initialRouteName='splash'
+      //    screenOptions={{ headerShown: false }}>
+      //    <Stack.Screen name='auth' component={Auth}/>
+      //    <Stack.Screen name='welcome' component={Welcome} />
+      //    <Stack.Screen name='survey' component={Survey} />
+      //    <Stack.Screen name='water' component={Water} />
+      //    <Stack.Screen name='water-overview' component={WaterOverview} />
+      //    <Stack.Screen name='water-setting' component={WaterSetting} />
+      //    <Stack.Screen name='survey-loading' component={SurveyLoading} />
+      //    <Stack.Screen name='splash' component={Splash} />
+      //    <Stack.Screen name='main' component={BottomTabs} />
+      //    <Stack.Screen name='fastai-overview' component={FastAIOverview} />
+      //    <Stack.Screen name='fastai-mainchat' component={FastAIMainChat} />
+      //    <Stack.Screen name='plans' component={FastingPlans} />
+      //    <Stack.Screen name='fasting-stages' component={FastingStages} />
+      //    <Stack.Screen name='fasting-result' component={FastingResult} />
+      //    <Stack.Screen name='fasting-definitions' component={FastingDefinitions} />
+      //    <Stack.Screen name='onboarding' component={Onboarding} />
+      //    <Stack.Screen name='day-plan' component={DayPlan} />
+      //    <Stack.Screen name='body-measures' component={BodyMeasures} />
+      //    <Stack.Screen name='timeline' component={Timeline} />
+      //    <Stack.Screen name='personal-data' component={PersonalData} />
+      //    <Stack.Screen name='reminder' component={Reminder} />
+      //    <Stack.Screen name='setting' component={Setting} />
+      //    <Stack.Screen name='feedback' component={Feedback} />
+      //    <Stack.Screen name='goal' component={Goal} />
+      //    <Stack.Screen name='insight-reading' component={InsightReading}/>
+      //    <Stack.Screen name='add-activity' component={AddActivity} />
+      //    <Stack.Screen name='add-food' component={AddFood} />
+      // </Stack.Navigator>
+      <FastingDefinitions />
    )
 })
 
 const Main = () => {
-   console.log('render Main')
-   const dispatch = useDispatch()
-   const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-   const [ initialized, setInitialized ] = useState<boolean>(false)
-   const { session: prevSession, metadata } = useSelector((state: AppState) => state.user)
+   // const dispatch = useDispatch()
+   // const { popup: Popup, setPopup } = useContext<any>(PopupContext)
+   // const [ initialized, setInitialized ] = useState<boolean>(false)
+   // const { session: prevSession, metadata } = useSelector((state: AppState) => state.user)
 
-   const fetchPersonalData = async (userId: string): Promise<void> => {
-      const { res, error } = await UserService.getPersonalData(userId)
-      if (res && !error) initializeUserData(res)
-   }
+   // const fetchPersonalData = async (userId: string): Promise<void> => {
+   //    const { res, error } = await UserService.getPersonalData(userId)
+   //    if (res && !error) initializeUserData(res)
+   // }
 
-   const initializeUserData = (res: any) => {
-      const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = res
-      dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
-      const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
-      dispatch(updateCurrentPlan(currentPlan && convertObjectKeysToCamelCase(currentPlan) || null))
-      dispatch(updateMetadata(personalData))
-   }
+   // const initializeUserData = (res: any) => {
+   //    const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = res
+   //    dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
+   //    const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
+   //    dispatch(updateCurrentPlan(currentPlan && convertObjectKeysToCamelCase(currentPlan) || null))
+   //    dispatch(updateMetadata(personalData))
+   // }
 
-   useEffect(() => {
-      let channel: any
-      let supabaseAuthListener: any
+   // useEffect(() => {
+   //    let channel: any
+   //    let supabaseAuthListener: any
 
-      const netInfoUnsubscribe = NetInfo.addEventListener(state => {
-         dispatch(updateNetworkOnline(state.isConnected))
-      })
+   //    const netInfoUnsubscribe = NetInfo.addEventListener(state => {
+   //       dispatch(updateNetworkOnline(state.isConnected))
+   //    })
 
-      NetInfo.fetch().then(state => {
-         const isOnline: boolean = !!state.isConnected
-         dispatch(updateNetworkOnline(isOnline))
-         const { data } = supabase.auth.onAuthStateChange(async(event, session) => {
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-               if (session) {
-                  const userId: string = session.user.id
-                  const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
-                  if (isSurveyed && !error) await fetchPersonalData(userId)
-               }
-               dispatch(updateSession(session))
-            }
-            if (prevSession) {
-               const { isSurveyed } = metadata
-               if (isSurveyed && isOnline) {
-                  const userId: string = prevSession.user.id 
-                  await fetchPersonalData(userId)
-               }
-            }
-            const currentSession = prevSession || session
-            if (currentSession && !channel) {
-               const userId: string = currentSession.user.id
-               channel = supabase.channel('schema-db-changes')
-               .on('postgres_changes', {
-                  event: 'UPDATE',
-                  schema: 'public',
-                  table: 'users',
-                  filter: `id=eq.${userId}`
-               }, (payload: any) => { 
-                  const convertedResponse = convertObjectKeysToCamelCase(payload.new)
-                  initializeUserData(convertedResponse)
-               })
-               .subscribe()
-            }
-            setInitialized(true)
-         })
-         supabaseAuthListener = data
-      })
+   //    NetInfo.fetch().then(state => {
+   //       const isOnline: boolean = !!state.isConnected
+   //       dispatch(updateNetworkOnline(isOnline))
+   //       const { data } = supabase.auth.onAuthStateChange(async(event, session) => {
+   //          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+   //             if (session) {
+   //                const userId: string = session.user.id
+   //                const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
+   //                if (isSurveyed && !error) await fetchPersonalData(userId)
+   //             }
+   //             dispatch(updateSession(session))
+   //          }
+   //          if (prevSession) {
+   //             const { isSurveyed } = metadata
+   //             if (isSurveyed && isOnline) {
+   //                const userId: string = prevSession.user.id 
+   //                await fetchPersonalData(userId)
+   //             }
+   //          }
+   //          const currentSession = prevSession || session
+   //          if (currentSession && !channel) {
+   //             const userId: string = currentSession.user.id
+   //             channel = supabase.channel('schema-db-changes')
+   //             .on('postgres_changes', {
+   //                event: 'UPDATE',
+   //                schema: 'public',
+   //                table: 'users',
+   //                filter: `id=eq.${userId}`
+   //             }, (payload: any) => { 
+   //                const convertedResponse = convertObjectKeysToCamelCase(payload.new)
+   //                initializeUserData(convertedResponse)
+   //             })
+   //             .subscribe()
+   //          }
+   //          setInitialized(true)
+   //       })
+   //       supabaseAuthListener = data
+   //    })
 
-      return () => {
-         netInfoUnsubscribe()
-         supabaseAuthListener.subscription.unsubscribe()
-      }
-   }, [])
+   //    return () => {
+   //       netInfoUnsubscribe()
+   //       supabaseAuthListener.subscription.unsubscribe()
+   //    }
+   // }, [])
 
-   if (!initialized) return <></>
+   // if (!initialized) return <></>
 
    return (
       <>
-         <SyncDetector />
+         {/* <SyncDetector /> */}
          <StackNav />
-         { Popup && <Popup setVisible={setPopup} /> }
+         {/* { Popup && <Popup setVisible={setPopup} /> } */}
       </>
    )
 }
