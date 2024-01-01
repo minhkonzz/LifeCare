@@ -3,15 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { AppState } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateStartFastRemind } from '@store/setting'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 import MeasureInput from '../measure-input'
 import SettingToggle from '@components/shared/setting-toggle'
-
-const { hex: darkHex } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default withPopupBehavior(
    ({ 

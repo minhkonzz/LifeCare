@@ -3,12 +3,10 @@ import { View, Text, StyleSheet, Platform, StatusBar, Animated } from 'react-nat
 import { NavigationProp } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import Login from '@components/signin'
 import Register from '@components/signup'
 import LottieView from 'lottie-react-native'
-
-const { hex: darkHex } = Colors.darkPrimary
 
 const messageIcons = {
    success: require('../assets/lottie/success-float.json'), 

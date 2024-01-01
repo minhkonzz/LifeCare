@@ -1,14 +1,11 @@
 import { View, Text, StyleSheet, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Circle } from 'react-native-svg'
 import { timestampToDateTime } from '@utils/datetimes'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import withFastingState from '@hocs/withFastingState'
-
-const { rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default withVisiblitySensor(withFastingState(({ 
 	isViewable, 

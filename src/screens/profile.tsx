@@ -1,14 +1,14 @@
 import { useContext } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { View, Text, StyleSheet, Animated } from 'react-native'
 import { ClockIcon, LogoutIcon, SettingIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { lightHex, lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { PopupContext } from '@contexts/popup'
+import { AnimatedTouchableOpacity, AnimatedLinearGradient } from '@components/shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
-import LinearGradient from 'react-native-linear-gradient'
 import LatestBMI from '@components/profile-latest-bmi'
 import FastingRecords from '@components/profile-fasting-records'
 import HydrateRecords from '@components/profile-hydrate-records'
@@ -18,12 +18,6 @@ import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
 import LogoutPopup from '@components/shared/popup/logout'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const { session, metadata } = useSelector((state: AppState) => state.user)

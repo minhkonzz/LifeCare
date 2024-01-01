@@ -1,12 +1,6 @@
-import {
-	View,
-	Text,
-	StyleSheet,
-	Pressable
-} from 'react-native'
-
-import BackIcon from '@assets/icons/goback.svg'
-import { Colors } from '@utils/constants/colors'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { BackIcon } from '@assets/icons'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 interface StackHeaderProps {
@@ -38,7 +32,7 @@ const styles = StyleSheet.create({
 	title: {
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(16),
-		color: Colors.darkPrimary.hex,
+		color: darkHex,
 		letterSpacing: .2
 	}
 })

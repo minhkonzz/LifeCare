@@ -2,7 +2,7 @@ import { useState, Dispatch, useRef, SetStateAction } from 'react'
 import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { kilogramsToPounds, poundsToKilograms } from '@utils/fomular'
@@ -16,8 +16,6 @@ import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 
 const options: string[] = ['kg', 'lb']
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { rgb: darkRgb } = Colors.darkPrimary
 
 export default withPopupBehavior(
    withSync(({ 

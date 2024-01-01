@@ -1,13 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { View, Text, Animated, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { View, Animated, StyleSheet } from 'react-native'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import Button from '@components/shared/button/Button'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default (): JSX.Element => {
 	const navigation = useNavigation()

@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { useRoute } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import ClockIcon from '@assets/icons/clock.svg'
+import { ClockIcon } from '@assets/icons'
 import {
    View, 
    Text,
@@ -11,8 +11,6 @@ import {
    Animated, 
    StyleSheet
 } from 'react-native'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current

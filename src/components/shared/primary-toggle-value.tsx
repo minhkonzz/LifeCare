@@ -1,14 +1,10 @@
 import { useState, useRef } from 'react'
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import LinearGradient from 'react-native-linear-gradient'
+import { AnimatedLinearGradient } from './animated'
 
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 const OPTION_WIDTH: number = hS(92)
-
-const { rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface PrimaryToggleValue {
    options: string[],

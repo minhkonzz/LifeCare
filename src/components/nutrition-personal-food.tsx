@@ -6,10 +6,8 @@ import {
    TouchableOpacity
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ item, index }: { item: any, index: number }): JSX.Element => {
    return (

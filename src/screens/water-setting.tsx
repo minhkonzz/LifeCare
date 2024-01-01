@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, Pressable, Animated, Platform, StatusBar } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
@@ -8,6 +8,7 @@ import { AppState } from '../store'
 import { updateCupsize } from '../store/water'
 import { formatNum } from '@utils/helpers'
 import { PopupContext } from '@contexts/popup'
+import { AnimatedPressable } from '@components/shared/animated'
 import Button from '@components/shared/button/Button'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
@@ -15,9 +16,6 @@ import WaterGoalPopup from '@components/shared/popup/water-setting-goal'
 import WaterStartRemindPopup from '@components/shared/popup/water-setting-start-remind'
 import WaterEndRemindPopup from '@components/shared/popup/water-setting-end-remind'
 import WaterIntervalPopup from '@components/shared/popup/water-setting-interval'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const CupSizes = memo(() => {
 	const { initCupsize, cupsize } = useSelector((state: AppState) => state.water)

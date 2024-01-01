@@ -4,14 +4,12 @@ import { View, Text, StyleSheet, Pressable, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { updateNewPlan } from '../store/fasting'
 import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { AppState } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { ElectroIcon, RestaurantIcon } from '@assets/icons'
 import RequireEndFastingPopup from '@components/shared/popup/require-end-fasting'
 import ConfirmPopup from '@components/shared/popup/ask-start-fasting'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ item }): JSX.Element => {
 	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)

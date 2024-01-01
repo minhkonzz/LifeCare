@@ -1,16 +1,11 @@
-import {
-	View,
-	Text,
-	Image,
-	StyleSheet
-} from 'react-native'
-
-import Button from '@components/shared/button/Button'
-import { Colors } from '@utils/constants/colors'
+import { View, Text, Image, StyleSheet } from 'react-native'
+import { primaryHex, primaryRgb, darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
+import Button from '@components/shared/button/Button'
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
+export default (): JSX.Element => {
+	const navigation = useNavigation()
 	return (
 		<View style={styles.container}>
 			<Image style={styles.storyset} source={require('../assets/images/storyset/welcome.gif')} />
@@ -18,7 +13,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 			<Button
 				title='Get started'
 				size='large'
-				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+				bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 				onPress={() => navigation.navigate('onboarding')}
 			/>
 		</View>
@@ -41,7 +36,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Bold',
 		textAlign: 'center',
 		lineHeight: hS(52),
-		color: Colors.darkPrimary.hex
+		color: darkHex
 	},
 
 	storyset: {

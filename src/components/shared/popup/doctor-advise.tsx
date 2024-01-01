@@ -1,14 +1,11 @@
 import { Dispatch, SetStateAction } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import { MedicalCheckupIcon } from '@assets/icons'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { rgb: darkRgb } = Colors.darkPrimary
 
 export default withPopupBehavior(
    ({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {

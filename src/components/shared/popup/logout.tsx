@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import UserService from '@services/user'
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
    title: {
       fontFamily: 'Poppins-Regular',
       fontSize: hS(12), 
-      color: Colors.darkPrimary.hex, 
+      color: darkHex, 
       letterSpacing: .2
    }, 
 

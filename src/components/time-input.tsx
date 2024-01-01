@@ -1,9 +1,7 @@
 import { Dispatch, SetStateAction } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+import { darkHex, darkRgb } from '@utils/constants/colors'
 
 interface TimeInputProps {
 	hours: number 

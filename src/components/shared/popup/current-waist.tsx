@@ -1,6 +1,6 @@
 import { useState, Dispatch, SetStateAction } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
@@ -16,7 +16,6 @@ import LinearGradient from 'react-native-linear-gradient'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
 const options: string[] = ['cm', 'in']
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default withPopupBehavior(
    withSync(({ 

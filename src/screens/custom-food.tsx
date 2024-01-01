@@ -7,15 +7,12 @@ import {
    StyleSheet
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { PhotoIcon } from '@assets/icons'
 import Screen from '@components/shared/screen' 
 import StackHeader from '@components/shared/stack-header'
 import LinearGradient from 'react-native-linear-gradient'
-import PhotoIcon from '@assets/icons/photo.svg'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    return (

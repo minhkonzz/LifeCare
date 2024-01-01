@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { LineChart } from 'react-native-gifted-charts'
 import { View, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { useSelector } from 'react-redux'
 import { AppState } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
    axisText: {
       fontSize: hS(11),
       fontFamily: 'Poppins_Regular',
-      color: Colors.darkPrimary.hex,
+      color: darkHex,
       letterSpacing: .2
    },
 

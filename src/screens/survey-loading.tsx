@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { NavigationProp } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateMetadata } from '../store/user'
@@ -9,8 +9,6 @@ import { AppState } from '../store'
 import { InitialPersonalData, PersonalData } from '@utils/interfaces'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const dispatch = useDispatch()

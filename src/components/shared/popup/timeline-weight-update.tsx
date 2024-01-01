@@ -1,11 +1,11 @@
 import { memo, Dispatch, useState, useRef, SetStateAction } from 'react'
 import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateMetadata } from '../../../store/user'
+import { updateMetadata } from '@store/user'
 import { poundsToKilograms, kilogramsToPounds } from '@utils/fomular'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../../../store'
+import { AppState } from '@store/index'
 import { getMonthTitle } from '@utils/datetimes'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
@@ -13,8 +13,6 @@ import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const options: Array<string> = ["kg", "lb"]
 
 const Main = ({ 

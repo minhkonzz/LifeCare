@@ -16,16 +16,12 @@ import Button from '@components/shared/button/Button'
 import { UserFieldIcon, LockIcon, AtIcon, BackIcon } from '@assets/icons'
 import AuthInput from './auth-input'
 import { useSelector } from 'react-redux'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
 import { AppState } from '../store'
 import AuthService from '@services/user'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   console.log('render SignUp component')
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    useEffect(() => {

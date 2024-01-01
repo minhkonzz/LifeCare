@@ -17,7 +17,7 @@ import { PopupContext } from '@contexts/popup'
 import { AppState } from '../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { formatNum } from '@utils/helpers'
 import SurveyOption from '@components/survey-option'
@@ -27,9 +27,6 @@ import Button from '@components/shared/button/Button'
 import MeasureInput from '@components/shared/measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import DoctorAdvisePopup from '@components/shared/popup/doctor-advise'
-
-const { hex: darkHex } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const SCREEN_WIDTH: number = Dimensions.get('window').width
 const PADDING_SIDE: number = hS(24)

@@ -2,15 +2,12 @@ import { useState, Dispatch, SetStateAction } from 'react'
 import { AppState } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateWeightRemind } from '@store/setting'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 import TimeInput from '@components/time-input'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default withPopupBehavior(
    ({ 

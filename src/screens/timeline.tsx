@@ -1,5 +1,5 @@
-import { View, Text, FlatList, StyleSheet, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { View, FlatList, StyleSheet } from 'react-native'
+import { darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { handleTimelineData } from '@utils/helpers'
 import StackHeader from '@components/shared/stack-header'
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
       height: vS(114),
       elevation: 12,
       backgroundColor: '#fff',
-      shadowColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .4)`,
+      shadowColor: `rgba(${darkRgb.join(', ')}, .4)`,
       paddingVertical: vS(21),
       paddingHorizontal: hS(24)
    },

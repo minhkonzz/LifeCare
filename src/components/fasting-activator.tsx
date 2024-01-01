@@ -1,7 +1,7 @@
 import { memo, useCallback, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { PopupContext } from '@contexts/popup'
@@ -13,6 +13,7 @@ import { enqueueAction } from '@store/user'
 import { updateTimes } from '@store/fasting'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { AnimatedTouchableOpacity } from './shared/animated'
 import UserService from '@services/user'
 import withSync from '@hocs/withSync'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
@@ -20,10 +21,6 @@ import withFastingStage from '@hocs/withFastingState'
 import StartFastingPopup from '@components/shared/popup/start-fasting'
 import LinearGradient from 'react-native-linear-gradient'
 import ConfirmStopFastingPopup from '@components/shared/popup/confirm-stop-fasting'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 
 interface ActivateTimeProps {
 	title: string

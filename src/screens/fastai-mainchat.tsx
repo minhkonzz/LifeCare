@@ -1,16 +1,13 @@
 import { memo, useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Message } from '@utils/types'
 import { MessageIcon, BackIcon, MicrophoneIcon } from '@assets/icons'
 import { SERVER_URL } from '@env'
+import { AnimatedLinearGradient } from '@components/shared/animated'
 import LottieView from 'lottie-react-native'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.Element => {
    const isUserMessage = item.sender === 'user'

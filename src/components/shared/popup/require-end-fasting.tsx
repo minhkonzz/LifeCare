@@ -1,13 +1,10 @@
 import { memo, ReactNode, SetStateAction, useRef, Dispatch } from 'react'
 import { Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<ReactNode>> }): JSX.Element => {
    const navigation = useNavigation<any>()
@@ -18,7 +15,7 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<React
          toValue: 0, 
          duration: 300, 
          useNativeDriver: true
-      }).start(({ finished }) => {
+      }).start(() => {
          navigation.navigate('main')
       })
    }

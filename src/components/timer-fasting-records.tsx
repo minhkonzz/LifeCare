@@ -1,19 +1,14 @@
-import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { View, Text, StyleSheet, Animated } from 'react-native'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { getDatesRange } from '@utils/datetimes'
 import { handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
+import { AnimatedLinearGradient, AnimatedPressable } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const Record = ({ 
 	item, 

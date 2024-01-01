@@ -1,18 +1,14 @@
-import { Colors } from '@utils/constants/colors'
+import { lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'  
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { BluePlusIcon, WatercupIcon } from '@assets/icons'
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { AnimatedPressable } from './shared/animated'
 import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import WaterWave from '@components/water-wave'
-
-const { rgb: lightRgb } = Colors.lightPrimary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
    const drinked = useSelector((state: AppState) => state.water.drinked)

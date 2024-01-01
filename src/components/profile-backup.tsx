@@ -1,13 +1,11 @@
 import { memo } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { CloudBackupIcon } from '@assets/icons'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import LinearGradient from 'react-native-linear-gradient'
+import { AnimatedLinearGradient, createAnimatedIcon } from './shared/animated'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const AnimatedIcon = Animated.createAnimatedComponent(CloudBackupIcon)
+const AnimatedCloudBackupIcon = createAnimatedIcon(CloudBackupIcon)
 
 export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
    return (
@@ -41,7 +39,7 @@ export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.El
                <Text style={styles.syncDataButtonText}>SYNC DATA</Text>
             </TouchableOpacity>
          </View>
-         <AnimatedIcon 
+         <AnimatedCloudBackupIcon 
             style={{
                ...styles.cloudSvg,
                opacity: animateValue, 

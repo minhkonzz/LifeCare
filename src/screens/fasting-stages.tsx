@@ -2,10 +2,10 @@ import { View, StyleSheet, FlatList } from 'react-native'
 import { verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import { BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, FireColorIcon } from '@assets/icons'
 import StackHeader from '@components/shared/stack-header'
 import FastingStage from '@components/fasting-stage'
 import fastingStagesData from '@assets/data/fasting-stages.json'
-import { BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, FireColorIcon } from '@assets/icons'
 
 const stageIcons = [
    BloodSugarIncreaseIcon,

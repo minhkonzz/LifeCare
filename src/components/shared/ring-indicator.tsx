@@ -1,16 +1,8 @@
 import { FC, useEffect } from 'react'
 import { View } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
-import Animated, { 
-   useAnimatedStyle,
-   useSharedValue, 
-   withDelay, 
-   withTiming, 
-   withRepeat 
-} from 'react-native-reanimated'
-
-const primary: string = Colors.primary.hex
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, withRepeat } from 'react-native-reanimated'
 
 interface RingIndicatorProps {
    color: string, 
@@ -54,7 +46,7 @@ const Ring: FC<RingProps> = ({ color, size, index }) => {
          height: size,
          borderRadius: size / 2, 
          position: 'absolute', 
-         backgroundColor: color === 'primary' && primary || color
+         backgroundColor: color === 'primary' && primaryHex || color
       }, rStyle]} />
    )
 }
@@ -68,7 +60,7 @@ export default ({ color, size }: RingIndicatorProps): JSX.Element => {
          ...(color === 'primary' && {} || { backgroundColor: '#30E3CA' })
       },
       ...(color === 'primary' && {
-         colors: [`rgba(${Colors.primary.rgb.join(', ')}, .4)`, primary], 
+         colors: [`rgba(${primaryRgb.join(', ')}, .4)`, primaryHex], 
          start: { x: .5, y: 0 },
          end: { x: .5, y: 1 }
       } || {})

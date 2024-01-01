@@ -1,6 +1,6 @@
 import { useState, Dispatch, SetStateAction } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
@@ -10,7 +10,6 @@ import LinearGradient from 'react-native-linear-gradient'
 import WheelPicker from '../wheel-picker'
 import UserService from '@services/user'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const ages: Array<number> = Array.from({ length: 120 }, (_, i) => i + 1)
 
 export default withPopupBehavior(

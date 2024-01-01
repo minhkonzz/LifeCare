@@ -1,12 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { View, StyleSheet, Animated, Platform, StatusBar, Easing } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const onboardingData: Array<any> = [
 	{

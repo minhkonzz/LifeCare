@@ -4,7 +4,7 @@ import { updateTimes, updateCurrentPlan } from '../store/fasting'
 import { toDateTimeV1, getCurrentTimestamp, toTimestampV1 } from '@utils/datetimes'
 import { AppState } from '../store'
 import { useSelector, useDispatch } from 'react-redux'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, lightHex, lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { enqueueAction } from '@store/user'
@@ -28,10 +28,6 @@ import {
 	Animated,
 	ScrollView
 } from 'react-native'
-
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 const TimeSetting = ({ 
 	startTime, 

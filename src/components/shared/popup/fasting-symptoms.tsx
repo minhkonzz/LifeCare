@@ -1,5 +1,5 @@
 import { ScrollView, Text, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors' 
+import { darkHex } from '@utils/constants/colors' 
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
    text: {
       fontFamily: 'Poppins-Regular',
       fontSize: hS(14),
-      color: Colors.darkPrimary.hex,
+      color: darkHex,
       letterSpacing: .2,
       lineHeight: vS(28)
    }

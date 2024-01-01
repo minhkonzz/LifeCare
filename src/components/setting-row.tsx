@@ -1,12 +1,10 @@
 import { FC, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon } from '@assets/icons'
 import SettingToggle from '@components/shared/setting-toggle'
 import SettingToggleValue from './shared/setting-toggle-value'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 interface SettingRowProps {
     title: string,

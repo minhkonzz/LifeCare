@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { lightHex, darkRgb, darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-import SyncDetector from '@components/shared/sync-detect'
+import { AnimatedPressable, AnimatedTouchableOpacity } from '@components/shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import Screen from '@components/shared/screen'
 import LinearGradient from 'react-native-linear-gradient'
@@ -13,12 +13,6 @@ import WeightTrack from '@components/daily-weight-track'
 import BMITrack from '@components/daily-bmi-track'
 import WaterTrack from '@components/daily-water-track'
 import NutritionTrack from '@components/daily-nutrition-track'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex } = Colors.lightPrimary
-
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { name } = useSelector((state: AppState) => state.user.metadata)

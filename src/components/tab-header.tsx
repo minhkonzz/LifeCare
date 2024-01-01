@@ -1,13 +1,11 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
 import { WatercupIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-
-const { hex: darkHex } = Colors.darkPrimary
 
 interface TabHeaderProps {
 	title?: string

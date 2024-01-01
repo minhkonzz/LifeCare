@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { AppState } from '../store'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon, PrimaryBookIcon, SymptomsIcon } from '@assets/icons'
 import { PopupContext } from '@contexts/popup'
+import { AnimatedPressable } from '@components/shared/animated'
 import SyncDetector from '@components/shared/sync-detect'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import FastingSymptoms from '@components/shared/popup/fasting-symptoms'
@@ -14,9 +15,6 @@ import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)

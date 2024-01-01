@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { View, ScrollView, StyleSheet } from 'react-native'
 import { horizontalScale as hS } from '@utils/responsive'
 import StackHeader from '@components/shared/stack-header'
 import BodyMeasureSection from '@components/body-measure-section'
@@ -6,7 +7,6 @@ import CurrentWaistPopup from '@components/shared/popup/current-waist'
 import CurrentChestPopup from '@components/shared/popup/current-chest'
 import CurrentHipsPopup from '@components/shared/popup/current-hips'
 import CurrentThighPopup from '@components/shared/popup/current-thigh'
-import { View, ScrollView, StyleSheet } from 'react-native'
 
 export default (): JSX.Element => {
    const [ currentWaistPopupVisible, setCurrentWaistPopupVisible ] = useState<boolean>(false)

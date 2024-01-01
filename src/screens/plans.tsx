@@ -4,22 +4,17 @@ import {
 	Text,
 	FlatList,
 	StyleSheet,
-	Animated,
-	Pressable,
 	Platform,
 	StatusBar,
 	ScrollView
 } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
 import plansData from '../assets/data/plans.json'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 type PlanCategorySectionProps = {
 	title: string,

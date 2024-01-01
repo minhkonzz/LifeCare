@@ -3,13 +3,11 @@ import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { updateEndWaterRemind } from '@store/setting'
 import { AppState } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 import TimeInput from '@components/time-input'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default withPopupBehavior(
    ({ 

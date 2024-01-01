@@ -1,8 +1,8 @@
-import { memo, useRef, useEffect, useContext } from 'react'
+import { memo, useRef, useEffect, useCallback, useContext } from 'react'
 import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
@@ -10,29 +10,32 @@ import { resetTimes } from '@store/fasting'
 import { addRec, enqueueAction } from '@store/user'
 import { getLocalDatetimeV2, toDateTimeV1 } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
-import { BackIcon, WhiteEditIcon } from '@assets/icons'
+import { WhiteBackIcon, WhiteEditIcon, PrimaryEditIcon } from '@assets/icons'
 import { autoId } from '@utils/helpers'
+import { AnimatedLinearGradient } from '@components/shared/animated'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import Button from '@components/shared/button/Button'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
-import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-
-const TimeSetting = memo(() => {
+const TimeSetting = memo(({ 
+	startTimeStamp, 
+	endTimeStamp, 
+	planName 
+}: {
+	startTimeStamp: number,
+	endTimeStamp: number,
+	planName: string
+}) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
-	const { name: planName } = currentPlan
-	const endTimeStamp = Date.now()
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1, 
-			duration: 1200, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [])
@@ -55,14 +58,20 @@ const TimeSetting = memo(() => {
 						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
+					<View style={styles.horz}>
+						<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
+						<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+					</View>
 				</View>
 				<View style={{...styles.timeSetting, marginTop: vS(28) }}>
 					<View style={styles.timeSettingTitle}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
+					<View style={styles.horz}>
+						<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
+						<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+					</View>
 				</View>
 			</View>
 		</Animated.View>
@@ -183,15 +192,30 @@ const TrackWeight = memo((): JSX.Element => {
 })
 
 export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
-	const dispatch = useDispatch()
-	const navigation = useNavigation<any>()
-	const bottomBarHeight = useDeviceBottomBarHeight()
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
+	const bottomBarHeight = useDeviceBottomBarHeight()
+	const navigation = useNavigation<any>()
+	const dispatch = useDispatch()
+	const route = useRoute()
+	const screenParams: any = route.params
+	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
+
+	let startTimeStamp: number, endTimeStamp: number, planName: string
+		 
+	if (screenParams) {
+		const { item } = screenParams
+		const { plan, startTimeStamp: _start, endTimeStamp: _end } = item
+		startTimeStamp = _start
+		endTimeStamp = _end
+		planName = plan
+	} else {
+		startTimeStamp = _startTimeStamp
+		endTimeStamp = Date.now()
+		planName = currentPlan.name
+	}
+	
 	const session = useSelector((state: AppState) => state.user.session) 
    const userId: string | null = session && session.user.id || null
-	const { name: planName } = currentPlan
-	const endTimeStamp: number = Date.now()
 	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
 	const hours: number = Math.floor(totalMins / 60)
 	const mins: number = totalMins % 60
@@ -254,10 +278,43 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 		navigation.goBack()
 	}
 
-	const onDelete = () => {
-		dispatch(resetTimes())
-		navigation.goBack()
-	}
+	const BottomButtons = useCallback(memo(() => {
+
+		const onDelete = () => {
+			dispatch(resetTimes())
+			navigation.goBack()
+		}
+
+		return (
+			<View style={styles.bottom}>
+				{ !screenParams && 
+				<>
+					<TouchableOpacity
+						activeOpacity={.7}
+						onPress={onDelete}>
+						<LinearGradient
+							style={styles.bottomButton}
+							colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.bottomButtonText}>Delete</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+					<TouchableOpacity
+						activeOpacity={.7}
+						onPress={onSave}>
+						<LinearGradient
+							style={styles.bottomButton}
+							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.bottomButtonText}>Save</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+				</> || <Button title='Confirm' size='large' bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} /> }
+			</View>
+		)
+	}), [])
 
 	return (
 		<ScrollView contentContainerStyle={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
@@ -271,7 +328,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 				start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }} />
 			<View style={styles.header}>
-				<BackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
+				<WhiteBackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
 				<Animated.Text 
 					style={{
 						...styles.headerTitle,
@@ -297,38 +354,20 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 					<Text style={styles.symbolTitle}>m</Text>
 				</Animated.View>
 			</View>
-			<TimeSetting />
+			<TimeSetting {...{ startTimeStamp, endTimeStamp, planName }} />
 			<TrackWeight />
-			<View style={styles.bottom}>
-				<TouchableOpacity
-					activeOpacity={.7}
-					onPress={onDelete}>
-					<LinearGradient
-						style={styles.bottomButton}
-						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }}>
-						<Text style={styles.bottomButtonText}>Delete</Text>
-					</LinearGradient>
-				</TouchableOpacity>
-				<TouchableOpacity
-					activeOpacity={.7}
-					onPress={onSave}>
-					<LinearGradient
-						style={styles.bottomButton}
-						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }}>
-						<Text style={styles.bottomButtonText}>Save</Text>
-					</LinearGradient>
-				</TouchableOpacity>
-			</View>
+			<BottomButtons />
 		</ScrollView>
 	)
 })
 
 const styles = StyleSheet.create({
 	wfull: { width: '100%' },
+
+	horz: {
+		flexDirection: 'row', 
+		alignItems: 'center'
+	},
 
 	container: {
 		backgroundColor: '#fff',
@@ -401,7 +440,7 @@ const styles = StyleSheet.create({
 
 	bottomButton: {
 		width: hS(172),
-		height: vS(72),
+		height: vS(64),
 		borderRadius: 100,
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -477,7 +516,8 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
 		letterSpacing: .2,
-		color: darkHex
+		color: darkHex,
+		marginRight: hS(12)
 	},
 
 	trackWeight: {
@@ -559,8 +599,8 @@ const styles = StyleSheet.create({
 
 	weightProcessText: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: hS(10),
-		color: darkHex,
+		fontSize: hS(12),
+		color: `rgba(${darkRgb.join(', ')}, .6)`,
 		letterSpacing: .2
 	}
 })

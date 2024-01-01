@@ -1,19 +1,9 @@
 import { memo, Dispatch, SetStateAction } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import WhiteEditIcon from '@assets/icons/edit-white.svg'
+import { WhiteEditIcon } from '@assets/icons'
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import {
-   View,
-   Text, 
-   StyleSheet,
-   TouchableOpacity,
-   FlatList, 
-   Animated
-} from 'react-native'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface Props {
    title: string, 

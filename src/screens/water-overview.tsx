@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, strongBlueHex } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateMetadata } from '../store/user'
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
    title: {
       fontFamily: 'Poppins-Regular',
       fontSize: hS(16),
-      color: Colors.darkPrimary.hex,
+      color: darkHex,
       letterSpacing: .2,
       textAlign: 'center', 
       lineHeight: vS(28)
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
       height: vS(72),
       justifyContent: 'center',
       alignItems: 'center', 
-      backgroundColor: Colors.strongBlue.hex,
+      backgroundColor: strongBlueHex,
       borderRadius: hS(32),
       marginBottom: vS(6)
    },

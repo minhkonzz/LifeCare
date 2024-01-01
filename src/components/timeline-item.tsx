@@ -1,6 +1,6 @@
 import { memo, useCallback, Dispatch, SetStateAction, useContext } from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { WatercupIcon, OrangeWeightIcon } from '@assets/icons'
 import { getMonthTitle } from '@utils/datetimes'
@@ -9,9 +9,6 @@ import { useNavigation } from '@react-navigation/native'
 import TimelineWeightUpdate from '@components/shared/popup/timeline-weight-update'
 import LinearGradient from 'react-native-linear-gradient'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-
 interface TimelineItemProps {
    item?: any 
    index?: any
@@ -19,10 +16,15 @@ interface TimelineItemProps {
 
 const FastingTimeline = ({ item }: { item: any }) => {
    const navigation = useNavigation<any>()
+   console.log('fasting item:', item)
+
+   const onPress = () => {
+      navigation.navigate('fasting-result', { item })
+   }
 
    return (
       <View>
-         <Pressable>
+         <Pressable {...{ onPress }}>
             <LinearGradient
                style={{ 
                   width: hS(250), 

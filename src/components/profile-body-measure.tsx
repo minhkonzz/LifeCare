@@ -1,18 +1,13 @@
 import { FC } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, darkHex, darkRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon, BodyIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import { AnimatedLinearGradient } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
-import LinearGradient from 'react-native-linear-gradient'
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const primaryHex: string = Colors.primary.hex
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 
 interface BodyPartProps {
    title: string,

@@ -1,10 +1,8 @@
 import { memo, ReactNode, Dispatch, SetStateAction, useEffect } from 'react'
 import { View, Text, Animated, Pressable, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { CloseIcon } from '@assets/icons'
-
-const darkPrimary: string = Colors.darkPrimary.hex
 
 interface PopupProps {
 	type: 'bottomsheet' | 'centered'
@@ -141,7 +139,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(16),
-		color: darkPrimary
+		color: darkHex
 	},
 
 	closeButton: {

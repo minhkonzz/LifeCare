@@ -1,4 +1,4 @@
-import { FC, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import {
 	StyleSheet,
 	TextInput,
@@ -8,14 +8,13 @@ import {
 	Image
 } from 'react-native'
 
-import ImagePickerIcon from '@assets/icons/image-picker.svg'
+import { ImagePickerIcon } from '@assets/icons'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { launchImageLibrary } from 'react-native-image-picker'
 
 const LINE_THRESHOLD = 3
 const FIXED_HEIGHT = vS(159)
-const darkPrimary: string = Colors.darkPrimary.hex
 
 export default (): JSX.Element => {
 	const [ text, setText ] = useState<string>('')
@@ -23,16 +22,17 @@ export default (): JSX.Element => {
 	const [ attachedImages, setAttachedImages ] = useState<string[]>([])
 
 	const handleTextChange = (text: string) => {
+		const lineCount = text.split('\n').length
 		setText(text)
 		if (lineCount === 1) {
 			Animated.timing(textInputHeight, {
 				toValue: FIXED_HEIGHT,
 				duration: 100,
-				useNativeDrive: false
+				useNativeDriver: false
 			})
 			return
 		}
-		const lineCount = text.split('\n').length
+		
 		if (lineCount >= LINE_THRESHOLD) {
 			const newHeight = FIXED_HEIGHT + lineCount * 8
 			Animated.timing(textInputHeight, {
@@ -51,7 +51,7 @@ export default (): JSX.Element => {
 	}
 
 	return (
-		<Animated.View style={[styles.container, { height: textInputHeight }]}>
+		<Animated.View style={{...styles.container, height: textInputHeight }}>
 			<TextInput
 				multiline
 				style={styles.input}
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
 	container: {
 		width: hS(366),
 		borderRadius: hS(24),
-		backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`,
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`,
 		paddingVertical: vS(14),
 		justifyContent: 'space-between'
 	},
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
 	input: {
 		fontFamily: 'Poppins-Regular',
 		fontSize: hS(12),
-		color: darkPrimary,
+		color: darkHex,
 		position: 'absolute',
 		top: 0,
 		paddingHorizontal: hS(22)
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
 	},
 
 	pickImageButton: {
-		backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .24)`,
+		backgroundColor: `rgba(${darkRgb.join(', ')}, .24)`,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginLeft: hS(12)

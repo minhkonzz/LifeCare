@@ -1,11 +1,6 @@
 import { Pressable, StyleSheet, Text, Dimensions } from 'react-native'
 import { useEffect } from 'react'
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
-
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { getPathXCenterByIndex } from '@utils/path'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import usePath from '@hooks/usePath'

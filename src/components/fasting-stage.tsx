@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native' 
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import LinearGradient from 'react-native-linear-gradient'
 import RingIndicator from './shared/ring-indicator'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 interface FastingStageProps {
    item: any, 

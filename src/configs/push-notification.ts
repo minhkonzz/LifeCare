@@ -2,13 +2,7 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import { NOTIFICATION_CHANNEL_ID } from '@utils/constants/notification'
 import { calculateAmountBetweenTimes } from '@utils/datetimes'
-
-import {  
-   WATER_REMIND,
-   START_FAST_REMIND,
-   END_FAST_REMIND,
-   WEIGHT_REMIND
-} from '@utils/constants/notification'
+import { WATER_REMIND, START_FAST_REMIND, END_FAST_REMIND, WEIGHT_REMIND } from '@utils/constants/notification'
 
 export const configPushStartFastNotification = (bundledConfig: any) => {
    const {
@@ -39,9 +33,7 @@ export const configPushStartFastNotification = (bundledConfig: any) => {
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: START_FAST_REMIND
-      }
+      userInfo: { type: START_FAST_REMIND }
    })
 }
 
@@ -82,9 +74,7 @@ export const configPushEndFastNotification = (bundledConfig: any) => {
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: END_FAST_REMIND
-      }
+      userInfo: { type: END_FAST_REMIND }
    })
 }
 
@@ -129,9 +119,7 @@ export const configPushWaterDrinkNotification = (bundledConfig: any) => {
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: WATER_REMIND
-      }
+      userInfo: { type: WATER_REMIND }
    })
 }
 

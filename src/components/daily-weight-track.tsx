@@ -1,20 +1,18 @@
 import { useContext } from 'react'
-import { View, Text, Pressable, Image, Animated, StyleSheet } from 'react-native'
+import { View, Text, Image, Animated, StyleSheet } from 'react-native'
 import { EditIcon, BackIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
+import { AnimatedPressable } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import UpdateWeightsPopup from '@components/shared/popup/weights'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
@@ -213,7 +211,7 @@ const styles = StyleSheet.create({
    current7: {
       fontFamily: 'Poppins-SemiBold',
       fontSize: hS(14),
-      color: Colors.primary.hex,
+      color: primaryHex,
       letterSpacing: .2
    },
 

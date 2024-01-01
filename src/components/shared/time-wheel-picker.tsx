@@ -1,6 +1,6 @@
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { formatNum } from '@utils/helpers'
 import WheelPicker from './wheel-picker'
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
    indicator: {
       width: '100%', 
       height: '18%', 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .1)`, 
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`, 
       borderRadius: 100,
       position: 'absolute', 
       top: vS(192)    

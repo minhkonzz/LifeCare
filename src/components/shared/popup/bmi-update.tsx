@@ -2,7 +2,7 @@ import { useState, ReactNode, Dispatch, SetStateAction } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
@@ -17,8 +17,6 @@ import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 
 const options: Array<string> = ["cm/kg", "ft/lb"]
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { rgb: darkRgb } = Colors.darkPrimary
 
 export default withPopupBehavior(
    withSync(({ 

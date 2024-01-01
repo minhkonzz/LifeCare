@@ -1,16 +1,13 @@
 import { useRef, useEffect } from 'react'
 import { View, FlatList, Text, Animated, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { BackIcon, DontEatTimeIcon, EatTimeIcon, PrimaryWeightIcon, StayHydratedIcon, WomenEatIcon } from '@assets/icons'
 import { LineChart, CurveType } from 'react-native-gifted-charts'
 import LinearGradient from 'react-native-linear-gradient'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()

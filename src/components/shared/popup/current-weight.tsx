@@ -2,7 +2,7 @@ import { useState, Dispatch, SetStateAction } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { poundsToKilograms, kilogramsToPounds } from '@utils/fomular'
@@ -15,7 +15,6 @@ import UserService from '@services/user'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const options = ['kg', 'lb']
 
 export default withPopupBehavior(

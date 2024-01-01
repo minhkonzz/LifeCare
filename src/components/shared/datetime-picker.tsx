@@ -2,13 +2,11 @@ import { memo, useCallback, useMemo, useState, useRef, Dispatch, SetStateAction 
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { getDatesRange, getMonthTitle } from '@utils/datetimes'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
 import WheelPicker from './wheel-picker'
 
-const { rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const dateOpts = getDatesRange(8)
 const hoursOpts = Array.from({ length: 24 }).map((e, i) => i)
 const minsOpts = Array.from({ length: 60 }).map((e, i) => i)

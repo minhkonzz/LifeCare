@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Text } from 'react-native'
 import { AnimatedNumberProps } from '@utils/interfaces'
+import { formatNum } from '@utils/helpers'
 
 export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
   const [number, setNumber] = useState<number>(value < 60 ? 0 : value - 50)
@@ -20,5 +21,5 @@ export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
     return () => clearInterval(interval)
   }, [value])
 
-  return <Text {...{ style }}>{Number(number.toFixed(2))}</Text>
+  return <Text {...{ style }}>{formatNum(Number(number.toFixed(2)))}</Text>
 }

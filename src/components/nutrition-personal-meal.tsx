@@ -1,10 +1,8 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native'
 import NutritionPersonalFood from './nutrition-personal-food'
 import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    return (

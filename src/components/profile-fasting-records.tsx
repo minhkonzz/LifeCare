@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
@@ -8,14 +8,9 @@ import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
+import { AnimatedLinearGradient } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail?: boolean }) => {
 	if (!hideDetail) {

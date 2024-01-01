@@ -1,4 +1,4 @@
-export const Colors = {
+const Colors = {
     primary: {
         hex: '#30E3CA',
         rgb: [48, 227, 202]
@@ -19,4 +19,23 @@ export const Colors = {
         hex: '#4682A9',
         rgb: [70, 130, 169]
     }
+}
+
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
+const { hex: lightBlueHex, rgb: lightBlueRgb } = Colors.lightBlue
+const { hex: strongBlueHex, rgb: strongBlueRgb } = Colors.strongBlue
+
+export { 
+    primaryHex, 
+    primaryRgb, 
+    darkHex, 
+    darkRgb, 
+    lightHex, 
+    lightRgb, 
+    lightBlueHex, 
+    lightBlueRgb, 
+    strongBlueHex, 
+    strongBlueRgb 
 }

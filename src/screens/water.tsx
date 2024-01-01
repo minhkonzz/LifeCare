@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing }
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { NavigationProp } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, strongBlueHex, lightBlueHex, strongBlueRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
 import { updateLiquid, resetSpecs } from '../store/water'
@@ -12,10 +12,6 @@ import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
 import WaterWave from '@components/water-wave'
-
-const darkPrimary: string = Colors.darkPrimary.hex
-const lightBlue: string = Colors.lightBlue.hex
-const strongBlue: string = Colors.strongBlue.hex
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -112,7 +108,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseLiquid}>
                   <LinearGradient
                      style={styles.increaseMilButton}
-                     colors={[lightBlue, `rgba(${Colors.strongBlue.rgb.join(', ')}, .6)`]}
+                     colors={[lightBlueHex, `rgba(${strongBlueRgb.join(', ')}, .6)`]}
                      start={{ x: .2, y: 0 }}
                      end={{ x: .5, y: 1 }}>
                      <WhitePlusIcon width={hS(20)} height={vS(20)} />
@@ -161,7 +157,7 @@ const styles = StyleSheet.create({
    headerTitle: {
       fontSize: hS(15),
       fontFamily: 'Poppins-SemiBold',
-      color: darkPrimary
+      color: darkHex
    },
 
    interacts: {
@@ -187,7 +183,7 @@ const styles = StyleSheet.create({
    totalMilText: {
       fontSize: hS(36),
       fontFamily: 'Poppins-SemiBold',
-      color: strongBlue
+      color: strongBlueHex
    },
 
    totalMilSymbText: {
@@ -197,7 +193,7 @@ const styles = StyleSheet.create({
    goalMilText: {
       fontFamily: 'Poppins-Medium',
       fontSize: hS(14),
-      color: darkPrimary
+      color: darkHex
    },
 
    updates: {
@@ -223,7 +219,7 @@ const styles = StyleSheet.create({
    sideUpdateButton: {
       width: hS(70),
       height: vS(70),
-      backgroundColor: `rgba(${Colors.strongBlue.rgb.join(', ')}, .2)`,
+      backgroundColor: `rgba(${strongBlueRgb.join(', ')}, .2)`,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 500, 

@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon } from '@assets/icons'
 import LinearGradient from 'react-native-linear-gradient'
@@ -8,9 +8,6 @@ import Calories from '@components/nutrition-swiper-calories'
 import HealthNutrients from '@components/nutrition-swiper-health-nutrients'
 import Macros from '@components/nutrition-swiper-macros'
 import Carousel from './shared/carousel'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 
 const carouselData = [
    HealthNutrients,

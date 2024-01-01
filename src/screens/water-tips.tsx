@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { SCREEN_WIDTH, horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { CloseIcon } from '@assets/icons'
 import Carousel from '@components/shared/carousel'
 import LottieView from 'lottie-react-native'
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
    text: {
       fontSize: hS(16),
       fontFamily: 'Poppins-Regular',
-      color: Colors.darkPrimary.hex, 
+      color: darkHex, 
       letterSpacing: .2,
       lineHeight: vS(24),
       marginTop: vS(60)

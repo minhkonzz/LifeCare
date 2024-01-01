@@ -1,10 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
-
-const darkPrimary: string = Colors.darkPrimary.rgb.join(', ')
 
 export default (): JSX.Element => {
 	const navigation = useNavigation<any>()
@@ -16,7 +14,7 @@ export default (): JSX.Element => {
 				onPress={() => navigation.navigate('feedback')}
 				title='Feedback' 
 				size='medium' 
-				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
+				bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 			/>
 		</View>
 	)
@@ -29,7 +27,7 @@ const styles = StyleSheet.create({
 		height: vS(135),
 		borderRadius: hS(32),
 		elevation: 12,
-		shadowColor: `rgba(${darkPrimary}, .5)`,
+		shadowColor: `rgba(${darkRgb}, .5)`,
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		paddingVertical: vS(22),
@@ -38,7 +36,7 @@ const styles = StyleSheet.create({
 	},
 
 	title: {
-		color: `rgb(${darkPrimary})`,
+		color: darkHex,
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(14),
 		letterSpacing: .2

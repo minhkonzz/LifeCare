@@ -1,12 +1,7 @@
-import { useContext } from 'react'
-import { PopupContext } from '@contexts/popup'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { PrimaryEditIcon } from '@assets/icons'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex } = Colors.primary
 
 interface TimePickerProps {
    title: string, 

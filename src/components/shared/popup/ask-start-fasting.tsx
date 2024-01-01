@@ -1,5 +1,5 @@
 import { memo, SetStateAction, useRef, Dispatch } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,9 +13,6 @@ import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(withSync(({ 
    setVisible,

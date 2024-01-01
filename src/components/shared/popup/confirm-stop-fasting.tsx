@@ -1,15 +1,12 @@
 import { Dispatch, SetStateAction } from 'react'
 import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { useSelector } from 'react-redux'
 import { AppState } from '@store/index'
 import { useNavigation } from '@react-navigation/native'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default withPopupBehavior(
    ({ 

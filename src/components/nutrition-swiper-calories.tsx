@@ -1,10 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, darkHex, darkRgb } from '@utils/constants/colors'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex } = Colors.primary
 
 export default (): JSX.Element => {
    function Part({ title, value }: { title: string, value: number }) {

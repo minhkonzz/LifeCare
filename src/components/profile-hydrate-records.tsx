@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
-import { View, Text, StyleSheet, Animated, TouchableOpacity, ScrollView, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { View, Text, StyleSheet, Animated, ScrollView, Pressable } from 'react-native'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BluePlusIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
@@ -10,13 +10,9 @@ import { formatNum } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
+import { AnimatedLinearGradient, AnimatedTouchableOpacity } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail: boolean }) => {
 	if (!hideDetail) {
@@ -161,7 +157,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
 			{ noDataFound && 
 			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={5} />
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={3} />
 				<Text style={styles.noDataText}>No data found</Text>
 			</View> }
 		</AnimatedLinearGradient>

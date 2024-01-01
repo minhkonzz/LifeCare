@@ -1,13 +1,11 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 
 const options: string[] = ['Vietnamese', 'Korean', 'English']
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default withPopupBehavior(
    ({ 

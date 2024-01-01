@@ -127,7 +127,7 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fast
       }, []),
 
       ...fastingRecords.reduce((acc, cur) => {
-         const datetimeCreated: Date = new Date(cur.createdAt)
+         const datetimeCreated: Date = new Date(cur.createdAt.split('+')[0])
          const day = getDayTitle(datetimeCreated, true)
          const date = datetimeCreated.getDate()
          const month = datetimeCreated.getMonth() + 1
@@ -143,6 +143,8 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fast
             id: cur.id,
             plan: cur.planName,
             start: start.toLocaleString(),
+            startTimeStamp: cur.startTimeStamp,
+            endTimeStamp: cur.endTimeStamp, 
             end: end.toLocaleString(),
             total: timestampToDateTime(cur.endTimeStamp - cur.startTimeStamp),
             type: 'fasting',

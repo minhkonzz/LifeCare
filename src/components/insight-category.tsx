@@ -1,11 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { View, FlatList, Animated, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { BackIcon } from '@assets/icons'
 import InsightItem from './insight-item'
-
-const darkPrimary: string = Colors.darkPrimary.hex
 
 export default ({ item, index }: { item: any, index: number }): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -69,7 +66,7 @@ const styles = StyleSheet.create({
 	},
 
 	title: {
-		color: darkPrimary,
+		color: darkHex,
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(18),
 		letterSpacing: .2

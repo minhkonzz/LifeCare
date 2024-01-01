@@ -2,7 +2,7 @@ import { Pressable, Text, StyleSheet } from 'react-native'
 import { CheckmarkIcon } from '@assets/icons'
 import { OptionProps } from '@utils/interfaces'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, lightHex, darkHex } from '@utils/constants/colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { submitSurveyOption } from '@store/survey'
@@ -50,12 +50,12 @@ const styles = StyleSheet.create({
    title: {
       fontFamily: 'Poppins-Medium',
       fontSize: hS(14),
-      color: Colors.darkPrimary.hex
+      color: darkHex
    },
 
    checked: {
       borderWidth: 1.5,
-      borderColor: Colors.primary.hex,
-      backgroundColor: Colors.lightPrimary.hex
+      borderColor: primaryHex,
+      backgroundColor: lightHex
    }
 })

@@ -8,7 +8,7 @@ import {
 	Text
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { WheelPickerProps } from '@utils/interfaces'
 
 let valueScrolledTo: string | number = 0
@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		textAlign: 'center',
 		textAlignVertical: 'center',
-		color: Colors.darkPrimary.hex
+		color: darkHex
 	}
 })

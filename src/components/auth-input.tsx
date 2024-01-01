@@ -3,7 +3,7 @@ import { TextInput, StyleSheet, Animated, Pressable } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { updateEmail, updatePassword, updatePasswordConfirm, updateName } from '../store/auth'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { EyeIcon, EyeHidedIcon } from '@assets/icons'
 
 const onChangeTextActions = {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
       paddingRight: hS(80),
       fontFamily: 'Poppins-Regular',
       fontSize: hS(13),
-      color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`
+      color: `rgba(${darkRgb.join(', ')}, .6)`
    },
 
    eyeIc: {

@@ -1,10 +1,8 @@
 import { Text, StyleSheet, Pressable, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { rgb: darkRgb } = Colors.darkPrimary
 
 type InsightItemProps = {
 	item: any,

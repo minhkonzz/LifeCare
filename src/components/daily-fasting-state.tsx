@@ -1,18 +1,14 @@
-import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Animated } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { BackIcon, SpoonForkIcon } from '@assets/icons'
 import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
+import { AnimatedPressable } from './shared/animated'
 import withFastingState from '@hocs/withFastingState'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { rgb: primaryRgb } = Colors.primary
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export default withVisiblitySensor(withFastingState(({ 
 	isViewable, 

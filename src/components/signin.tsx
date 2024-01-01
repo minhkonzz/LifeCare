@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Keyboard
 import { GoogleIcon, AtIcon, LockIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { LoginComponentProps } from '@utils/interfaces'
 import { AppState } from '../store'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
@@ -13,9 +13,6 @@ import AuthInput from '@components/auth-input'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
 import UserService from '@services/user'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginComponentProps): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current 

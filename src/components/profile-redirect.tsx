@@ -1,10 +1,9 @@
 import { ReactNode, useRef, useEffect } from 'react'
-import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { View, Text, StyleSheet, Animated } from 'react-native'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon } from '@assets/icons'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+import { AnimatedPressable } from './shared/animated'
 
 interface ProfileRedirectProps {
    title: string, 
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       paddingHorizontal: hS(24), 
       borderRadius: hS(24), 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`, 
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, 
       marginTop: vS(16)
    }, 
 
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins-Medium', 
       fontSize: hS(14), 
       letterSpacing: .2,
-      color: Colors.darkPrimary.hex,
+      color: darkHex,
       marginLeft: hS(17),
       marginTop: vS(2)
    }, 

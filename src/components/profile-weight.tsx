@@ -1,20 +1,17 @@
 import { useContext } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { PopupContext } from '@contexts/popup'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
 import { kilogramsToPounds } from '@utils/fomular'
 import { BackIcon, EditIcon } from '@assets/icons'
+import { AnimatedLinearGradient } from './shared/animated'
 import AnimatedText from './shared/animated-text'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import ProfileWeightChart from './profile-weight-chart'
 import UpdateWeightsPopup from '@components/shared/popup/weights'
-import LinearGradient from 'react-native-linear-gradient'
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { setPopup } = useContext<any>(PopupContext)

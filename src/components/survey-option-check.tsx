@@ -1,8 +1,8 @@
 import { View, Pressable, Text, FlatList, StyleSheet } from 'react-native'
-import { FC, useState } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { useState } from 'react'
+import { darkHex, lightHex, primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import CheckmarkIcon from '@assets/icons/checkmark.svg'
+import { CheckmarkIcon } from '@assets/icons'
 
 const SURVEY_DATA = [
    {
@@ -33,7 +33,7 @@ const SURVEY_DATA = [
    }
 ]
 
-const Option: FC = ({ item, index }: { item: any, index: number }) => {
+const Option = ({ item, index }: { item: any, index: number }) => {
     const [ isChecked, setIsChecked ] = useState<boolean>(true)
     return (
         <Pressable 
@@ -50,7 +50,7 @@ const Option: FC = ({ item, index }: { item: any, index: number }) => {
     )
 } 
 
-export default ({ style }): FC => {
+export default ({ style }) => {
     return (
         <View style={{ 
 	    width: '100%', 
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     optionTitle: {
       	fontFamily: 'Poppins-Medium', 
       	fontSize: hS(14),
-      	color: Colors.darkPrimary.hex
+      	color: darkHex
     },
 
     checkmark: {
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 
     checked: {
 	borderWidth: 1, 
-      	borderColor: Colors.primary.hex,
-      	backgroundColor: Colors.lightPrimary.hex
+      	borderColor: primaryHex,
+      	backgroundColor: lightHex
     }
 })

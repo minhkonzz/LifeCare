@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, Animated, Pressable, Platform, StatusBar } from 'react-native'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store' 
+import { AnimatedPressable } from '@components/shared/animated'
+import { CheckmarkIcon } from '@assets/icons'
 import UserService from '@services/user'
 import StackHeader from '@components/shared/stack-header'
 import Button from '@components/shared/button/Button'
-import CheckmarkIcon from '@assets/icons/checkmark.svg'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const goals = ['Lose weight', 'Live longer', 'Be\nenergetic', 'Improve Health']
 
 export default (): JSX.Element => {

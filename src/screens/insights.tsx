@@ -2,10 +2,10 @@ import { View, StyleSheet, FlatList, Pressable, Platform, StatusBar } from 'reac
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { BOTTOM_NAVIGATOR_HEIGHT } from '@utils/constants/screen'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { insights } from '@assets/data/insights'
 import TabHeader from '@components/tab-header'
 import InsightCategory from '@components/insight-category'
 import FeedBackReference from '@components/feedback-reference'
-import { insights } from '@assets/data/insights'
 
 export default (): JSX.Element => {
    const bottomBarHeight: number = useDeviceBottomBarHeight()

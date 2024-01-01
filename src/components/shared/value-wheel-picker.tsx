@@ -1,8 +1,8 @@
 import { View, StyleSheet } from 'react-native'
-import WheelPicker from './wheel-picker'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { verticalScale as vS } from '@utils/responsive'
 import { WheelPickerProps } from '@utils/interfaces'
+import WheelPicker from './wheel-picker'
 
 export default ({ 
    items, 
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
    indicator: {
       width: '100%', 
       height: '18%', 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .1)`, 
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`, 
       borderRadius: 100,
       marginBottom: vS(4)
    }
