@@ -3,6 +3,11 @@ import { WaterRecordsPayload } from "@utils/types"
 import { InitialPersonalData } from "@utils/interfaces"
 import { convertObjectKeysToSnakeCase, convertObjectKeysToCamelCase, handleErrorMessage } from "@utils/helpers"
 
+const updateRec = async (tableName: string, id: string, payload: any): Promise<string> => {
+   const { error } = await supabase.from(tableName).update(convertObjectKeysToSnakeCase(payload)).eq('id', id)
+   return error ? handleErrorMessage(error.message) : ''
+}
+
 export default {
    signInPassword: async (email: string, password: string) => {
       return await supabase.auth.signInWithPassword({ email, password })
@@ -110,10 +115,12 @@ export default {
    updatePersonalData: async (
       userId: string, 
       payload: any
-   ): Promise<string> => {
-      const { error } = await supabase.from('users').update(convertObjectKeysToSnakeCase(payload)).eq('id', userId)
-      return error ? handleErrorMessage(error.message) : ''
-   },
+   ): Promise<string> => updateRec('users', userId, payload),
+
+   updateFastingRec: async (
+      id: string,
+      payload: any
+   ): Promise<string> => updateRec('fasting_records', id, payload),
 
    updateBMI: async (
       userId: string,

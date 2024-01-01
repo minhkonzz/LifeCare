@@ -188,8 +188,8 @@ export const toTimestampV1 = (date: string, h: number, m: number) => {
    return d.getTime()
 }
 
-export const toDateTimeV1 = (timestamp: number): string => {
-   const d = new Date(timestamp)
+export const toDateTimeV1 = (timestamp?: number): string => {
+   const d = new Date(timestamp || Date.now())
    return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -198,4 +198,14 @@ export const toDateTimeV1 = (timestamp: number): string => {
       hour12: true
    }).format(d)
 }
+
+export const toDateTimeV2 = (timestamp?: number): { date: string, hour: number, min: number } => {
+   const d = new Date(timestamp || Date.now())
+   const hour: number = d.getHours()
+   const min: number = d.getMinutes()
+   const date: string = `${d.toLocaleString('en-US', { month: 'short' })} ${d.getDate()}`
+   return { date, hour, min }
+}
+
+
 

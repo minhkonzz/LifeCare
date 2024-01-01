@@ -94,14 +94,11 @@ const TimeSetting = ({
 }
 
 const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
-	// console.log('rerender day-plan')
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
-	// const [ isFirstRender, setIsFirstRender ] = useState<boolean>(true)
 	const { session } = useSelector((state: AppState) => state.user)
 	const userId: string | null = session && session.user.id || null
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
-	// console.log('what is new plan:', newPlan)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
 	const endTimeStamp = _startTimeStamp + hrsFast * 60 * 60 * 1000
@@ -206,7 +203,6 @@ export default (): JSX.Element => {
 	}
 
 	const GoBackIcon = headerStyles && BackIcon || WhiteBackIcon
-	console.log('render root day-plan')
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight}}>
@@ -231,7 +227,6 @@ export default (): JSX.Element => {
 				<Text style={{...styles.headerTitle, color: headerStyles && darkHex || '#fff' }}>1 day plan</Text>
 				<View />
 			</Animated.View>
-			{/* { visible && <DateTimePopup {...{ setVisible, onConfirm }} /> } */}
 		</View>
 	)
 }

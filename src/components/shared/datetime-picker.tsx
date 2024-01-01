@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState, useRef, Dispatch, SetStateAction } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { getDatesRange, getMonthTitle, toDateTimeV2 } from '@utils/datetimes'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
@@ -37,19 +37,18 @@ const Picker = memo(({
 
 const Main = ({ 
    setVisible,
-   animateValue, 
+   animateValue,
+   datetime,
    onSave 
 }: {
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<any>>,
+   datetime?: { date: string, hour: number, min: number }
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }): JSX.Element => {
 
    const memorizedDatetime = useMemo(() => {
-      const d: Date = new Date()
-      const hour: number = d.getHours()
-      const min: number = d.getMinutes()
-      const date: string = `${d.toLocaleString('en-US', { month: 'short' })} ${d.getDate()}`
+      const { date, hour, min } = datetime ?? toDateTimeV2()
       return { currentDate: date, currentHour: hour, currentMin: min }
    }, [])
 

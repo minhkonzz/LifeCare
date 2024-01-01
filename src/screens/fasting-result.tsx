@@ -1,5 +1,5 @@
-import { memo, useRef, useEffect, useCallback, useContext } from 'react'
-import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView } from 'react-native'
+import { memo, Dispatch, SetStateAction, useRef, useEffect, useCallback, useContext } from 'react'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -8,12 +8,14 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../store'
 import { resetTimes } from '@store/fasting'
 import { addRec, enqueueAction } from '@store/user'
-import { getLocalDatetimeV2, toDateTimeV1 } from '@utils/datetimes'
+import { getLocalDatetimeV2, toDateTimeV1, toDateTimeV2 } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
 import { WhiteBackIcon, WhiteEditIcon, PrimaryEditIcon } from '@assets/icons'
 import { autoId } from '@utils/helpers'
 import { AnimatedLinearGradient } from '@components/shared/animated'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import UpdateStartFastPopup from '@components/shared/popup/update-startfast'
+import UpdateEndFastPopup from '@components/shared/popup/update-endfast'
 import Button from '@components/shared/button/Button'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
@@ -22,15 +24,26 @@ import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
 
 const TimeSetting = memo(({ 
+	fastingRecId,
 	startTimeStamp, 
 	endTimeStamp, 
 	planName 
 }: {
+	fastingRecId?: string,
 	startTimeStamp: number,
 	endTimeStamp: number,
 	planName: string
 }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const { setPopup } = useContext<any>(PopupContext)
+
+	const UpdateStartFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+		return <UpdateStartFastPopup {...{ setVisible, datetime: toDateTimeV2(startTimeStamp), fastingRecId }} />
+	}), [])
+
+	const UpdateEndFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+		return <UpdateEndFastPopup {...{ setVisible, datetime: toDateTimeV2(endTimeStamp), fastingRecId }} />
+	}), [])
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -60,7 +73,9 @@ const TimeSetting = memo(({
 					</View>
 					<View style={styles.horz}>
 						<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
-						<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						<Pressable onPress={() => setPopup(UpdateStartFastTimePopup)}>
+							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						</Pressable>
 					</View>
 				</View>
 				<View style={{...styles.timeSetting, marginTop: vS(28) }}>
@@ -70,7 +85,9 @@ const TimeSetting = memo(({
 					</View>
 					<View style={styles.horz}>
 						<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
-						<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						<Pressable onPress={() => setPopup(UpdateEndFastTimePopup)}>
+							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						</Pressable>
 					</View>
 				</View>
 			</View>

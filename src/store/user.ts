@@ -25,6 +25,13 @@ export const userSlice = createSlice({
          collection.push(rec)
       },
 
+      updateRec: (state, action) => {
+         const { key, id, payload } = action.payload
+         const collection = state.metadata[key]
+         let rec = collection.find((e: any) => e.id === id)
+         rec = { ...payload }
+      },
+
       enqueueAction: (state, action) => {
          state.queuedActions = [...state.queuedActions, action.payload]
       },
@@ -40,5 +47,5 @@ export const userSlice = createSlice({
    }
 })
 
-export const { updateMetadata, updateSession, addRec, enqueueAction, dequeueAction, updateQueuedActions } = userSlice.actions
+export const { updateMetadata, updateSession, addRec, updateRec, enqueueAction, dequeueAction, updateQueuedActions } = userSlice.actions
 export default userSlice.reducer

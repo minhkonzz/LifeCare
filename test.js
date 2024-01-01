@@ -77,5 +77,5 @@
 // // console.log(handleFastingRecords(1701570543000, 1701729003000))
 // console.log(new Date().toLocaleDateString())
 
-const d = new Date("2023-12-22T10:19:41.359444+00")
+const d = Date.now()
 console.log(d)
