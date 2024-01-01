@@ -19,7 +19,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
    const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
-   const change: number = kilogramsToPounds(currentWeight - startWeight)
+   const change: number = currentWeight - startWeight > 0 ? kilogramsToPounds(currentWeight - startWeight) : 0
    const { setPopup } = useContext<any>(PopupContext)
    const navigation = useNavigation<any>()
 
@@ -58,9 +58,11 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						<AnimatedText value={kilogramsToPounds(currentWeight)} style={styles.current3} />
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
+                     { !!change &&  
 							<View style={styles.current6}>
 								<Text style={styles.current7}>{`${change}`}</Text>
 							</View>
+                     }
 						</View>
 					</Animated.View>
 					<AnimatedPressable 
@@ -77,9 +79,9 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 					</AnimatedPressable>
 				</View>
             <View style={styles.progressBar}>
-               <Text style={styles.progressText}>{`${percent}%`}</Text>
+               <Text style={styles.progressText}>{`${percent >= 0 ? percent : 0}%`}</Text>
                <LinearGradient
-						style={{...styles.activeBar, width: `${percent}%`}}
+						style={{...styles.activeBar, width: `${percent >= 0 ? percent : 0}%`}}
 						colors={['#ffb72b', `rgba(255, 183, 43, .6)`]}
 						start={{ x: 0, y: .5 }}
 						end={{ x: 1, y: .5 }}

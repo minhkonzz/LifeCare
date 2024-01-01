@@ -9,7 +9,7 @@ export default <P extends object>(BaseComponent: ComponentType<P>) => {
       useEffect(() => {
          Animated.timing(animateValue, {
             toValue: isViewable && 1 || 0,
-            duration: 840,
+            duration: 720,
             useNativeDriver: true
          }).start()
       }, [isViewable])

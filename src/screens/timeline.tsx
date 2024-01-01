@@ -7,7 +7,7 @@ import TimelineItem from '@components/timeline-item'
 import timeline from '@assets/data/timeline.json'
 
 export default (): JSX.Element => {
-   const timelineData = handleTimelineData(timeline.waterRecords, timeline.bodyRecords)
+   const timelineData = handleTimelineData(timeline.waterRecords, timeline.bodyRecords, timeline.fastingRecords)
    return (
       <View style={styles.container}>
          <StackHeader title='Timeline' />
@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
 
    timeline: {
       marginTop: vS(32),
-      alignItems: 'flex-end'
+      alignItems: 'flex-end',
+      paddingBottom: vS(10)
    }
 })

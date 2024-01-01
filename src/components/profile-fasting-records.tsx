@@ -1,12 +1,13 @@
-import { memo, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-native'
 import { Colors } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-import { getDatesRange } from '@utils/datetimes'
-import { handleFastingRecords } from '@utils/helpers'
+import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
+import { PolygonIcon } from '@assets/icons'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -18,19 +19,45 @@ const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail?: boolean }) => {
 	if (!hideDetail) {
-		const startTime = item.startTime
+
+		if (typeof item === 'string') {
+			const [ month, date ] = item.split(' ')
+			return (
+				<View key={index} style={{ marginLeft: hS(18), alignItems: 'center', justifyContent: 'center' }}>
+					<Text style={styles.recText}>{month}</Text>
+					<View style={styles.recProg} />
+					<Text style={styles.recText}>{date}</Text>
+				</View>
+			)
+		}
+
+		const [ shown, setShown ] = useState<boolean>(false)
+		const { startTime, endTime, date, totalHours } = item
+		const [ y, m, d ] = date.split('-')
+		const monthTitle = getMonthTitle(m - 1, true)
 		const [ s1, s2 ] = startTime.split(' ')
 		const [ hours, mins ] = s1.split(':').map(Number)
-		const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)
+		const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)	
+		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
+
+		const onPress = () => {
+			Animated.timing(detailAnimateValue, {
+				toValue: !shown && 1 || 0,
+				duration: 200,
+				useNativeDriver: true
+			}).start(() => {
+				setShown(!shown)
+			})
+		}
 
 		return (
-			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center' }}>
-				{ !hideDetail && <Text style={styles.recText}>Nov</Text> }
+			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', position: 'relative' }} {...{ onPress }}>
+				<Text style={styles.recText}>{monthTitle}</Text>
 				<View style={styles.recProg}>
 					<AnimatedLinearGradient
 						style={{
 							...styles.recProgValue, 
-							height: `${item.totalHours / 24 * 100}%`,
+							height: `${totalHours / 24 * 100}%`,
 							top: `${Math.floor(hoursPassed / 24 * 100)}%`
 						}}
 						colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
@@ -38,7 +65,29 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 						end={{ x: .5, y: 1 }} 
 					/>
 				</View>
-				{ !hideDetail && <Text style={styles.recText}>29</Text> }
+				<Text style={styles.recText}>{formatNum(d)}</Text>
+				{ shown && 
+				<AnimatedLinearGradient 
+					style={{
+						position: 'absolute',
+						top: hS(20),
+						width: hS(132),
+						height: vS(70),
+						borderRadius: hS(12),
+						padding: hS(12),
+						opacity: detailAnimateValue,
+						transform: [{ translateY: detailAnimateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [-15, 0]
+						}) }]
+					}}
+					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+					start={{ x: .5, y: 0 }}
+					end={{ x: .52, y: .5 }}>
+					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Total: ${totalHours} hours`}</Text>
+					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(4) }}>{`${startTime} to ${endTime}`}</Text>
+					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25), left: hS(58) }} width={16} />
+				</AnimatedLinearGradient> }
 			</Pressable>
 		)
 	}
@@ -48,6 +97,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
+
 	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
 		const { startTimeStamp, endTimeStamp } = cur
 		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp) }
@@ -64,10 +114,10 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				totalHours
 			}
 		}
-		return null
+		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
 	})
 
-	const noDataFound: boolean = chartData.every(e => !e)
+	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	if (!isViewable) return <View style={styles.container} />
 
@@ -248,8 +298,8 @@ const styles = StyleSheet.create({
 
 	records: {
 		width: '100%',
-		marginTop: vS(20),
-		overflow: 'visible'
+		overflow: 'visible',
+		marginBottom: 2
 	},
 
 	rec: {

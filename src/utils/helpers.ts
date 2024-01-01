@@ -1,4 +1,4 @@
-import { getLocalTimeV1, getDayTitle, getMonthTitle } from "./datetimes"
+import { getLocalTimeV1, getDayTitle, getMonthTitle, timestampToDateTime } from "./datetimes"
 
 export const handleErrorMessage = (message: string) => {
    const splits: string[] = message.split(': ')
@@ -62,7 +62,9 @@ export const handleFastingRecords = (startTimestamp: number, endTimestamp: numbe
          const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
          const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
          const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
-         const [ m, d, y ] = currentDate.toLocaleDateString('en-US')
+         const y = currentDate.getFullYear()
+         const m = formatNum(currentDate.getMonth() + 1)
+         const d = formatNum(currentDate.getDate())
          const date: string = `${y}-${m}-${d}`
          fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
       }
@@ -72,7 +74,7 @@ export const handleFastingRecords = (startTimestamp: number, endTimestamp: numbe
    return fastingData
 }
 
-export const handleTimelineData = (waterRecords: any[], bodyRecords: any[]) => {
+export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fastingRecords: any[]) => {
    const handled = [
       ...waterRecords.reduce((acc, cur) => {
          const { date, times } = cur
@@ -120,6 +122,36 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[]) => {
             year,
             hour,
             min, 
+            sec
+         }]
+      }, []),
+
+      ...fastingRecords.reduce((acc, cur) => {
+         const datetimeCreated: Date = new Date(cur.createdAt)
+         const day = getDayTitle(datetimeCreated, true)
+         const date = datetimeCreated.getDate()
+         const month = datetimeCreated.getMonth() + 1
+         const year = datetimeCreated.getFullYear()
+         const hour = datetimeCreated.getHours()
+         const min = datetimeCreated.getMinutes()
+         const sec = datetimeCreated.getSeconds()
+
+         const start: Date = new Date(cur.startTimeStamp)
+         const end: Date = new Date(cur.endTimeStamp)
+         
+         return [...acc, {
+            id: cur.id,
+            plan: cur.planName,
+            start: start.toLocaleString(),
+            end: end.toLocaleString(),
+            total: timestampToDateTime(cur.endTimeStamp - cur.startTimeStamp),
+            type: 'fasting',
+            day,
+            date,
+            month,
+            year, 
+            hour,
+            min,
             sec
          }]
       }, [])

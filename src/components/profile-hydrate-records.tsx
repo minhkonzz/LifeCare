@@ -31,10 +31,10 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			)
 		}
 
-		const [ shown, setShown ] = useState<boolean>(false)
 		const { id, date, value, goal } = item
 		const [ y, m, d ] = date.split('-')
 		const monthTitle = getMonthTitle(m - 1, true)
+		const [ shown, setShown ] = useState<boolean>(false)
 		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
 
 		const onPress = () => {
@@ -65,7 +65,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 						end={{ x: .5, y: 1 }} 
 					/>
 				</View>
-				<Text style={styles.recText}>{d}</Text>
+				<Text style={styles.recText}>{formatNum(d)}</Text>
 				{ shown && 
 				<AnimatedLinearGradient 
 					style={{

@@ -5,16 +5,62 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { WatercupIcon, OrangeWeightIcon } from '@assets/icons'
 import { getMonthTitle } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
+import { useNavigation } from '@react-navigation/native'
 import TimelineWeightUpdate from '@components/shared/popup/timeline-weight-update'
+import LinearGradient from 'react-native-linear-gradient'
 
 const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface TimelineItemProps {
    item?: any 
    index?: any
 }
 
-const WaterDrinkTimeline = ({ item }) => {
+const FastingTimeline = ({ item }: { item: any }) => {
+   const navigation = useNavigation<any>()
+
+   return (
+      <View>
+         <Pressable>
+            <LinearGradient
+               style={{ 
+                  width: hS(250), 
+                  borderRadius: hS(18),
+                  padding: hS(14),
+                  elevation: 10,
+                  shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
+               }}
+               colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+               start={{ x: .5, y: 0 }}
+               end={{ x: .5, y: 1 }}>
+               <Text style={{...styles.name, color: '#fff' }}>{item.plan}</Text>
+               <Text style={{...styles.value, color: '#fff', fontSize: hS(22) }}>{item.total}</Text>
+               <View style={{
+                  width: '100%',
+                  borderRadius: hS(10),
+                  paddingVertical: vS(8),
+                  paddingHorizontal: hS(12),
+                  backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`
+               }}>
+                  <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                     <Text style={{...styles.name, marginBottom: 0, color: '#fff' }}>Start</Text>
+                     <Text style={{...styles.name, marginBottom: 0, color: '#fff' }}>{item.start}</Text>
+                  </View>
+                  <View style={{ width: 1, height: vS(16), borderWidth: .5, borderStyle: 'dashed', marginVertical: vS(2) }} />
+                  <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                     <Text style={{...styles.name, marginBottom: 0, color: '#fff' }}>End</Text>
+                     <Text style={{...styles.name, marginBottom: 0, color: '#fff' }}>{item.end}</Text>
+                  </View>
+               </View>
+            </LinearGradient>
+         </Pressable>
+         <View style={{...styles.iconIndicator, marginLeft: hS(14) }} />
+      </View>
+   )
+}
+
+const WaterDrinkTimeline = ({ item }: { item: any }) => {
    return (
       <>
          <View style={styles.iconWrapper}>
@@ -37,7 +83,7 @@ const WaterDrinkTimeline = ({ item }) => {
    )
 }
 
-const WeightTimeline = ({ item }) => {
+const WeightTimeline = ({ item }: { item: any }) => {
    const { setPopup } = useContext<any>(PopupContext)
 
    const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) =>
@@ -67,14 +113,15 @@ const WeightTimeline = ({ item }) => {
 
 const timelineTypes = {
    water: WaterDrinkTimeline,
-   weight: WeightTimeline
+   weight: WeightTimeline,
+   fasting: FastingTimeline
 }
 
 export default ({ item, index }: TimelineItemProps): JSX.Element => {
    const TimelineItem = timelineTypes[item.type]
 
    return (
-      <View style={{...styles.container, marginTop: (index > 0 ? vS(13) : 0) }}>
+      <View style={{...styles.container, marginTop: (index > 0 ? vS(12) : 0) }}>
          <Text style={styles.date}>{`${item.day}, ${getMonthTitle(item.month, true)} ${item.date}`}</Text>
          <TimelineItem {...{ item }} />
       </View>
@@ -84,10 +131,13 @@ export default ({ item, index }: TimelineItemProps): JSX.Element => {
 const styles = StyleSheet.create({
    container: {
       flexDirection: 'row' ,
+      justifyContent: 'space-between',
+      width: hS(370),
       paddingRight: hS(4)
    }, 
 
    date: {
+      width: hS(92),
       marginTop: vS(12),
       fontFamily: 'Poppins-Regular', 
       fontSize: hS(12), 
@@ -111,8 +161,8 @@ const styles = StyleSheet.create({
 
    iconIndicator: {
       width: hS(3),
-      height: vS(48), 
-      marginTop: vS(13),
+      height: vS(72), 
+      marginTop: vS(10),
       backgroundColor: `rgba(${darkRgb.join(', ')}, .3)`
    },
 
@@ -133,9 +183,9 @@ const styles = StyleSheet.create({
       paddingHorizontal: hS(14), 
       paddingVertical: vS(10), 
       width: hS(200),
-      elevation: 8, 
+      elevation: 10, 
       backgroundColor: '#fff', 
-      shadowColor: `rgba(${darkRgb.join(', ')}, .2)`
+      shadowColor: `rgba(${darkRgb.join(', ')}, .5)`
    }, 
 
    name: {
