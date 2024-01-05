@@ -9,18 +9,20 @@ import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 import { poundsToKilograms, kilogramsToPounds, centimeterToInch, inchToCentimeter } from '@utils/fomular'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { autoId } from '@utils/helpers'
+import { commonStyles } from '@utils/stylesheet'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
+import useSession from '@hooks/useSession'
 
+const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: Array<string> = ["cm/kg", "ft/lb"]
 
 export default withPopupBehavior(
    withSync(({ 
-      setVisible,
       onConfirm,
       isOnline 
    }: { 
@@ -29,8 +31,7 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const session = useSelector((state: AppState) => state.user.session) 
-      const userId: string | null = session && session.user.id || null
+      const { userId } = useSession()
       let { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppState) => state.user.metadata)
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ weight, setWeight ] = useState<number>(currentWeight)
@@ -42,7 +43,7 @@ export default withPopupBehavior(
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
 
-         const cache = (beQueued = false) => {
+         const cache = () => {
             dispatch(updateMetadata(payload))
             const i: number = bodyRecords.findIndex((e: any) => {
                const createdAt: Date = new Date(e.createdAt)
@@ -58,13 +59,13 @@ export default withPopupBehavior(
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-               
-            } else {
+            } else
                bodyRecords[i].value = weight
-            }
+
             dispatch(updateMetadata({ bodyRecords }))
-            if (beQueued) {
+            if (userId && !isOnline) {
                dispatch(enqueueAction({
+                  userId, 
                   actionId: autoId('qaid'),
                   invoker: 'updateBMI',
                   name: 'UPDATE_BMI',
@@ -73,16 +74,12 @@ export default withPopupBehavior(
             }
          }
 
-         if (!userId) cache()
-         else if (!isOnline) cache(true)
-         else {
+         if (userId) {
             const errorMessage: string = await UserService.updateBMI(userId, { ...payload, newBodyRecId, currentDate })
-            if (errorMessage === NETWORK_REQUEST_FAILED) {
-               console.log('reach here 111')
-               cache(true)
-            }
+            if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+            return
          } 
-         setVisible(null)
+         cache()
       }
 
       const onChangeOption = (index: number) => {
@@ -118,13 +115,13 @@ export default withPopupBehavior(
             <TouchableOpacity
                onPress={() => onConfirm(onSave)}
                activeOpacity={.7}
-               style={styles.button}>
+               style={popupButton}>
                <LinearGradient
-                  style={styles.buttonBg}
+                  style={popupButtonBg}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                   start={{ x: .5, y: 0 }}
                   end={{ x: .5, y: 1 }}>
-                  <Text style={styles.buttonText}>Save</Text>
+                  <Text style={popupButtonText}>Save</Text>
                </LinearGradient>
             </TouchableOpacity>
          </>
@@ -136,27 +133,6 @@ export default withPopupBehavior(
 )
 
 const styles = StyleSheet.create({
-   button: {
-      width: '100%',
-      height: vS(82),
-      borderRadius: hS(32),
-      overflow: 'hidden',
-      marginTop: vS(20)
-   },
-
-   buttonBg: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center', 
-      alignItems: 'center'
-   }, 
-
-   buttonText: {
-      fontFamily: 'Poppins-SemiBold', 
-      fontSize: hS(14), 
-      color: '#fff', 
-      letterSpacing: .2
-   },
 
    toggle: { marginVertical: vS(8) },
 

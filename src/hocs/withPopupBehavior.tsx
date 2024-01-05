@@ -14,6 +14,7 @@ export default <P extends object>(MainPopup: ComponentType<P>, type: 'bottomshee
             useNativeDriver: true
          }).start(() => {
             if (afterDisappear) afterDisappear()
+            setVisible(null)
          })
       }
       

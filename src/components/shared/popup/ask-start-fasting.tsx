@@ -13,6 +13,7 @@ import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
+import useSession from '@hooks/useSession'
 
 export default memo(withSync(({ 
    setVisible,
@@ -24,8 +25,7 @@ export default memo(withSync(({
    const navigation = useNavigation<any>()
    const dispatch = useDispatch()
    const { newPlan } = useSelector((state: AppState) => state.fasting)
-   const { session } = useSelector((state: AppState) => state.user)
-   const userId: string | null = session && session.user.id || null
+   const { userId } = useSession()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    const onConfirm = (isAllowed: boolean) => {
@@ -39,10 +39,11 @@ export default memo(withSync(({
             const currentPlanId = newPlan.id
             const payload = { currentPlanId }
             
-            const cache = (beQueued = false) => {
+            const cache = () => {
                dispatch(updateCurrentPlan())
-               if (beQueued) {
+               if (userId && !isOnline) {
                   dispatch(enqueueAction({
+                     userId,
                      actionId: autoId('qaid'),
                      invoker: 'updatePersonalData',
                      name: 'UPDATE_CURRENT_PLAN',
@@ -51,12 +52,11 @@ export default memo(withSync(({
                }
             }
 
-            if (!userId) cache()
-            else if (!isOnline) cache(true)
-            else {
+            if (userId) {
                const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-               if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+               if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             }
+            else cache()
          }
          navigation.navigate(targetRoute)
          setVisible(null)

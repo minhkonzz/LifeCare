@@ -13,12 +13,12 @@ import Timer from '@screens/timer'
 import Daily from '@screens/daily'
 import Insights from '@screens/insights'
 import Nutrition from '@screens/nutrition'
+import useSession from '@hooks/useSession'
 
 const BottomNavigator = createBottomTabNavigator()
 
 const BottomNav = memo(() => {
 	const screenOptions = useMemo(() => ({ headerShown: false, unmountOnBlur: true }), [])
-	console.log('render BottomNav')
 	return (
 		<BottomNavigator.Navigator tabBar={props => <BottomTabs {...props} />}>
 	   	<BottomNavigator.Group {...{ screenOptions }}>
@@ -54,8 +54,7 @@ const BottomNav = memo(() => {
 
 export default (): JSX.Element => {
 	const dispatch = useDispatch()
-	const session = useSelector((state: AppState) => state.user.session)
-   const userId: string | null = session && session.user.id || null
+	const { userId } = useSession()
    const { drinked, changes, date } = useSelector((state: AppState) => state.water)
    const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
 

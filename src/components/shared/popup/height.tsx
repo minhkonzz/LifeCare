@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '@store/index'
@@ -6,30 +6,31 @@ import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { centimeterToInch, inchToCentimeter } from '@utils/fomular'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
-import { autoId } from '@utils/helpers'
-import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import useSession from '@hooks/useSession'
 
+const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: string[] = ['cm', 'in']
 
 export default withPopupBehavior(
    withSync(({ 
-      setVisible, 
       onConfirm,
       isOnline
    }: { 
-      setVisible: Dispatch<SetStateAction<any>>, 
       onConfirm: (afterDisappear: () => Promise<void>) => void,
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { session, metadata } = useSelector((state: AppState) => state.user)
-      const userId: string | null = session && session.user.id || null 
+      const { metadata } = useSelector((state: AppState) => state.user)
+      const { userId } = useSession()
       const { currentHeight } = metadata
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ optionIndex, setOptionIndex ] = useState<number>(0)
@@ -37,10 +38,11 @@ export default withPopupBehavior(
       const onSave = async () => {
          const payload = { currentHeight: height }
          
-         const cache = (beQueued = false) => {
+         const cache = () => {
             dispatch(updateMetadata(payload))
-            if (beQueued) {
+            if (userId && !isOnline) {
                dispatch(enqueueAction({
+                  userId,
                   actionId: autoId('qaid'),
                   invoker: 'updatePersonalData',
                   name: 'UPDATE_HEIGHT',
@@ -49,13 +51,12 @@ export default withPopupBehavior(
             }
          }
 
-         if (!userId) cache()
-         else if (!isOnline) cache(true)
-         else {
+         if (userId) {
             const errorMessage: string = await UserService.updatePersonalData(userId, payload) 
-            if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+            if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+            return
          }
-         setVisible(false)
+         cache()
       }
    
       const onChangeOption = (index: number) => {
@@ -77,13 +78,13 @@ export default withPopupBehavior(
             <TouchableOpacity
                onPress={() => onConfirm(onSave)}
                activeOpacity={.7}
-               style={styles.button}>
+               style={popupButton}>
                <LinearGradient
-                  style={styles.buttonBg}
+                  style={popupButtonBg}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                   start={{ x: .5, y: 0 }}
                   end={{ x: .5, y: 1 }}>
-                  <Text style={styles.buttonText}>Save</Text>
+                  <Text style={popupButtonText}>Save</Text>
                </LinearGradient>
             </TouchableOpacity>
          </>
@@ -95,28 +96,6 @@ export default withPopupBehavior(
 )
 
 const styles = StyleSheet.create({
-   button: {
-      width: '100%',
-      height: vS(82),
-      borderRadius: hS(32),
-      overflow: 'hidden',
-      marginTop: vS(20)
-   },
-
-   buttonBg: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center', 
-      alignItems: 'center'
-   }, 
-
-   buttonText: {
-      fontFamily: 'Poppins-SemiBold', 
-      fontSize: hS(14), 
-      color: '#fff', 
-      letterSpacing: .2
-   }, 
-
    input: {
       marginLeft: hS(20),
       height: vS(105)

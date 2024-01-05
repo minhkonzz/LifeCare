@@ -15,6 +15,7 @@ import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
+import SuggestionPopup from '@components/shared/popup/suggestion'
 
 const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
@@ -60,7 +61,7 @@ const Tips = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: bo
 	return (
 		isViewable && 
 		<View style={styles.tips}>
-			<AnimatedPressable style={{
+			<AnimatedPressable onPress={() => setPopup(SuggestionPopup)} style={{
 				...styles.tip,
 				opacity: animateValue,
 				transform: [{ translateX: animateValue.interpolate({

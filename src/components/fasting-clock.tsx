@@ -55,7 +55,7 @@ export default withVisiblitySensor(withFastingState(({
 					<AnimatedCircularProgress
 						lineCap='round'
 						width={hS(28)}
-						size={hS(320)}
+						size={hS(348)}
 						rotation={360}
 						fill={100}
 						tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
@@ -85,7 +85,7 @@ export default withVisiblitySensor(withFastingState(({
 				<AnimatedCircularProgress
 					lineCap='round'
 					width={hS(28)}
-					size={hS(320)}
+					size={hS(348)}
 					rotation={360}
 					fill={elapsedTimePercent >= 0 ? elapsedTimePercent : 0}
 					tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
@@ -95,7 +95,7 @@ export default withVisiblitySensor(withFastingState(({
 			</Animated.View>
 		)
 	}
-
+	
 	return (
 		<Animated.View
 			style={{
@@ -115,7 +115,7 @@ export default withVisiblitySensor(withFastingState(({
 			<AnimatedCircularProgress
 				lineCap='round'
 				width={hS(28)}
-				size={hS(320)}
+				size={hS(348)}
 				rotation={360}
 				fill={0}
 				tintColor={`rgba(${primaryRgb.join(', ')}, .6)`}
@@ -128,8 +128,8 @@ export default withVisiblitySensor(withFastingState(({
 const styles = StyleSheet.create({
 	container: {
 		borderRadius: 500,
-		width: hS(328),
-		height: vS(328),
+		width: hS(350),
+		height: vS(350),
 		justifyContent: 'center',
 		alignItems: 'center',
 		padding: 10,

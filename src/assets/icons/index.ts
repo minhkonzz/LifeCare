@@ -59,8 +59,22 @@ import EatTimeIcon from './eat-time.svg'
 import WomenEatIcon from './women-eat.svg'
 import StayHydratedIcon from './stay-hydrated.svg'
 import MedicalCheckupIcon from './medical-checkup.svg'
+import IntoFatBurnIcon from './into-fat-burn.svg'
+import FatBurnStartIcon from './fat-burn-start.svg'
+import GrowthHormoneIcon from './growth-hormone.svg'
+import CleaningIcon from './cleaning.svg'
+import InsulinIcon from './insulin.svg'
+import BloodCellsIcon from './red-blood-cells.svg'
+import SwitchToFastIcon from './switch-to-fast.svg'
 
 export {
+   SwitchToFastIcon,
+   IntoFatBurnIcon,
+   FatBurnStartIcon,
+   GrowthHormoneIcon,
+   CleaningIcon,
+   InsulinIcon,
+   BloodCellsIcon,
    AtIcon,
    BloodSugarDecreaseIcon,
    BloodSugarIncreaseIcon,
@@ -121,6 +135,7 @@ export {
    StayHydratedIcon,
    DontEatTimeIcon,
    EatTimeIcon,
-   MedicalCheckupIcon
+   MedicalCheckupIcon,
+   
 }
 

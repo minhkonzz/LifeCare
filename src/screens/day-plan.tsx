@@ -29,6 +29,8 @@ import {
 	ScrollView
 } from 'react-native'
 
+import useSession from '@hooks/useSession'
+
 const TimeSetting = ({ 
 	startTime, 
 	endTime,
@@ -96,8 +98,7 @@ const TimeSetting = ({
 const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
-	const { session } = useSelector((state: AppState) => state.user)
-	const userId: string | null = session && session.user.id || null
+	const { userId } = useSession()
 	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
@@ -106,11 +107,12 @@ const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 	const onStartFasting = async () => {
 		const payload = { startTimeStamp: _startTimeStamp, endTimeStamp, currentPlanId: newPlan.id }
 
-		const cache = (beQueued = false) => {
+		const cache = () => {
 			dispatch(updateTimes({ startTimeStamp: _startTimeStamp, endTimeStamp }))
 			dispatch(updateCurrentPlan())
-			if (beQueued) {
+			if (userId && !isOnline) {
 				dispatch(enqueueAction({
+					userId, 
 					actionId: autoId('qaid'),
 					invoker: 'updatePersonalData',
 					name: 'UPDATE_FASTING_TIMES',
@@ -119,12 +121,11 @@ const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 			}
 		}
 
-		if (!userId) cache()
-		else if (!isOnline) cache(true)
-		else {
+		if (userId) {
 			const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-			if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+			if (errorMessage === NETWORK_REQUEST_FAILED) cache()
 		}
+		else cache()
 		navigation.navigate('main')
 	}
 

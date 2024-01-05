@@ -22,6 +22,7 @@ import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
+import useSession from '@hooks/useSession'
 
 const TimeSetting = memo(({ 
 	fastingRecId,
@@ -231,8 +232,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 		planName = currentPlan.name
 	}
 	
-	const session = useSelector((state: AppState) => state.user.session) 
-   const userId: string | null = session && session.user.id || null
+	const { userId } = useSession()
 	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
 	const hours: number = Math.floor(totalMins / 60)
 	const mins: number = totalMins % 60
@@ -245,60 +245,65 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
       }).start()
    }, [])
 
-	const onSave = async () => {
-		let fastingRecPayload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
-		const resetPayload = { startTimeStamp: 0, endTimeStamp: 0 }
-
-		const cache1 = (beQueued = false) => {
-			dispatch(resetTimes())
-			if (beQueued) {
-				dispatch(enqueueAction({
-					actionId: autoId('qaid'),
-					invoker: 'updatePersonalData',
-					name: 'UPDATE_FASTING_TIMES',
-					params: [userId, resetPayload]
-				}))
-			}
-		}
-		
-		const cache2 = (beQueued = false) => {
-			const createdAt: string = getLocalDatetimeV2()
-			fastingRecPayload = {
-				...fastingRecPayload, 
-				id: autoId('frec'),
-				createdAt,
-				updatedAt: createdAt
-			}
-			dispatch(addRec({ key: 'fastingRecords', rec: fastingRecPayload }))
-			if (beQueued) {
-				dispatch(enqueueAction({
-					actionId: autoId('qaid'),
-					invoker: 'saveFastingRecord',
-					name: 'ADD_FASTING_REC',
-					params: [userId, fastingRecPayload]
-				}))
-			}
-		}
-
-		if (!userId) {
-			cache2()
-			cache1()
-		} else if (!isOnline) {
-			cache2(true)
-			cache1(true)
-		} else {
-			const addFastingRecErrorMessage: string = await UserService.saveFastingRecord(userId, fastingRecPayload)
-			if (addFastingRecErrorMessage === NETWORK_REQUEST_FAILED) cache2(true)
-			const resetFastingTimesErrorMessage: string = await UserService.updatePersonalData(userId, resetPayload)
-			if (resetFastingTimesErrorMessage === NETWORK_REQUEST_FAILED) cache1(true)
-		}
-		navigation.goBack()
-	}
-
 	const BottomButtons = useCallback(memo(() => {
 
-		const onDelete = () => {
-			dispatch(resetTimes())
+		const resetFastingTimes = async () => {
+			const resetPayload = { startTimeStamp: 0, endTimeStamp: 0 }
+			const cache = () => {
+				dispatch(resetTimes())
+				if (userId && !isOnline) {
+					dispatch(enqueueAction({
+						userId, 
+						actionId: autoId('qaid'),
+						invoker: 'updatePersonalData',
+						name: 'UPDATE_FASTING_TIMES',
+						params: [userId, resetPayload]
+					}))
+				}
+			}
+
+			if (userId) {
+				const errorMessage: string = await UserService.updatePersonalData(userId, resetPayload)
+				if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+				return
+			}
+			cache()
+		}
+
+		const onSave = async () => {
+			let payload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
+			
+			const cache = () => {
+				const createdAt: string = getLocalDatetimeV2()
+				payload = {
+					...payload, 
+					id: autoId('frec'),
+					createdAt,
+					updatedAt: createdAt
+				}
+				dispatch(addRec({ key: 'fastingRecords', rec: payload }))
+				if (userId && !isOnline) {
+					dispatch(enqueueAction({
+						userId,
+						actionId: autoId('qaid'),
+						invoker: 'saveFastingRecord',
+						name: 'ADD_FASTING_REC',
+						params: [userId, payload]
+					}))
+				}
+			}
+	
+			if (userId) {
+				const addFastingRecErrorMessage: string = await UserService.saveFastingRecord(userId, payload)
+				if (addFastingRecErrorMessage === NETWORK_REQUEST_FAILED) cache()
+			}
+			else cache()
+			await resetFastingTimes()
+			navigation.goBack()
+		}
+
+		const onDelete = async () => {
+			await resetFastingTimes()
 			navigation.goBack()
 		}
 

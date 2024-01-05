@@ -12,15 +12,14 @@ import MeasureInput from '../measure-input'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
+import useSession from '@hooks/useSession'
 
 const options: Array<string> = ["kg", "lb"]
 
 const Main = ({ 
-   setVisible, 
    animateValue,
    timelineTimeRecord
 }: {
-   setVisible: Dispatch<SetStateAction<any>>,
    animateValue: Animated.Value,
    timelineTimeRecord: any
 }) => {
@@ -28,8 +27,7 @@ const Main = ({
    const dispatch = useDispatch()
    const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const { bodyRecords } = useSelector((state: AppState) => state.user.metadata)
-   const session = useSelector((state: AppState) => state.user.session) 
-   const userId: string | null = session && session.user.id || null
+   const { userId } = useSession()
    const { id, value, day, date, month } = timelineTimeRecord
    const [ weight, setWeight ] = useState<any>(value)
    const [ weightError, setWeightError ] = useState<boolean>(false)
@@ -61,10 +59,9 @@ const Main = ({
             const errorMessage: string = await UserService.updateWeightTimeline(userId, payload)
             return
          }
-         const r = bodyRecords.find(e => e.id === id)
+         const r = bodyRecords.find((e: any) => e.id === id)
          r['value'] = value
          dispatch(updateMetadata({ bodyRecords }))
-         setVisible(null)
       })
    }
 

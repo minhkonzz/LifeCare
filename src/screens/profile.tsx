@@ -18,11 +18,12 @@ import Screen from '@components/shared/screen'
 import Backup from '@components/profile-backup'
 import ProfileRedirect from '@components/profile-redirect'
 import LogoutPopup from '@components/shared/popup/logout'
+import useSession from '@hooks/useSession'
 
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const { session, metadata } = useSelector((state: AppState) => state.user)
+	const { metadata } = useSelector((state: AppState) => state.user)
 	const { setPopup } = useContext<any>(PopupContext)
-	const userId: string | null = session && session.user.id || null
+	const { userId } = useSession()
 
 	if (userId) {
 		const { name, email } = metadata

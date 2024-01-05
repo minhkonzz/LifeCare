@@ -17,18 +17,6 @@ import {
    REGISTER
  } from 'redux-persist'
 
-// const aesEncryptDecryptTransformer = {
-//    in: (state: any) => {
-//       console.log('reach here 1')
-//       console.log('state:', state)
-//    },
-
-//    out: (state: any) => {
-//       console.log('reach here 2')
-//       console.log('state:', state)
-//    }
-// }
-
 const persistConfig = {
    key: 'root', 
    storage: AsyncStorage,

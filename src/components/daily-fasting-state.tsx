@@ -55,7 +55,7 @@ export default withVisiblitySensor(withFastingState(({
 									/>
 								</View>
 								<View style={styles.mainTexts}>
-									<Text style={styles.t1}>Fasting period start after</Text>
+									<Text style={styles.t1}>Fasting start after</Text>
 									<Text style={styles.t3}>{elapsedTimeText}</Text>
 									<Text style={styles.t4}>You still can eat during this time</Text>
 								</View>
@@ -231,13 +231,13 @@ const styles = StyleSheet.create({
 
 	t4: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: hS(8),
+		fontSize: hS(9),
 		color: '#fff',
 		letterSpacing: .2,
 		paddingHorizontal: hS(10),
 		paddingVertical: vS(3),
 		backgroundColor: `rgba(255, 255, 255, .12)`,
-		borderRadius: 200,
+		borderRadius: 30,
 		marginTop: vS(-3)
 	},
 

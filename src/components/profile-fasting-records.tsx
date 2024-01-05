@@ -32,7 +32,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		const monthTitle = getMonthTitle(m - 1, true)
 		const [ s1, s2 ] = startTime.split(' ')
 		const [ hours, mins ] = s1.split(':').map(Number)
-		const hoursPassed = hours + (s2 === 'PM' ? 12 : hours === 12 ? -12 : 0) + (mins > 50 ? 1 : 0)	
+		const hoursPassed = hours + (s2 === 'PM' && (hours === 12 ? 0 : 12)) + (mins > 50 ? 1 : 0)	
 		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
 
 		const onPress = () => {
@@ -45,11 +45,12 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			})
 		}
 
+		console.log('hp:', hoursPassed)
 		return (
 			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', position: 'relative' }} {...{ onPress }}>
 				<Text style={styles.recText}>{monthTitle}</Text>
 				<View style={styles.recProg}>
-					<AnimatedLinearGradient
+					<LinearGradient
 						style={{
 							...styles.recProgValue, 
 							height: `${totalHours / 24 * 100}%`,
@@ -66,7 +67,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					style={{
 						position: 'absolute',
 						top: hS(20),
-						width: hS(132),
+						width: hS(140),
 						height: vS(70),
 						borderRadius: hS(12),
 						padding: hS(12),
@@ -81,7 +82,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					end={{ x: .52, y: .5 }}>
 					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Total: ${totalHours} hours`}</Text>
 					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(4) }}>{`${startTime} to ${endTime}`}</Text>
-					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25), left: hS(58) }} width={16} />
+					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25), left: hS(60) }} width={16} />
 				</AnimatedLinearGradient> }
 			</Pressable>
 		)

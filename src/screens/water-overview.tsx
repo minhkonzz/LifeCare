@@ -3,16 +3,19 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { darkHex, strongBlueHex } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
-import { useSelector, useDispatch } from 'react-redux'
-import { updateMetadata } from '../store/user'
-import { AppState } from '../store'
+import { useDispatch } from 'react-redux'
+import { enqueueAction, updateMetadata } from '../store/user'
+
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
+import useSession from '@hooks/useSession'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 
-export default (): JSX.Element => {
+export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { session } = useSelector((state: AppState) => state.user)
-   const userId: string | null = session && session.user.id || null
+   const { userId } = useSession()
    const dispatch = useDispatch()
    const navigation = useNavigation<any>()
 
@@ -26,11 +29,25 @@ export default (): JSX.Element => {
 
    const onPress = async () => {
       const payload = { firstTimeWaterTrack: true }
-      if (userId) {
-         await UserService.updatePersonalData(userId, payload)
-      } else {
+
+      const cache = () => {
          dispatch(updateMetadata(payload))
+         if (userId && !isOnline) {
+            dispatch(enqueueAction({
+               userId,
+               actionId: autoId('qaid'),
+               invoker: 'updatePersonalData',
+               name: 'UPDATE_FIRST_TRACK_WATER',
+               params: [userId, payload]
+            }))
+         }
       }
+
+      if (userId) {
+         const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+         if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+      } 
+      else cache()
       navigation.navigate('water')
    }
 
@@ -57,7 +74,7 @@ export default (): JSX.Element => {
          </TouchableOpacity>
       </View>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {

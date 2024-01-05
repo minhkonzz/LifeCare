@@ -3,50 +3,67 @@ import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/color
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppState } from '../store'
-import { getDatesRange } from '@utils/datetimes'
-import { handleFastingRecords } from '@utils/helpers'
+import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
-import { AnimatedLinearGradient, AnimatedPressable } from './shared/animated'
+import { AnimatedPressable } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
 const Record = ({ 
 	item, 
 	index, 
-	hideDetail, 
-	animateValue 
+	hideDetail
 }: { 
 	item: any, 
 	index: number, 
-	hideDetail: boolean, 
-	animateValue: Animated.Value 
+	hideDetail: boolean
 }): JSX.Element => {
 
 	if (!hideDetail) {
-		const [ month, day ] = item.date.split(' ')
+		if (typeof item === 'string') {
+			const [ month, day ] = item.split(' ')
+			return (
+				<View style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0)}}>
+					<Text></Text>
+					<LinearGradient
+						style={styles.recProg}
+						colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} />
+					<View style={{ alignItems: 'center', marginTop: vS(7) }}>
+						<Text style={styles.recText}>{day}</Text>
+						<Text style={{...styles.recText, marginTop: vS(-2) }}>{month}</Text>
+					</View>
+				</View>
+			)
+		}
+
+		const { date, totalHours } = item
+		const [ y, m, d ] = date.split('-')
+		const monthTitle = getMonthTitle(m - 1, true)
+
 		return (
 			<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
-				<Text style={{...styles.recText, height: vS(22) }}>{item.totalHours > 0 ? `${item.totalHours}h` : ''}</Text>
+				<Text style={{...styles.recText, height: vS(22) }}>{totalHours > 0 ? `${totalHours}h` : ''}</Text>
 				<LinearGradient
 					style={styles.recProg}
 					colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .5, y: 1 }}>
-					<AnimatedLinearGradient
+					<LinearGradient
 						style={{
-							...styles.recProgValue, 
-							height: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: ['0%', `${item.totalHours / 24 * 100}%`]
-							}) 
+							...styles.recProgValue,
+							height: '100%',
+							top: `${100 - item.totalHours / 24 * 100}%`
 						}}
 						colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }} />
 				</LinearGradient>
 				<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-					<Text style={styles.recText}>{day}</Text>
-					<Text style={{...styles.recText, marginTop: vS(-2) }}>{month}</Text>
+					<Text style={styles.recText}>{formatNum(d)}</Text>
+					<Text style={{...styles.recText, marginTop: vS(-2) }}>{monthTitle}</Text>
 				</View>
 			</View>
 		)
@@ -76,10 +93,10 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 			date: e.value,
 			totalHours: r.totalHours
 		}
-		return null
+		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
 	})
 
-	const noDataFound: boolean = chartData.every(e => !e)
+	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	if (!isViewable) return <View style={styles.container} />
 
@@ -131,7 +148,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				data={chartData}
-				renderItem={({ item, index }) => <Record {...{ item, index, hideDetail: noDataFound, animateValue }} />}
+				renderItem={({ item, index }) => <Record {...{ item, index, hideDetail: noDataFound }} />}
 			/>
 			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
 				<Text style={styles.timelineText}>Timeline</Text>
@@ -230,13 +247,15 @@ const styles = StyleSheet.create({
 	recProg: {
 		width: hS(54),
 		height: vS(121),
-		borderRadius: 200,
-		justifyContent: 'flex-end'
+		borderRadius: 100,
+		justifyContent: 'flex-end',
+		overflow: 'hidden'
 	},
 
 	recProgValue: {
 		width: '100%',
-		borderRadius: 200
+		borderRadius: 100,
+		position: 'absolute'
 	},
 
 	timelineRef: {

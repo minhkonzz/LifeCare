@@ -2,14 +2,21 @@ import { ComponentType, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { AppState } from '@store/index'
 import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
-import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon } from '@assets/icons'
+import { BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, FireColorIcon, IntoFatBurnIcon, FatBurnStartIcon, CleaningIcon, GrowthHormoneIcon, InsulinIcon, BloodCellsIcon, SwitchToFastIcon } from '@assets/icons'
 import fastingStagesData from '@assets/data/fasting-stages.json'
 
 const stageIcons = [
 	BloodSugarIncreaseIcon,
-	BloodSugarDecreaseIcon,
-	BloodSugarNormalIcon,
-	FireColorIcon
+   BloodSugarDecreaseIcon,
+   BloodSugarNormalIcon,
+   SwitchToFastIcon,
+   IntoFatBurnIcon,
+   FireColorIcon,
+   FatBurnStartIcon,
+   CleaningIcon,
+   GrowthHormoneIcon,
+   InsulinIcon,
+   BloodCellsIcon
 ]
 
 const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
@@ -25,6 +32,7 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
          startTimeStamp: number,
          endTimeStamp: number,
          elapsedTime: number,
+         elapsedTimeInHours: number,
          elapsedTimeText: string, 
          elapsedTimePercent: number, 
          timeExceededValue: number,
@@ -40,9 +48,9 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
                const currentTimeStamp: number = getCurrentTimestamp()
                const isOnFastingTime: boolean = startTimeStamp < currentTimeStamp
                const elapsedTime: number = Math.abs(currentTimeStamp - startTimeStamp)
+               const elapsedTimeInHours: number = elapsedTime / 3600000
                const elapsedTimePercent: number = isOnFastingTime ? Math.floor(elapsedTime / (endTimeStamp - startTimeStamp) * 100) : -1
                const elapsedTimeText: string = timestampToDateTime(elapsedTime)
-               const elapsedHours: number = isOnFastingTime ? Math.floor(elapsedTime / (1000 * 60 * 60)) : 0
                const timeExceededValue: number = isOnFastingTime ? elapsedTime - endTimeStamp + startTimeStamp : 0
                let currentStage: any = null
                let currentStageIndex: number = -1
@@ -52,21 +60,22 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
                if (isOnFastingTime) {
                   if (stageData && stageData.stage) {
                      const { to } = stageData.stage
-                     currentStage = elapsedHours >= to && stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stageData.stage
+                     currentStage = elapsedTimeInHours >= to && stages.find(e => elapsedTimeInHours >= e.from && elapsedTimeInHours <= e.to) || stageData.stage
                   } else {
-                     currentStage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stages.at(-1)
+                     currentStage = stages.find(e => elapsedTimeInHours >= e.from && elapsedTimeInHours <= e.to) || stages.at(-1)
                   }
 
                   const { from, to } = currentStage
                   currentStageIndex = stages.findIndex((e: any) => e.id === currentStage.id)
                   nextStage = currentStageIndex === stages.length - 1 ? null : stages[currentStageIndex + 1]
-                  stageElapsedPercent = (elapsedHours - from) / (to - from) * 100
-               }               
-
+                  stageElapsedPercent = (elapsedTimeInHours - from) / (to - from) * 100
+               }   
+               
                setStageData({ 
                   startTimeStamp,
                   endTimeStamp,
                   elapsedTime,
+                  elapsedTimeInHours,
                   elapsedTimeText, 
                   elapsedTimePercent, 
                   timeExceededValue: timeExceededValue > 0 ? timeExceededValue : 0,
@@ -75,6 +84,7 @@ export default <P extends object>(BaseComponent: ComponentType<P>, runInterval =
                   nextStage 
                })
             }, 1000)
+            
          } else setStageData(null)
          return () => { if (interval) clearInterval(interval) }
       }, [startTimeStamp])

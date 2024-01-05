@@ -39,11 +39,12 @@ import AddFood from '@screens/add-food'
 import Auth from '@screens/auth'
 import FastingDefinitions from '@screens/fasting-definitions'
 import Onboarding from '@screens/onboarding'
+import TestPopup from '@screens/test-popup'
+import Insights from '@screens/insights'
 
 const Stack = createStackNavigator()
 
 const StackNav = memo((): JSX.Element => {
-   console.log('render Stack')
    return (
       <Stack.Navigator
          initialRouteName='splash'
@@ -92,7 +93,7 @@ const Main = () => {
 
    const initializeUserData = (res: any) => {
       const { startTimeStamp, endTimeStamp, currentPlanId, ...personalData } = res
-      dispatch(updateTimes({ _start: startTimeStamp, _end: endTimeStamp }))
+      dispatch(updateTimes({ startTimeStamp, endTimeStamp }))
       const currentPlan = plansData[0].items.find(e => e.id === currentPlanId)
       dispatch(updateCurrentPlan(currentPlan && convertObjectKeysToCamelCase(currentPlan) || null))
       dispatch(updateMetadata(personalData))

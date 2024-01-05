@@ -14,6 +14,7 @@ import { updateTimes } from '@store/fasting'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { AnimatedTouchableOpacity } from './shared/animated'
+import useSession from '@hooks/useSession'
 import UserService from '@services/user'
 import withSync from '@hocs/withSync'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
@@ -128,8 +129,7 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 	const navigation = useNavigation<any>()
 	const { setPopup } = useContext<any>(PopupContext)
 	const { currentPlan } = useSelector((state: AppState) => state.fasting)
-	const { session } = useSelector((state: AppState) => state.user)
-	const userId: string | null = session && session.user.id || null
+	const { userId } = useSession()
 
 	const handleFastingButton = () => {
 		if (!currentPlan) {
@@ -151,10 +151,11 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 
 			const onEndPlan = async () => {
 				const payload = { startTimeStamp: 0, endTimeStamp: 0 }
-				const cache = (beQueued = false) => {
+				const cache = () => {
 					dispatch(updateTimes(payload))
-					if (beQueued) {
+					if (userId && !isOnline) {
 						dispatch(enqueueAction({
+							userId,
 							actionId: autoId('qaid'),
 							invoker: 'updatePersonalData',
 							name: 'UPDATE_FASTING_TIMES',
@@ -163,25 +164,23 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 					}
 				}
 
-				if (!userId) {
-					console.log('call onEndPlan 1')
-					cache()
-				}
-				else if (!isOnline) cache(true)
-				else {
+				if (userId) {
 					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-					if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+					return
 				}
+				cache()
 			}
 
 			const onStartFastingNow = async () => {
 				const _ct = getCurrentTimestamp()
 				const { hrsFast } = currentPlan
 				const payload = { startTimeStamp: _ct, endTimeStamp: _ct + hrsFast * 60 * 60 * 1000 }
-				const cache = (beQueued = false) => {
+				const cache = () => {
 					dispatch(updateTimes(payload))
-					if (beQueued) {
+					if (userId && !isOnline) {
 						dispatch(enqueueAction({
+							userId,
 							actionId: autoId('qaid'),
 							invoker: 'updatePersonalData',
 							name: 'UPDATE_FASTING_TIMES',
@@ -190,12 +189,12 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 					}
 				}
 
-				if (!userId) cache()
-				else if (!isOnline) cache(true)
-				else {
+				if (userId) {
 					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
-					if (errorMessage === NETWORK_REQUEST_FAILED) cache(true)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+					return
 				}
+				cache()
 			}
 
 			return (

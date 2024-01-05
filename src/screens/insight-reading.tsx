@@ -3,6 +3,7 @@ import { darkHex, darkRgb } from '@utils/constants/colors'
 import { useRoute } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { ClockIcon } from '@assets/icons'
+
 import {
    View, 
    Text,
@@ -14,7 +15,7 @@ import {
 
 export default (): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const route = useRoute()
+   const route = useRoute<any>()
    const {
       banner, 
       title, 
@@ -46,7 +47,21 @@ export default (): JSX.Element => {
                </View>
             </View>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.content}>{content}</Text>
+            <View>
+               { content.map((e: any) => {
+                  switch (e.k) {
+                     case "desc": return (
+                        <Text style={styles.content}>{e.v}</Text>
+                     )
+                     case "section_title": return (
+                        <Text style={styles.sectionTitle}>{e.v}</Text>
+                     )
+                     case "image": return (
+                        <Image source={e.v} style={styles.imageContent} />
+                     )
+                  }
+               }) }
+            </View>
          </ScrollView>
       </View>
    )
@@ -122,5 +137,18 @@ const styles = StyleSheet.create({
       letterSpacing: .2, 
       lineHeight: vS(25), 
       marginTop: vS(15)
-   }
+   },
+
+   sectionTitle: {
+      fontFamily: 'Poppins-SemiBold',
+      fontSize: hS(14), 
+      color: darkHex,
+      letterSpacing: .2, 
+      lineHeight: vS(25), 
+      marginTop: vS(12)
+   },
+   
+   imageContent: {
+      width: '100%'
+   },
 })

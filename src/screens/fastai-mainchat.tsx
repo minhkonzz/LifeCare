@@ -94,7 +94,6 @@ export default (): JSX.Element => {
          headers: { 'Content-type': 'application/json; charset=UTF-8' }
       })
       const { text } = await botResponse.json()
-      console.log('text:', text)
       pushMessage({ message: text, sender: 'bot' })
    }
 

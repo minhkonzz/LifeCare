@@ -4,8 +4,11 @@ import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import { MedicalCheckupIcon } from '@assets/icons'
+import { commonStyles } from '@utils/stylesheet'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
+
+const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
 export default withPopupBehavior(
    ({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
@@ -24,13 +27,13 @@ export default withPopupBehavior(
                   navigation.navigate('survey-loading')
                }}
                activeOpacity={.7}
-               style={styles.button}>
+               style={popupButton}>
                <LinearGradient
-                  style={styles.buttonBg}
+                  style={popupButtonBg}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                   start={{ x: .5, y: 0 }}
                   end={{ x: .5, y: 1 }}>
-                  <Text style={styles.buttonText}>Remembered</Text>
+                  <Text style={popupButtonText}>Remembered</Text>
                </LinearGradient>
             </TouchableOpacity>
          </>
@@ -48,27 +51,5 @@ const styles = StyleSheet.create({
       letterSpacing: .2,
       lineHeight: vS(24),
       marginBottom: vS(24)
-   },
-
-   button: {
-      width: '100%',
-      height: vS(82),
-      borderRadius: hS(32),
-      overflow: 'hidden',
-      marginTop: vS(20)
-   },
-
-   buttonBg: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center', 
-      alignItems: 'center'
-   }, 
-
-   buttonText: {
-      fontFamily: 'Poppins-SemiBold', 
-      fontSize: hS(14), 
-      color: '#fff', 
-      letterSpacing: .2
    }
 })

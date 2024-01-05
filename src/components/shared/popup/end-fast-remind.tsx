@@ -5,10 +5,13 @@ import { AppState } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { commonStyles } from '@utils/stylesheet' 
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
 import MeasureInput from '../measure-input'
 import SettingToggle from '@components/shared/setting-toggle'
+
+const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
 export default withPopupBehavior(
    ({ 
@@ -52,13 +55,13 @@ export default withPopupBehavior(
             <TouchableOpacity
                onPress={() => onConfirm(onSave)}
                activeOpacity={.7}
-               style={styles.button}>
+               style={popupButton}>
                <LinearGradient
-                  style={styles.buttonBg}
+                  style={popupButtonBg}
                   colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                   start={{ x: .5, y: 0 }}
                   end={{ x: .5, y: 1 }}>
-                  <Text style={styles.buttonText}>Save</Text>
+                  <Text style={popupButtonText}>Save</Text>
                </LinearGradient>
             </TouchableOpacity>
          </>
@@ -80,28 +83,6 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins-Medium',
       fontSize: hS(14),
       color: darkHex,
-      letterSpacing: .2
-   },
-
-   button: {
-      width: '100%',
-      height: vS(82),
-      borderRadius: hS(32),
-      overflow: 'hidden',
-      marginTop: vS(20)
-   },
-
-   buttonBg: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center', 
-      alignItems: 'center'
-   }, 
-
-   buttonText: {
-      fontFamily: 'Poppins-SemiBold', 
-      fontSize: hS(14), 
-      color: '#fff', 
       letterSpacing: .2
    }
 })

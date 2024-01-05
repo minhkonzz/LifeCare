@@ -1,149 +1,94 @@
 import { View, Text, StyleSheet } from 'react-native' 
-import { darkHex, darkRgb } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import LinearGradient from 'react-native-linear-gradient'
-import RingIndicator from './shared/ring-indicator'
+import LottieView from 'lottie-react-native'
 
 interface FastingStageProps {
-   item: any, 
-   index: number, 
-   elapsedHours: number
+   item: any,  
+   elapsedTimeInHours: number
 }
 
-export default ({ item, index, elapsedHours }: FastingStageProps): JSX.Element => {
+export default ({ item, elapsedTimeInHours }: FastingStageProps): JSX.Element => {
    const { title, from, to, content, icon } = item
    const MainIcon = icon
-   const active = elapsedHours >= from && elapsedHours <= to
+   const active = elapsedTimeInHours >= from && elapsedTimeInHours <= to
    return (
       <View style={styles.container}>
-         <View style={styles.alignCenter}>
-            <View style={styles.circleIndicator}>
-               { active && <RingIndicator color='primary' size={hS(14)} /> }
-            </View>
-            <View style={styles.lineIndicator} />
+         <View style={styles.stageIcBg}>
+            <AnimatedCircularProgress
+               lineCap='round'
+               style={{ position: 'absolute' }}
+               width={hS(8)}
+               size={hS(122)}
+               rotation={360}
+               fill={elapsedTimeInHours > to ? 100 : (elapsedTimeInHours - from) / (to - from) * 100}
+               tintColor='#30E3CA'
+               backgroundColor='rgba(255, 255, 255, .4)'
+            />
+            <MainIcon width={hS(72)} height={vS(72)} />
          </View>
-         <View style={styles.main}>
-            <Text style={styles.stageNumber}>{`STAGE ${index + 1}`}</Text>
-            <LinearGradient 
-               style={styles.mainContent}
-               colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
-               start={{ x: .5, y: 0 }}
-               end={{ x: .52, y: .5 }}>
-               <View style={styles.header}>
-                  <LinearGradient
-							style={styles.stageIcBg}
-							colors={['#000', 'rgba(0, 0, 0, 0)']}
-							start={{ x: .5, y: 0 }}
-							end={{ x: .5, y: 1 }}>
-							<AnimatedCircularProgress
-								lineCap='round'
-								style={{ position: 'absolute' }}
-								width={hS(7)}
-								size={hS(80)}
-								rotation={360}
-								fill={elapsedHours > to ? 100 : (elapsedHours - from) / (to - from) * 100}
-								tintColor='#30E3CA'
-								backgroundColor='rgba(255, 255, 255, .4)'
-							/>
-							<MainIcon width={hS(36)} height={vS(36)} />
-						</LinearGradient>
-                  <View>
-                     <Text style={styles.title}>{title}</Text>   
-                     <View style={styles.hrsRange}>
-                        <Text style={styles.hrsRangeText}>{`${from} - ${to} hours`}</Text>
-                     </View>
-                  </View>            
-               </View>
-               <Text style={styles.content}>{content}</Text>
-            </LinearGradient>
+         <View style={styles.titleWrapper}>
+            { active && <LottieView style={styles.primaryRing} source={require('../assets/lottie/primary-ring.json')} autoPlay /> }
+            <Text style={{...styles.title, ...(active ? { color: primaryHex, fontFamily: 'Poppins-SemiBold', marginTop: vS(-52) } : {})}}>{title}</Text> 
          </View>
+         <Text style={styles.hrsRangeText}>{`${from} - ${to} hours`}</Text>
+         <Text style={styles.content}>{content}</Text>
       </View>
    )
 }
 
 const styles = StyleSheet.create({
-   alignCenter: { alignItems: 'center' },
-   container: { flexDirection: 'row' },
-   main: { marginLeft: hS(14) },
+   container: {
+      width: hS(370),
+      alignItems: 'center',
+      marginTop: vS(60)
+   },
 
-   mainContent: {
-      width: hS(322),  
-      borderRadius: hS(32), 
-      paddingHorizontal: hS(22),
-      paddingVertical: vS(12)
-   }, 
-
-   circleIndicator: {   
-      width: hS(24), 
-      height: vS(24), 
-      borderWidth: 2, 
-      borderRadius: hS(12), 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      borderColor: `rgba(${darkRgb.join(', ')}, .12)`
-   }, 
-
-   lineIndicator: {
-      height: vS(320), 
-      width: hS(2.5), 
-      backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`
-   }, 
-
-   stageNumber: {
-      fontFamily: 'Poppins-Medium', 
-      fontSize: hS(12), 
-      color: `rgba(${darkRgb.join(', ')}, .6)`,
-      letterSpacing: .2, 
-      marginBottom: vS(12)
+   titleWrapper: {
+      width: '100%'
+   },
+   
+   primaryRing: {
+      marginLeft: hS(15),
+      width: hS(80),
+      height: vS(80),
+      marginTop: vS(30)
    },
 
    stageIcBg: {
-      marginTop: -0.5,
-		width: hS(78),
-		height: vS(78),
+		width: hS(120),
+		height: vS(120),
 		justifyContent: 'center',
 		alignItems: 'center',
-		borderRadius: 500
+		borderRadius: 500,
+      backgroundColor: darkHex
    },
-
-   header: {
-      flexDirection: 'row',
-      alignItems: 'center'
-   }, 
 
    title: {
-      width: hS(173),
       fontFamily: 'Poppins-Medium', 
-      fontSize: hS(14), 
-      color: '#fff', 
+      fontSize: hS(16), 
+      color: darkHex, 
       letterSpacing: .2,
-      lineHeight: vS(22)
+      lineHeight: vS(22), 
+      marginTop: vS(20),
+      alignSelf: 'center'
    }, 
-
-   hrsRange: {
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      borderRadius: 100,
-      paddingVertical: vS(5), 
-      backgroundColor: `rgba(255, 255, 255, .12)`,
-      marginTop: vS(9)
-   },
 
    hrsRangeText: {
       fontFamily: 'Poppins-Medium', 
-      fontSize: hS(12), 
-      color: '#fff', 
+      fontSize: hS(13), 
+      color: `rgba(${darkRgb.join(', ')}, .7)`, 
       letterSpacing: .2, 
-      marginTop: 1
+      marginTop: vS(14)
    }, 
 
    content: {
       fontFamily: 'Poppins-Regular', 
-      fontSize: hS(12), 
-      color: '#fff', 
+      fontSize: hS(14), 
+      color: `rgba(${darkRgb.join(', ')}, .8)`, 
       letterSpacing: .2,
-      lineHeight: vS(20), 
+      lineHeight: vS(24), 
       marginTop: vS(22)
    }
 })
