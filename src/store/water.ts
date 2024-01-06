@@ -8,6 +8,7 @@ const initialState: DailyWaterState = {
    drinked: 0,
    needSync: false,
    initCupsize: 200,
+   customCupsize: 0,
    cupsize: 250,
    specs: [],
    changes: []

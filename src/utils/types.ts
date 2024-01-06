@@ -35,8 +35,9 @@ export type DailyWaterState = {
    drinked: number, 
    needSync: boolean,
    initCupsize: number,
+   customCupsize: number,
    cupsize: number,
-   specs: Array<{ id: string, liquid: number, time: string, type: boolean }>
+   specs: any[]
    changes: Array<{ id: string, liquid: number, time: string }>
 }
 

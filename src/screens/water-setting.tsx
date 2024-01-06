@@ -1,5 +1,5 @@
 import { memo, useState, useRef, useEffect, useContext } from 'react'
-import { View, Text, StyleSheet, Pressable, Animated, Platform, StatusBar } from 'react-native'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
@@ -18,7 +18,7 @@ import WaterEndRemindPopup from '@components/shared/popup/water-setting-end-remi
 import WaterIntervalPopup from '@components/shared/popup/water-setting-interval'
 
 const CupSizes = memo(() => {
-	const { initCupsize, cupsize } = useSelector((state: AppState) => state.water)
+	const { initCupsize, cupsize, customCupsize } = useSelector((state: AppState) => state.water)
 	const dispatch = useDispatch()
 	return (
 		<>
@@ -29,7 +29,7 @@ const CupSizes = memo(() => {
 				initCupsize + 100,
 				initCupsize + 150,
 				initCupsize + 300,
-				-1
+				customCupsize
 			].map((e, i) => (
 				<AnimatedPressable 
 					key={i} 
@@ -43,7 +43,7 @@ const CupSizes = memo(() => {
 					} : {})
 					}}
 					onPress={() => dispatch(updateCupsize(e))}>
-					<Text style={styles.cupSizeText}>{`${e !== -1 ? e + ' ml' : 'Customize'}`}</Text>
+					<Text style={styles.cupSizeText}>{`${e && e + ' ml' || 'Customize'}`}</Text>
 				</AnimatedPressable>
 			))
 		}
