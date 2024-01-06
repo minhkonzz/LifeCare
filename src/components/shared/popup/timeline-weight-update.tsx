@@ -5,7 +5,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata } from '@store/user'
 import { poundsToKilograms, kilogramsToPounds } from '@utils/fomular'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { getMonthTitle } from '@utils/datetimes'
 import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
@@ -26,7 +26,7 @@ const Main = ({
 
    const dispatch = useDispatch()
    const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { bodyRecords } = useSelector((state: AppState) => state.user.metadata)
+   const { bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
    const { userId } = useSession()
    const { id, value, day, date, month } = timelineTimeRecord
    const [ weight, setWeight ] = useState<any>(value)

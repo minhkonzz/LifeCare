@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { lightHex, darkRgb, darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { AnimatedPressable, AnimatedTouchableOpacity } from '@components/shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import Screen from '@components/shared/screen'
@@ -15,7 +15,7 @@ import WaterTrack from '@components/daily-water-track'
 import NutritionTrack from '@components/daily-nutrition-track'
 
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
-	const { name } = useSelector((state: AppState) => state.user.metadata)
+	const { name } = useSelector((state: AppStore) => state.user.metadata)
 
 	return (
 		isViewable && 

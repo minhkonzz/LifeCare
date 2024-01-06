@@ -5,7 +5,7 @@ import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
 import { WatercupIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 
 interface TabHeaderProps {
 	title?: string
@@ -13,8 +13,8 @@ interface TabHeaderProps {
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
 	const navigation = useNavigation<any>()
-	const drinked: number = useSelector((state: AppState) => state.water.drinked)
-	const { dailyWater, firstTimeTrackWater } = useSelector((state: AppState) => state.user.metadata)
+	const drinked: number = useSelector((state: AppStore) => state.water.drinked)
+	const { dailyWater, firstTimeTrackWater } = useSelector((state: AppStore) => state.user.metadata)
 
 	return (
 		<View style={styles.container}>

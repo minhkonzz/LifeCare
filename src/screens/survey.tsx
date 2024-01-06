@@ -14,7 +14,7 @@ import {
 
 import { updateSurveyIndex, submitSurveyOption } from '../store/survey'
 import { PopupContext } from '@contexts/popup'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
@@ -164,7 +164,7 @@ const GenderSurvey = memo(() => {
 
 const GoalWeightSurvey = memo(() => {
    const dispatch = useDispatch()
-   const goalWeight = useSelector((state: AppState) => state.survey.goalWeight)
+   const goalWeight = useSelector((state: AppStore) => state.survey.goalWeight)
    return (
       <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
          <MeasureInput 
@@ -180,7 +180,7 @@ const GoalWeightSurvey = memo(() => {
 
 const CurrentWeightSurvey = memo(() => {
    const dispatch = useDispatch()
-   const currentWeight = useSelector((state: AppState) => state.survey.currentWeight)
+   const currentWeight = useSelector((state: AppStore) => state.survey.currentWeight)
    return (
       <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
          <MeasureInput 
@@ -196,7 +196,7 @@ const CurrentWeightSurvey = memo(() => {
 
 const CurrentHeightSurvey = memo(() => {
    const dispatch = useDispatch()
-   const currentHeight = useSelector((state: AppState) => state.survey.currentHeight)
+   const currentHeight = useSelector((state: AppStore) => state.survey.currentHeight)
    return (
       <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
          <MeasureInput 
@@ -291,7 +291,7 @@ const surveyComponents = [
 export default (): JSX.Element => {
    const dispatch = useDispatch()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const surveyIndex = useSelector((state: AppState) => state.survey.surveyIndex)
+   const surveyIndex = useSelector((state: AppStore) => state.survey.surveyIndex)
    const bottomBarHeight: number = useDeviceBottomBarHeight()
    const { setPopup } = useContext<any>(PopupContext)
 

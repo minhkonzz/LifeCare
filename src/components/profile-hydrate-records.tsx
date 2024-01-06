@@ -4,15 +4,18 @@ import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BluePlusIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { formatNum } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { AnimatedLinearGradient, AnimatedTouchableOpacity } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
+
+const { blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail: boolean }) => {
 	if (!hideDetail) {
@@ -92,7 +95,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 }
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const waterRecords = useSelector((state: AppState) => state.user.metadata.waterRecords)
+	const waterRecords = useSelector((state: AppStore) => state.user.metadata.waterRecords)
 	const navigation = useNavigation<any>()
 
 	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
@@ -156,38 +159,15 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 			</ScrollView>
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
 			{ noDataFound && 
-			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={3} />
-				<Text style={styles.noDataText}>No data found</Text>
+			<View style={blurOverlayWrapper}>
+				<BlurView style={blurOverlay} blurType='light' blurAmount={3} />
+				<Text style={noDataText}>No data found</Text>
 			</View> }
 		</AnimatedLinearGradient>
 	)
 })
 
 const styles = StyleSheet.create({
-	blurOverlayWrapper: {		
-		position: 'absolute',
-		top: 0,
-		left: 0, 
-		right: 0,
-		bottom: 0,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-
-	blurOverlay: {
-		position: 'absolute',
-		width: '100%',
-		height: '100%'
-	},
-
-	noDataText: {
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(14),
-		color: darkHex,
-		letterSpacing: .2
-	},
-
 	container: {
 		marginTop: vS(24),
 		width: hS(370),

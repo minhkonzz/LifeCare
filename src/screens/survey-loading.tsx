@@ -5,15 +5,15 @@ import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateMetadata } from '../store/user'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { InitialPersonalData, PersonalData } from '@utils/interfaces'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const dispatch = useDispatch()
-   const survey = useSelector((state: AppState) => state.survey)
-   const session = useSelector((state: AppState) => state.user.session)
+   const survey = useSelector((state: AppStore) => state.survey)
+   const session = useSelector((state: AppStore) => state.user.session)
 
    const initPersonalData = async () => {
       let isOk: boolean = false

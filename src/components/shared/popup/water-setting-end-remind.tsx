@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 import { updateEndWaterRemind } from '@store/setting'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { horizontalScale as hS } from '@utils/responsive'
 import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
@@ -17,7 +17,7 @@ export default withPopupBehavior(
    }: { 
       onConfirm: (afterDisappear: () => Promise<void>) => void
    }) => {
-      const { h, m } = useSelector((state: AppState) => state.setting.reminders.endWater)
+      const { h, m } = useSelector((state: AppStore) => state.setting.reminders.endWater)
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)
       const dispatch = useDispatch()

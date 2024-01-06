@@ -5,7 +5,7 @@ import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppState } from '../store' 
+import { AppStore } from '../store' 
 import { AnimatedPressable } from '@components/shared/animated'
 import { CheckmarkIcon } from '@assets/icons'
 import { enqueueAction, updateMetadata } from '@store/user'
@@ -24,7 +24,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
    const navigation = useNavigation<any>()
    const bottomBarHeight: number = useDeviceBottomBarHeight()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { metadata } = useSelector((state: AppState) => state.user)
+   const { metadata } = useSelector((state: AppStore) => state.user)
    const { userId } = useSession()
    const { goal } = metadata
    const [ selectedGoal, setSelectedGoal ] = useState<string[]>(goal)

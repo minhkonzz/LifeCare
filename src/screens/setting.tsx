@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, FlatList, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '@store/setting'
@@ -26,7 +26,7 @@ export default (): JSX.Element => {
 		darkmode,
 		syncGoogleFit,
 		lang
-	} = useSelector((state: AppState) => state.setting)
+	} = useSelector((state: AppStore) => state.setting)
 	
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()

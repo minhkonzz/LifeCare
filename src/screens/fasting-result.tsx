@@ -5,7 +5,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { resetTimes } from '@store/fasting'
 import { addRec, enqueueAction } from '@store/user'
 import { getLocalDatetimeV2, toDateTimeV1, toDateTimeV2 } from '@utils/datetimes'
@@ -100,7 +100,7 @@ const TrackWeight = memo((): JSX.Element => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { setPopup } = useContext<any>(PopupContext)
-	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
 
 	useEffect(() => {
 		Animated.parallel([
@@ -216,7 +216,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	const dispatch = useDispatch()
 	const route = useRoute()
 	const screenParams: any = route.params
-	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
+	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppStore) => state.fasting)
 
 	let startTimeStamp: number, endTimeStamp: number, planName: string
 		 

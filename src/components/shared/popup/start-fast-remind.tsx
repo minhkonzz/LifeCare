@@ -1,6 +1,6 @@
 import { useState, Dispatch, SetStateAction } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateStartFastRemind } from '@store/setting'
 import { darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
@@ -18,7 +18,7 @@ export default withPopupBehavior(
       setVisible: Dispatch<SetStateAction<boolean>>,
       onConfirm: (afterDisappear: () => Promise<void>) => void
    }) => {
-      const beforeStartFast = useSelector((state: AppState) => state.setting.reminders.beforeStartFast)
+      const beforeStartFast = useSelector((state: AppStore) => state.setting.reminders.beforeStartFast)
       const [ enabled, setEnabled ] = useState<boolean>(!beforeStartFast)
       const [ mins, setMins ] = useState<number>(beforeStartFast)
       const dispatch = useDispatch()

@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-n
 import { darkHex, darkRgb, primaryHex, primaryRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
@@ -92,7 +92,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 }
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
+	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
 
 	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
 		const { startTimeStamp, endTimeStamp } = cur

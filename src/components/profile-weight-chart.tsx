@@ -3,7 +3,7 @@ import { LineChart } from 'react-native-gifted-charts'
 import { View, StyleSheet } from 'react-native'
 import { darkHex } from '@utils/constants/colors'
 import { useSelector } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { getDatesRange, getMonthTitle } from '@utils/datetimes'
 import PrimaryToggleValue from './shared/primary-toggle-value'
@@ -14,7 +14,7 @@ let startIndex: number = 0
 let endIndex: number = 0
 
 export default (): JSX.Element => {
-   const { bodyRecords } = useSelector((state: AppState) => state.user.metadata)
+   const { bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
    const weightRecords = bodyRecords.filter((e: any) => e.type === 'weight')
    const standardWeightRecords = weightRecords.reduce((acc: any, cur: any) => {
       const { id, createdAt, value } = cur

@@ -1,7 +1,7 @@
 import { useState, ReactNode, Dispatch, SetStateAction } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
@@ -32,7 +32,7 @@ export default withPopupBehavior(
    }) => {
       const dispatch = useDispatch()
       const { userId } = useSession()
-      let { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppState) => state.user.metadata)
+      let { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ weight, setWeight ] = useState<number>(currentWeight)
       const [ optionIndex, setOptionIndex ] = useState<number>(0) 
@@ -47,7 +47,7 @@ export default withPopupBehavior(
             dispatch(updateMetadata(payload))
             const i: number = bodyRecords.findIndex((e: any) => {
                const createdAt: Date = new Date(e.createdAt)
-               return createdAt.toLocaleDateString() === currentDate
+               return createdAt.toLocaleDateString() === currentDate && e.type === 'weight'
             })
 
             if (i === -1) {
@@ -69,7 +69,7 @@ export default withPopupBehavior(
                   actionId: autoId('qaid'),
                   invoker: 'updateBMI',
                   name: 'UPDATE_BMI',
-                  params: [userId, { ...payload, newBodyRecId, currentDate }]
+                  params: [userId, payload]
                }))
             }
          }
@@ -133,7 +133,6 @@ export default withPopupBehavior(
 )
 
 const styles = StyleSheet.create({
-
    toggle: { marginVertical: vS(8) },
 
    input: {

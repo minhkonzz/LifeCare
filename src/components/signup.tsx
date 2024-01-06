@@ -1,24 +1,12 @@
-import { 
-   memo, 
-   Dispatch, 
-   SetStateAction, 
-   useEffect, 
-   useRef 
-} from 'react'
-import {
-   View,
-   Text,
-   Pressable,   
-   StyleSheet, 
-   Animated
-} from 'react-native'
-import Button from '@components/shared/button/Button'
+import { memo, Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { UserFieldIcon, LockIcon, AtIcon, BackIcon } from '@assets/icons'
-import AuthInput from './auth-input'
 import { useSelector } from 'react-redux'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
-import { AppState } from '../store'
+import { AppStore } from '../store'
+import Button from '@components/shared/button/Button'
+import AuthInput from './auth-input'
 import AuthService from '@services/user'
 
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
@@ -43,7 +31,7 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
    }
 
    const SignupButton = (): JSX.Element => {
-      const { email, password } = useSelector((state: AppState) => state.auth)
+      const { email, password } = useSelector((state: AppStore) => state.auth)
       const onSignup = async() => {
          try {
             const data = await AuthService.signUpWithEmail(email, password)

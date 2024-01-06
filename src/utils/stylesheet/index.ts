@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { darkHex } from '@utils/constants/colors'
 
 export const commonStyles = StyleSheet.create({
    hrz: {
@@ -27,5 +28,28 @@ export const commonStyles = StyleSheet.create({
       fontSize: hS(14), 
       color: '#fff', 
       letterSpacing: .2
-   }
+   },
+
+   blurOverlayWrapper: {		
+		position: 'absolute',
+		top: 0,
+		left: 0, 
+		right: 0,
+		bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+
+	blurOverlay: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%'
+	},
+
+	noDataText: {
+		fontFamily: 'Poppins-Regular',
+		fontSize: hS(14),
+		color: darkHex,
+		letterSpacing: .2
+	},
 })

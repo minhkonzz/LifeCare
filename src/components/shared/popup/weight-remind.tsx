@@ -1,5 +1,5 @@
 import { useState, Dispatch, SetStateAction } from 'react'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateWeightRemind } from '@store/setting'
 import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
@@ -18,7 +18,7 @@ export default withPopupBehavior(
    }: { 
       onConfirm: (afterDisappear: () => Promise<void>) => void
    }) => {
-      const repeatWeight = useSelector((state: AppState) => state.setting.reminders.repeatWeight)
+      const repeatWeight = useSelector((state: AppStore) => state.setting.reminders.repeatWeight)
       const { days, h, m } = repeatWeight
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)

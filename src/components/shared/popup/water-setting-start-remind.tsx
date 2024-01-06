@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 import { updateStartWaterRemind } from '@store/setting'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { commonStyles } from '@utils/stylesheet'
 import withPopupBehavior from '@hocs/withPopupBehavior'
@@ -17,7 +17,7 @@ export default withPopupBehavior(
    }: { 
       onConfirm: (afterDisappear: () => Promise<void>) => void
    }): JSX.Element => {
-      const { h, m } = useSelector((state: AppState) => state.setting.reminders.startWater)
+      const { h, m } = useSelector((state: AppStore) => state.setting.reminders.startWater)
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)
       const dispatch = useDispatch()

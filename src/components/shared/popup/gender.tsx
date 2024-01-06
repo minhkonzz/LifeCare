@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { autoId } from '@utils/helpers'
@@ -26,7 +26,7 @@ export default withPopupBehavior(
       isOnline: boolean
    }): JSX.Element => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppState) => state.user)
+      const { metadata } = useSelector((state: AppStore) => state.user)
       const { userId } = useSession()
       const { gender } = metadata
       const [ currentGender, setCurrentGender ] = useState<string>(gender)

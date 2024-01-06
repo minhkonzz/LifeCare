@@ -4,12 +4,12 @@ import { OptionProps } from '@utils/interfaces'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { primaryHex, lightHex, darkHex } from '@utils/constants/colors'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { submitSurveyOption } from '@store/survey'
 
 export default ({ item, index, stateKey }: OptionProps) => {
    const dispatch = useDispatch()
-   const value = useSelector((state: AppState) => state.survey[stateKey])
+   const value = useSelector((state: AppStore) => state.survey[stateKey])
    const isChecked = Array.isArray(value) && value.includes(item) || value === item
 
    const onPress = () => {

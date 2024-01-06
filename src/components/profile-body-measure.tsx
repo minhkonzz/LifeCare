@@ -5,7 +5,7 @@ import { primaryHex, darkHex, darkRgb, lightHex, lightRgb } from '@utils/constan
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon, BodyIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { AnimatedLinearGradient } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 
@@ -29,7 +29,7 @@ const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const navigation = useNavigation<any>()
-   const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppState) => state.user.metadata)
+   const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppStore) => state.user.metadata)
 
    return (
       isViewable && 

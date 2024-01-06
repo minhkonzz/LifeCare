@@ -1,7 +1,7 @@
 import { FC, useState, useRef, useContext } from 'react'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useSelector } from 'react-redux'
 import { formatNum } from '@utils/helpers'
 import { PopupContext } from '@contexts/popup'
@@ -77,7 +77,7 @@ export default (): JSX.Element => {
 		startWater,
 		endWater,
 		waterInterval
-	} = useSelector((state: AppState) => state.setting.reminders)
+	} = useSelector((state: AppStore) => state.setting.reminders)
 	
 	if (Object.keys(reminderCallbacks).length === 0) {
 		reminderCallbacks['start-fast-remind'] = () => { setPopup(RemindStartFastPopup) }

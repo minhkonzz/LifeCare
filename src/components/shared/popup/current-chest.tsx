@@ -4,7 +4,7 @@ import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateMetadata, enqueueAction } from '@store/user'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { inchToCentimeter, centimeterToInch } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
@@ -29,7 +29,7 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppState) => state.user)
+      const { metadata } = useSelector((state: AppStore) => state.user)
       const { chestMeasure } = metadata
       const [ chest, setChest ] = useState<number>(chestMeasure)
       const { userId } = useSession()

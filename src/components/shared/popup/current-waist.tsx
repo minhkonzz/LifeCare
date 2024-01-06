@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { updateMetadata, enqueueAction } from '@store/user'
 import { inchToCentimeter, centimeterToInch } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
@@ -29,7 +29,7 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppState) => state.user)
+      const { metadata } = useSelector((state: AppStore) => state.user)
       const { waistMeasure } = metadata
       const { userId } = useSession()
       const [ waist, setWaist ] = useState<number>(waistMeasure)

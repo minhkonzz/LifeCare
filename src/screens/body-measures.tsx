@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useContext } from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { horizontalScale as hS } from '@utils/responsive'
+import { useSelector } from 'react-redux'
+import { PopupContext } from '@contexts/popup'
+import { AppStore } from '@store/index'
 import StackHeader from '@components/shared/stack-header'
 import BodyMeasureSection from '@components/body-measure-section'
 import CurrentWaistPopup from '@components/shared/popup/current-waist'
@@ -9,10 +12,12 @@ import CurrentHipsPopup from '@components/shared/popup/current-hips'
 import CurrentThighPopup from '@components/shared/popup/current-thigh'
 
 export default (): JSX.Element => {
-   const [ currentWaistPopupVisible, setCurrentWaistPopupVisible ] = useState<boolean>(false)
-   const [ currentChestPopupVisible, setCurrentChestPopupVisible ] = useState<boolean>(false)
-   const [ currentHipsPopupVisible, setCurrentHipsPopupVisible ] = useState<boolean>(false)
-   const [ currentThighPopupVisible, setCurrentThighPopupVisible ] = useState<boolean>(false)
+   const { setPopup } = useContext<any>(PopupContext)
+   const { chestMeasure, hipsMeasure, waistMeasure, thighMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
+   const thighMeasureRecords = bodyRecords.filter((e: any) => e.type === 'thigh')
+   const chestMeasureRecords = bodyRecords.filter((e: any) => e.type === 'chest')
+   const waistMeasureRecords = bodyRecords.filter((e: any) => e.type === 'waist')
+   const hipsMeasureRecords = bodyRecords.filter((e: any) => e.type === 'hips')
 
    return (
       <View style={styles.container}>
@@ -21,15 +26,11 @@ export default (): JSX.Element => {
             style={styles.scrollview}
             contentContainerStyle={styles.scrollviewContent}
             showsVerticalScrollIndicator={false}>
-            <BodyMeasureSection title='Waist' value={72} onPressEdit={setCurrentWaistPopupVisible} />
-            <BodyMeasureSection title='Hips' value={68} onPressEdit={setCurrentHipsPopupVisible} />
-            <BodyMeasureSection title='Thigh' value={65} onPressEdit={setCurrentThighPopupVisible} />
-            <BodyMeasureSection title='Chest' value={82} onPressEdit={setCurrentChestPopupVisible} />
+            <BodyMeasureSection title='Waist' hd={waistMeasureRecords} value={waistMeasure} onPressEdit={() => setPopup(CurrentWaistPopup)} />
+            <BodyMeasureSection title='Hips' hd={hipsMeasureRecords} value={hipsMeasure} onPressEdit={() => setPopup(CurrentHipsPopup)} />
+            <BodyMeasureSection title='Thigh' hd={thighMeasureRecords} value={thighMeasure} onPressEdit={() => setPopup(CurrentThighPopup)} />
+            <BodyMeasureSection title='Chest' hd={chestMeasureRecords} value={chestMeasure} onPressEdit={() => setPopup(CurrentChestPopup)} />
          </ScrollView>
-         { currentWaistPopupVisible && <CurrentWaistPopup setVisible={setCurrentWaistPopupVisible} /> }
-         { currentHipsPopupVisible && <CurrentHipsPopup setVisible={setCurrentHipsPopupVisible} /> }
-         { currentThighPopupVisible && <CurrentThighPopup setVisible={setCurrentThighPopupVisible} /> }
-         { currentChestPopupVisible && <CurrentChestPopup setVisible={setCurrentChestPopupVisible} /> }
       </View>
    )
 }

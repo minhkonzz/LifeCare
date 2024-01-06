@@ -4,7 +4,7 @@ import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { updateCupsize } from '../store/water'
 import { formatNum } from '@utils/helpers'
 import { PopupContext } from '@contexts/popup'
@@ -18,7 +18,7 @@ import WaterEndRemindPopup from '@components/shared/popup/water-setting-end-remi
 import WaterIntervalPopup from '@components/shared/popup/water-setting-interval'
 
 const CupSizes = memo(() => {
-	const { initCupsize, cupsize, customCupsize } = useSelector((state: AppState) => state.water)
+	const { initCupsize, cupsize, customCupsize } = useSelector((state: AppStore) => state.water)
 	const dispatch = useDispatch()
 	return (
 		<>
@@ -54,7 +54,7 @@ const CupSizes = memo(() => {
 export default (): JSX.Element => {
 	const bottomBarHeight = useDeviceBottomBarHeight()
 	const { setPopup } = useContext<any>(PopupContext)
-	const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+	const dailyWater = useSelector((state: AppStore) => state.user.metadata?.dailyWater)
 	const [ remindOn, setRemindOn ] = useState<boolean>(false)
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const toggleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -63,7 +63,7 @@ export default (): JSX.Element => {
 		startWater,
 		endWater,
 		waterInterval
-	} = useSelector((state: AppState) => state.setting.reminders)
+	} = useSelector((state: AppStore) => state.setting.reminders)
 
 	const { h: startWaterHour, m: startWaterMin } = startWater
 	const { h: endWaterHour, m: endWaterMin } = endWater

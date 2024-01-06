@@ -7,7 +7,7 @@ import { darkHex, darkRgb, primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { AnimatedPressable } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import AnimatedText from '@components/shared/animated-text'
@@ -15,10 +15,10 @@ import LinearGradient from 'react-native-linear-gradient'
 import UpdateWeightsPopup from '@components/shared/popup/weights'
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-   const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+   const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
+   const { setPopup } = useContext<any>(PopupContext)
    const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
    const change: number = currentWeight - startWeight > 0 ? kilogramsToPounds(currentWeight - startWeight) : 0
-   const { setPopup } = useContext<any>(PopupContext)
    const navigation = useNavigation<any>()
 
    return (

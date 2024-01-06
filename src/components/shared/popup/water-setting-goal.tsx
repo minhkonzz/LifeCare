@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { enqueueAction, updateMetadata } from '@store/user'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { milliliterToOunce, ounceToMilliliter } from '@utils/fomular'
@@ -28,7 +28,7 @@ export default withPopupBehavior(
       onConfirm: (afterDisappear: () => Promise<void>) => void 
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppState) => state.user)
+      const { metadata } = useSelector((state: AppStore) => state.user)
       const { userId } = useSession()
       const { dailyWater } = metadata
       const [ goal, setGoal ] = useState<number>(dailyWater)

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Animated, Easing } from 'react-native'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import WaveSvg from '@assets/images/strong_wave.svg'
 
 interface WaterWaveProps {
@@ -15,8 +15,8 @@ export default ({ w, full }: WaterWaveProps): JSX.Element => {
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
-   const { drinked } = useSelector((state: AppState) => state.water)
-   const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
+   const { drinked } = useSelector((state: AppStore) => state.water)
+   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
 
    useEffect(() => {
       Animated.timing(animateValue, {

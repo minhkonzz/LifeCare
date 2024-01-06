@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
 import GenderPopup from '@components/shared/popup/gender'
@@ -28,7 +28,7 @@ const Main = () => {
 		currentWeight, 
 		goalWeight,
 		goal
-	} = useSelector((state: AppState) => state.user.metadata)
+	} = useSelector((state: AppStore) => state.user.metadata)
 
 	if (Object.keys(settingRowCallbacks).length === 0) {
 		settingRowCallbacks['gender'] = () => { setPopup(GenderPopup) }

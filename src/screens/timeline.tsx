@@ -2,12 +2,15 @@ import { View, FlatList, StyleSheet } from 'react-native'
 import { darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { handleTimelineData } from '@utils/helpers'
+import { useSelector } from 'react-redux'
+import { AppStore } from '@store/index'
 import StackHeader from '@components/shared/stack-header'
 import TimelineItem from '@components/timeline-item'
-import timeline from '@assets/data/timeline.json'
+// import timeline from '@assets/data/timeline.json'
 
 export default (): JSX.Element => {
-   const timelineData = handleTimelineData(timeline.waterRecords, timeline.bodyRecords, timeline.fastingRecords)
+   const { waterRecords, bodyRecords, fastingRecords } = useSelector((state: AppStore) => state.user.metadata)
+   const timelineData = handleTimelineData(waterRecords, bodyRecords, fastingRecords)
    return (
       <View style={styles.container}>
          <StackHeader title='Timeline' />

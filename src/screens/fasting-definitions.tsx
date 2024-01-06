@@ -2,7 +2,9 @@ import { useRef, useEffect } from 'react'
 import { View, FlatList, Text, Animated, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
+import { AppStore } from '@store/index'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 import { BackIcon, DontEatTimeIcon, EatTimeIcon, PrimaryWeightIcon, StayHydratedIcon, WomenEatIcon } from '@assets/icons'
 import { LineChart, CurveType } from 'react-native-gifted-charts'
 import LinearGradient from 'react-native-linear-gradient'
@@ -12,6 +14,8 @@ import LottieView from 'lottie-react-native'
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const { currentWeight, goalWeight } = useSelector((state: AppStore) => state.survey)
+   const lose: number = goalWeight - currentWeight
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -36,15 +40,15 @@ export default (): JSX.Element => {
                      <View style={{ alignItems: 'center' }}>
                         <View style={{...styles.k1, marginRight: hS(22) }}>
                            <PrimaryWeightIcon width={hS(28)} height={vS(28)} />
-                           <Text style={styles.f1}> -21 kg</Text>
+                           <Text style={styles.f1}>{`-${lose} kg`}</Text>
                         </View>
                         <View style={{...styles.k1, marginTop: vS(16) }}>
                            <Text style={{...styles.f2, color: `rgba(${darkRgb.join(', ')}, .5)` }}>
-                              83 <Text style={styles.f3}>kg</Text>
+                              {currentWeight} <Text style={styles.f3}>kg</Text>
                            </Text>
                            <BackIcon style={styles.k2} width={hS(18)} height={vS(18)} />
                            <Text style={{...styles.f2, color: darkHex }}>
-                              62.5 <Text style={styles.f3}>kg</Text>
+                              {goalWeight} <Text style={styles.f3}>kg</Text>
                            </Text>
                         </View>
                      </View>
@@ -54,18 +58,18 @@ export default (): JSX.Element => {
                         dataPointsColor={primaryHex} 
                         data={[
                            { 
-                              value: 92, 
-                              dataPointText: '83 kg' 
+                              value: currentWeight, 
+                              dataPointText: `${currentWeight} kg`
                            },
                            { 
-                              value: 62.5, 
+                              value: goalWeight, 
                               dataPointLabelComponent: () => 
                                  <LinearGradient 
                                     style={styles.targetWeightDataPoint}
                                     colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
                                     start={{ x: .5, y: 0 }}
                                     end={{ x: .5, y: 1 }}>
-                                    <Text style={styles.targetWeightDataPointText}>62.5 kg</Text>
+                                    <Text style={styles.targetWeightDataPointText}>{`${goalWeight} kg`}</Text>
                                  </LinearGradient>
                            }
                         ]} 
@@ -99,7 +103,7 @@ export default (): JSX.Element => {
                            autoPlay
                            loop={false} />
                         <Text style={styles.f5}>
-                           Reach your target weight: <Text style={styles.f6}>62.0 kg</Text>
+                           Reach your target weight: <Text style={styles.f6}>{`${goalWeight} kg`}</Text>
                         </Text>
                      </View>
                   </View>

@@ -1,7 +1,7 @@
 import { memo, useState, useEffect, useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { updateTimes, updateCurrentPlan } from '../store/fasting'
 import { updateNetworkOnline } from '../store/network'
 import { updateMetadata, updateSession } from '../store/user'
@@ -39,8 +39,6 @@ import AddFood from '@screens/add-food'
 import Auth from '@screens/auth'
 import FastingDefinitions from '@screens/fasting-definitions'
 import Onboarding from '@screens/onboarding'
-import TestPopup from '@screens/test-popup'
-import Insights from '@screens/insights'
 
 const Stack = createStackNavigator()
 
@@ -84,7 +82,7 @@ const Main = () => {
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
    const [ initialized, setInitialized ] = useState<boolean>(false)
-   const { session: prevSession, metadata } = useSelector((state: AppState) => state.user)
+   const { session: prevSession, metadata } = useSelector((state: AppStore) => state.user)
 
    const fetchPersonalData = async (userId: string): Promise<void> => {
       const { res, error } = await UserService.getPersonalData(userId)

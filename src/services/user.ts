@@ -129,6 +129,30 @@ export default {
       const { error } = await supabase.rpc('update_bmi', convertObjectKeysToSnakeCase({ userId, payload }))
       return error ? handleErrorMessage(error.message) : ''
    },
+   
+   updateWeight: async (
+      userId: string, 
+      payload: any
+   ): Promise<string> => {
+      const { error } = await supabase.rpc('update_weight', convertObjectKeysToSnakeCase({ userId, payload }))
+      return error ? handleErrorMessage(error.message) : ''
+   },
+
+   updateWeights: async (
+      userId: string, 
+      payload: any
+   ): Promise<string> => {
+      const { error } = await supabase.rpc('update_weights', convertObjectKeysToSnakeCase({ userId, payload }))
+      return error ? handleErrorMessage(error.message) : ''
+   },
+
+   updateBodyRec: async (
+      userId: string,
+      payload: any
+   ): Promise<string> => {
+      const { error } = await supabase.rpc('update_body_rec', convertObjectKeysToSnakeCase({ userId, payload }))
+      return error ? handleErrorMessage(error.message) : ''
+   },
 
    savePrevWaterRecords: async (userId: string, payload: WaterRecordsPayload): Promise<{ waterRecordId?: string, error: string }> => {
       const { data: waterRecordId, error } = await supabase.rpc('save_prev_water_records', convertObjectKeysToSnakeCase({ userId, payload }))

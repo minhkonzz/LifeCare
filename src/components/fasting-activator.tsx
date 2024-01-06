@@ -6,7 +6,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { PopupContext } from '@contexts/popup'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { toDateTimeV1, hoursToTimestamp, timestampToDateTime, getCurrentTimestamp } from '@utils/datetimes'
 import { PrimaryEditIcon } from '@assets/icons'
 import { enqueueAction } from '@store/user'
@@ -128,7 +128,7 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const { setPopup } = useContext<any>(PopupContext)
-	const { currentPlan } = useSelector((state: AppState) => state.fasting)
+	const { currentPlan } = useSelector((state: AppStore) => state.fasting)
 	const { userId } = useSession()
 
 	const handleFastingButton = () => {

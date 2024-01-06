@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { updateMetadata, enqueueAction } from '@store/user'
@@ -9,6 +9,7 @@ import { kilogramsToPounds, poundsToKilograms } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { commonStyles } from '@utils/stylesheet'
+import { getCurrentUTCDateV2 } from '@utils/datetimes'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
@@ -31,7 +32,7 @@ export default withPopupBehavior(
       const dispatch = useDispatch()
       const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
       const { userId } = useSession()
-      const { currentWeight, goalWeight } = useSelector((state: AppState) => state.user.metadata)
+      const { currentWeight, goalWeight } = useSelector((state: AppStore) => state.user.metadata)
       const [ weight, setWeight ] = useState<any>(currentWeight)
       const [ goal, setGoal ] = useState<any>(goalWeight)
       const [ weightError, setWeightError ] = useState<boolean>(false)
@@ -55,6 +56,8 @@ export default withPopupBehavior(
          }
 
          const payload = { currentWeight: +weight, goalWeight: +goal }
+         const currentDate: string = getCurrentUTCDateV2()
+         const newBodyRecId: string = autoId('br')
 
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -62,7 +65,7 @@ export default withPopupBehavior(
                dispatch(enqueueAction({
                   userId, 
                   actionId: autoId('qaid'),
-                  invoker: 'updatePersonalData',
+                  invoker: 'updateWeights',
                   name: 'UPDATE_WEIGHTS',
                   params: [userId, payload]
                }))
@@ -70,7 +73,7 @@ export default withPopupBehavior(
          }
 
          if (userId) {
-            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            const errorMessage: string = await UserService.updateWeights(userId, { ...payload, newBodyRecId, currentDate })
             if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             return
          }

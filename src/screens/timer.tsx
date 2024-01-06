@@ -1,6 +1,6 @@
 import { memo, useContext } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
@@ -18,7 +18,7 @@ import Screen from '@components/shared/screen'
 import SuggestionPopup from '@components/shared/popup/suggestion'
 
 const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
-	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
+	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
 	const navigation = useNavigation<any>()
 
 	return (

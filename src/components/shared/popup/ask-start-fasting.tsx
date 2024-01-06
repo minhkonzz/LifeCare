@@ -3,7 +3,7 @@ import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/color
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { enqueueAction } from '@store/user'
 import { updateCurrentPlan, updateNewPlan } from '@store/fasting'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
@@ -24,7 +24,7 @@ export default memo(withSync(({
 }): JSX.Element => {
    const navigation = useNavigation<any>()
    const dispatch = useDispatch()
-   const { newPlan } = useSelector((state: AppState) => state.fasting)
+   const { newPlan } = useSelector((state: AppStore) => state.fasting)
    const { userId } = useSession()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { commonStyles } from '@utils/stylesheet'
 import { updateCupsize } from '@store/water'
@@ -13,7 +13,7 @@ const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
 export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const dispatch = useDispatch()
-      const { customCupsize } = useSelector((state: AppState) => state.water)
+      const { customCupsize } = useSelector((state: AppStore) => state.water)
       const [ customValue, setCustomValue ] = useState<number>(customCupsize)
 
       const onSave = async () => {

@@ -4,7 +4,7 @@ import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { PopupContext } from '@contexts/popup'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { kilogramsToPounds } from '@utils/fomular'
 import { BackIcon, EditIcon } from '@assets/icons'
 import { AnimatedLinearGradient } from './shared/animated'
@@ -19,7 +19,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
       currentWeight, 
       goalWeight, 
       startWeight
-   } = useSelector((state: AppState) => state.user.metadata)
+   } = useSelector((state: AppStore) => state.user.metadata)
 
    const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
 

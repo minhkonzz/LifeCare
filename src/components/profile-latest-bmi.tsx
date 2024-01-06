@@ -4,7 +4,7 @@ import { PopupContext } from '@contexts/popup'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { getBMI } from '@utils/fomular'
 import { getBMIStatus } from '@utils/helpers'
 import { EditIcon, PolygonIcon } from '@assets/icons'
@@ -16,7 +16,7 @@ import bmiRangesData from '@assets/data/bmi-range-data.json'
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const { setPopup } = useContext<any>(PopupContext)
-	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
+	const { currentWeight, currentHeight } = useSelector((state: AppStore) => state.user.metadata)
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const bmiStatus: string = getBMIStatus(bmiValue)
 	const cursorAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current

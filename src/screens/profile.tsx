@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated } from 'react-native'
 import { ClockIcon, LogoutIcon, SettingIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { lightHex, lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { PopupContext } from '@contexts/popup'
@@ -21,7 +21,7 @@ import LogoutPopup from '@components/shared/popup/logout'
 import useSession from '@hooks/useSession'
 
 const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const { metadata } = useSelector((state: AppState) => state.user)
+	const { metadata } = useSelector((state: AppStore) => state.user)
 	const { setPopup } = useContext<any>(PopupContext)
 	const { userId } = useSession()
 

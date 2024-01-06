@@ -3,7 +3,7 @@ import { Text, TouchableOpacity } from 'react-native'
 import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { enqueueAction, updateMetadata } from '@store/user'
 import { commonStyles } from '@utils/stylesheet'
 import { autoId } from '@utils/helpers'
@@ -27,7 +27,7 @@ export default withPopupBehavior(
       onConfirm: (afterDisappear: () => Promise<void>) => void
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppState) => state.user)
+      const { metadata } = useSelector((state: AppStore) => state.user)
       const { age } = metadata
       const [ currentAge, setCurrentAge ] = useState<number>(age)
       const { userId } = useSession()

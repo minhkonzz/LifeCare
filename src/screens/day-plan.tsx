@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState, useCallback, useEffect, useRef, mem
 import { useNavigation } from '@react-navigation/native'
 import { updateTimes, updateCurrentPlan } from '../store/fasting'
 import { toDateTimeV1, getCurrentTimestamp, toTimestampV1 } from '@utils/datetimes'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { primaryHex, primaryRgb, lightHex, lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -99,7 +99,7 @@ const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 	const { userId } = useSession()
-	const { newPlan, startTimeStamp } = useSelector((state: AppState) => state.fasting)
+	const { newPlan, startTimeStamp } = useSelector((state: AppStore) => state.fasting)
 	const { hrsFast, hrsEat } = newPlan
 	const _startTimeStamp = startTimeStamp || getCurrentTimestamp()
 	const endTimeStamp = _startTimeStamp + hrsFast * 60 * 60 * 1000

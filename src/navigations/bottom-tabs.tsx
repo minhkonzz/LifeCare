@@ -2,7 +2,7 @@ import { memo, useMemo, useEffect } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useSelector, useDispatch } from 'react-redux'
 import { getCurrentDate, getLocalDatetimeV2 } from '@utils/datetimes'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { resetDailyWater } from '@store/water'
 import { addRec } from '@store/user'
 import { autoId } from '@utils/helpers'
@@ -55,8 +55,8 @@ const BottomNav = memo(() => {
 export default (): JSX.Element => {
 	const dispatch = useDispatch()
 	const { userId } = useSession()
-   const { drinked, changes, date } = useSelector((state: AppState) => state.water)
-   const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
+   const { drinked, changes, date } = useSelector((state: AppStore) => state.water)
+   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
 
 	const resetWaterTrack = async () => {
 		const todayDate: string = getCurrentDate()

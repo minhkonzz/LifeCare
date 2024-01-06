@@ -4,7 +4,7 @@ import { PopupContext } from '@contexts/popup'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { getBMI } from '@utils/fomular'
 import { getBMIStatus } from '@utils/helpers'
 import { AnimatedLinearGradient } from './shared/animated'
@@ -14,7 +14,7 @@ import UpdateBMIPopup from '@components/shared/popup/bmi-update'
 import AnimatedText from '@components/shared/animated-text'
 
 export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
-	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
+	const { currentWeight, currentHeight } = useSelector((state: AppStore) => state.user.metadata)
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
 	const { setPopup } = useContext<any>(PopupContext)
 

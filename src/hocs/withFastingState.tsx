@@ -1,6 +1,6 @@
 import { ComponentType, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
 import { BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, FireColorIcon, IntoFatBurnIcon, FatBurnStartIcon, CleaningIcon, GrowthHormoneIcon, InsulinIcon, BloodCellsIcon, SwitchToFastIcon } from '@assets/icons'
 import fastingStagesData from '@assets/data/fasting-stages.json'
@@ -23,7 +23,7 @@ const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
 
 export default <P extends object>(BaseComponent: ComponentType<P>, runInterval = false) => {
    return (props: any) => {
-      const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
+      const { startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
       const isFasting: boolean = !!(startTimeStamp && endTimeStamp)
 
       if (!runInterval) return <BaseComponent {...{...({ startTimeStamp, endTimeStamp, isFasting } as P), ...props}} /> 

@@ -2,11 +2,11 @@ import { useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { NavigationProp } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import LottieView from 'lottie-react-native'
 
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const metadata = useSelector((state: AppState) => state.user.metadata)
+   const metadata = useSelector((state: AppStore) => state.user.metadata)
 
    useEffect(() => {
       const routeName = !metadata && 'welcome' || 'main'

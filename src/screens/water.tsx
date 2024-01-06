@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { NavigationProp } from '@react-navigation/native'
 import { darkHex, strongBlueHex, lightBlueHex, strongBlueRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -16,9 +16,9 @@ import WaterWave from '@components/water-wave'
 export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppState) => state.water)
-   const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
-   const { session } = useSelector((state: AppState) => state.user)
+   const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppStore) => state.water)
+   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
+   const { session } = useSelector((state: AppStore) => state.user)
    const userId: string = session?.user?.id
    const dispatch = useDispatch()
 

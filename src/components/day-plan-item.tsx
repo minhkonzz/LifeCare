@@ -5,14 +5,14 @@ import { useDispatch } from 'react-redux'
 import { updateNewPlan } from '../store/fasting'
 import { PopupContext } from '@contexts/popup'
 import { darkHex, darkRgb } from '@utils/constants/colors'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { ElectroIcon, RestaurantIcon } from '@assets/icons'
 import RequireEndFastingPopup from '@components/shared/popup/require-end-fasting'
 import ConfirmPopup from '@components/shared/popup/ask-start-fasting'
 
 export default ({ item }): JSX.Element => {
-	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
+	const { startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
 	const { setPopup } = useContext<any>(PopupContext)
 	const dispatch = useDispatch()
 

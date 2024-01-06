@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { LoginComponentProps } from '@utils/interfaces'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
 import { GOOGLE_CLIENT_ID } from '@env'
 import { CornerArrowUpRightIcon } from '@assets/icons'
@@ -90,7 +90,7 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 	}
 
 	const SignInButton = useCallback(() => {
-		const { email, password } = useSelector((state: AppState) => state.auth)
+		const { email, password } = useSelector((state: AppStore) => state.auth)
 		const [ processing, setProcessing ] = useState<boolean>(false)
 
 		const onSignIn = async() => {

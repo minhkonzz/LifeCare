@@ -21,5 +21,6 @@ export default ({ value, style }: AnimatedNumberProps): JSX.Element => {
     return () => clearInterval(interval)
   }, [value])
 
-  return <Text {...{ style }}>{formatNum(Number(number.toFixed(2)))}</Text>
+  const numberText: string = number ? formatNum(Number(number.toFixed(2))) : '0'
+  return <Text {...{ style }}>{numberText}</Text>
 }

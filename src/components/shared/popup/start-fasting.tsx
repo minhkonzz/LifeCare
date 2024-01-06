@@ -1,7 +1,7 @@
 import { memo, Dispatch, SetStateAction } from 'react'
 import { toTimestampV1 } from '@utils/datetimes'
 import { updateTimes } from '@store/fasting'
-import { AppState } from '@store/index'
+import { AppStore } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
 import { enqueueAction } from '@store/user'
 import { autoId } from '@utils/helpers'
@@ -18,7 +18,7 @@ export default memo(withSync(({
    setVisible: Dispatch<SetStateAction<any>>,
    isOnline: boolean
 }): JSX.Element => {
-   const currentPlan = useSelector((state: AppState) => state.fasting.currentPlan)
+   const currentPlan = useSelector((state: AppStore) => state.fasting.currentPlan)
 	const { hrsFast } = currentPlan
    const { userId } = useSession()
    const dispatch = useDispatch()
