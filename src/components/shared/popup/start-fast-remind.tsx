@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { AppStore } from '@store/index'
 import { useSelector, useDispatch } from 'react-redux'
@@ -10,26 +10,18 @@ import LinearGradient from 'react-native-linear-gradient'
 import MeasureInput from '../measure-input'
 import SettingToggle from '@components/shared/setting-toggle'
 
-export default withPopupBehavior(
-   ({ 
-      setVisible, 
-      onConfirm
-   }: { 
-      setVisible: Dispatch<SetStateAction<boolean>>,
-      onConfirm: (afterDisappear: () => Promise<void>) => void
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const beforeStartFast = useSelector((state: AppStore) => state.setting.reminders.beforeStartFast)
       const [ enabled, setEnabled ] = useState<boolean>(!beforeStartFast)
       const [ mins, setMins ] = useState<number>(beforeStartFast)
       const dispatch = useDispatch()
 
       const onSave = async () => {
-         setVisible(false)
          if (enabled) {
-            dispatch(updateStartFastRemind(0))
+            dispatch(updateStartFastRemind({ beforeStartFast: 0 }))
             return
          }
-         dispatch(updateStartFastRemind(mins))
+         dispatch(updateStartFastRemind({ beforeStartFast: mins }))
       }
 
       const onTogglePress = () => {

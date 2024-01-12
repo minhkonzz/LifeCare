@@ -39,9 +39,10 @@ export default withPopupBehavior(
       const symbSplits = options[optionIndex].split('/')
 
       const onSave = async () => {
-         const payload = { currentHeight: height, currentWeight: weight }
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
+         const payload = { currentHeight: height, currentWeight: weight }
+         const reqPayload = { ...payload, newBodyRecId, currentDate }
 
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -59,8 +60,7 @@ export default withPopupBehavior(
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else
-               bodyRecords[i].value = weight
+            } else bodyRecords[i].value = weight
 
             dispatch(updateMetadata({ bodyRecords }))
             if (userId && !isOnline) {
@@ -69,13 +69,13 @@ export default withPopupBehavior(
                   actionId: autoId('qaid'),
                   invoker: 'updateBMI',
                   name: 'UPDATE_BMI',
-                  params: [userId, payload]
+                  params: [userId, reqPayload]
                }))
             }
          }
 
          if (userId) {
-            const errorMessage: string = await UserService.updateBMI(userId, { ...payload, newBodyRecId, currentDate })
+            const errorMessage: string = await UserService.updateBMI(userId, reqPayload)
             if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             return
          } 

@@ -115,7 +115,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
-	if (!isViewable) return <View style={styles.container} />
+	// if (!isViewable) return <View style={styles.container} />
 
 	return (
 		<AnimatedLinearGradient

@@ -10,7 +10,7 @@ const initialState: SurveyState = {
    age: 0, 
    currentHeight: 0,
    currentWeight: 0, 
-   goalWeight: 56,
+   goalWeight: 0,
    firstMealTime: '',
    lastMealTime: '',
    healthConcerns: [],
@@ -24,30 +24,6 @@ const SurveySlice = createSlice({
       updateSurveyIndex: (state, action) => {
          state.surveyIndex = action.payload
       },
-      // updateGoal: (state, action) => {
-      //    state.goal = action.payload
-      // },
-      // updateFastingFamiliar: (state, action) => {
-      //    state.fastingFamiliar = action.payload
-      // },
-      // updateExercisePerformance: (state, action) => {
-      //    state.exercisePerformance = action.payload
-      // },
-      // updateGender: (state, action) => {
-      //    state.gender = action.payload
-      // },
-      // updateAge: (state, action) => {
-      //    state.age = action.payload
-      // },
-      // updateCurrentHeight: (state, action) => {
-      //    state.currentHeight = action.payload
-      // },
-      // updateCurrentWeight: (state, action) => {
-      //    state.currentWeight = action.payload
-      // },
-      // updateGoalWeight: (state, action) => {
-      //    state.goalWeight = action.payload
-      // },
 
       submitSurveyOption: (state, action) => {
          const { k, v } = action.payload
@@ -58,14 +34,6 @@ const SurveySlice = createSlice({
 
 export const { 
    updateSurveyIndex,
-   // updateGoal, 
-   // updateFastingFamiliar, 
-   // updateExercisePerformance,
-   // updateGender,
-   // updateAge,
-   // updateCurrentHeight, 
-   // updateCurrentWeight,
-   // updateGoalWeight,
    submitSurveyOption
  } = SurveySlice.actions
  

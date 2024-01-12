@@ -1,13 +1,12 @@
-import { useContext, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, FlatList, Animated } from 'react-native'
+import { useContext } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '../store'
 import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '@store/setting'
+import { updateNotififcation, updateDarkMode } from '@store/setting'
 import { PopupContext } from '@contexts/popup'
-import { AnimatedTouchableOpacity } from '@components/shared/animated'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
@@ -18,26 +17,17 @@ const settingRowCallbacks = {}
 const settingRowValues = {}
 
 export default (): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { setPopup } = useContext<any>(PopupContext)
 
 	const { 
 		notification,  
 		darkmode,
-		syncGoogleFit,
+		// syncGoogleFit,
 		lang
 	} = useSelector((state: AppStore) => state.setting)
 	
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: 1, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [])
 
 	if (Object.keys(settingRowCallbacks).length === 0) {
 		settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
@@ -46,14 +36,13 @@ export default (): JSX.Element => {
 		settingRowCallbacks['widgets'] = () => {}
 		settingRowCallbacks['language'] = () => { setPopup(LanguagePopup) }
 		settingRowCallbacks['dark-mode'] = () => { dispatch(updateDarkMode()) }
-		settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
-		settingRowCallbacks['privacy-policy'] = () => {}
+		// settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
 		settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
 	}
 
 	settingRowValues['notification'] = notification
 	settingRowValues['dark-mode'] = darkmode
-	settingRowValues['sync-google-fit'] = syncGoogleFit
+	// settingRowValues['sync-google-fit'] = syncGoogleFit
 	settingRowValues['language'] = lang
 
 	return (
@@ -62,17 +51,7 @@ export default (): JSX.Element => {
 			{
 				['About me', 'General', 'Contact us'].map((e, i) => (
 					<View key={i} style={{ marginTop: vS(i > 0 ? 24 : 0) }}>
-						<Animated.Text 
-							style={{
-								...styles.settingSectionTitle, 
-								opacity: animateValue,
-								transform: [{ translateX: animateValue.interpolate({
-									inputRange: [0, 1], 
-									outputRange: [-150, 0]
-								}) }]
-							}}>
-							{e}
-						</Animated.Text>
+						<Text style={styles.settingSectionTitle}>{e}</Text>
 						<FlatList
 							style={{ flexGrow: 0 }}
 							showsVerticalScrollIndicator={false}
@@ -90,30 +69,13 @@ export default (): JSX.Element => {
 				))
 			}
 			<View style={styles.bottom}>
-				<Animated.Text 
-					style={{
-						...styles.versionText, 
-						opacity: animateValue,
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-150, 0]
-						}) }]
-					}}>
-					Version 1.0.0
-				</Animated.Text>
-				<AnimatedTouchableOpacity 
+				<Text style={styles.versionText}>Version 1.0.0</Text>
+				<TouchableOpacity 
 					onPress={() => setPopup(RewipeDataWarnPopup)}
 					activeOpacity={.7}
-					style={{
-						...styles.rewipeDataButton, 
-						opacity: animateValue,
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-50, 0]
-						}) }]
-					}}>
+					style={styles.rewipeDataButton}>
 					<Text style={styles.rewipeDataButtonText}>Rewipe all data</Text>
-				</AnimatedTouchableOpacity>
+				</TouchableOpacity>
 			</View>
 		</View>
 	)

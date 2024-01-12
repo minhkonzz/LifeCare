@@ -4,8 +4,10 @@ import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/color
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Message } from '@utils/types'
 import { MessageIcon, BackIcon, MicrophoneIcon } from '@assets/icons'
-import { SERVER_URL } from '@env'
+// import { SERVER_URL } from '@env'
 import { AnimatedLinearGradient } from '@components/shared/animated'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GOOGLE_AI_KEY } from '@env'
 import LottieView from 'lottie-react-native'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -58,6 +60,9 @@ const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.E
       </View>
    )
 })
+
+const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY)
+const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
  
 export default (): JSX.Element => {
    const [ messages, setMessages ] = useState<Message[]>([])
@@ -88,13 +93,15 @@ export default (): JSX.Element => {
    const sendMessage = async (message: string) => {
       pushMessage({ message, sender: 'user' })
       setQuestion('')
-      const botResponse = await fetch(`${SERVER_URL}/chat/q`, {
-         method: 'POST',
-         body: JSON.stringify({ question: message }),
-         headers: { 'Content-type': 'application/json; charset=UTF-8' }
-      })
-      const { text } = await botResponse.json()
-      pushMessage({ message: text, sender: 'bot' })
+      const ans = await model.generateContent(message)
+      const res = ans.response.text()
+      // const botResponse = await fetch(`${SERVER_URL}/chat/q`, {
+      //    method: 'POST',
+      //    body: JSON.stringify({ question: message }),
+      //    headers: { 'Content-type': 'application/json; charset=UTF-8' }
+      // })
+      // const { text } = await botResponse.json()
+      pushMessage({ message: res, sender: 'bot' })
    }
 
    return (

@@ -12,12 +12,7 @@ import TimeInput from '@components/time-input'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
-export default withPopupBehavior(
-   ({ 
-      onConfirm
-   }: { 
-      onConfirm: (afterDisappear: () => Promise<void>) => void
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const repeatWeight = useSelector((state: AppStore) => state.setting.reminders.repeatWeight)
       const { days, h, m } = repeatWeight
       const [ hours, setHours ] = useState<number>(h)

@@ -36,7 +36,7 @@ export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.El
                Sign in and synchronize your data
             </Animated.Text>
             <TouchableOpacity style={styles.syncDataButton} activeOpacity={.8}>
-               <Text style={styles.syncDataButtonText}>SYNC DATA</Text>
+               <Text style={styles.syncDataButtonText}>Sync data</Text>
             </TouchableOpacity>
          </View>
          <AnimatedCloudBackupIcon 
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row', 
       justifyContent: 'space-between',
       alignItems: 'flex-end',
-      marginTop: vS(24), // delete
+      marginTop: vS(92), // delete
       borderRadius: hS(24),
       paddingHorizontal: hS(16), 
       paddingVertical: vS(16)

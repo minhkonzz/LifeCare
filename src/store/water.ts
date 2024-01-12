@@ -5,6 +5,7 @@ import { getCurrentDate, getLocalDatetimeV2 } from '@utils/datetimes'
 
 const initialState: DailyWaterState = {
    date: getCurrentDate(),
+   firstTimeReachGoal: false,
    drinked: 0,
    needSync: false,
    initCupsize: 200,
@@ -47,6 +48,16 @@ const WaterSlice = createSlice({
          state.cupsize = action.payload
       },
 
+      updateCustomCupsize: (state, action) => {
+         const cupsize = action.payload
+         state.cupsize = cupsize
+         state.customCupsize = cupsize 
+      },
+
+      updateFirstTimeReachGoal: (state) => {
+         state.firstTimeReachGoal = true 
+      },
+
       resetSpecs: (state) => {
          state.specs = []
          state.needSync = false
@@ -63,10 +74,12 @@ const WaterSlice = createSlice({
 })
 
 export const {
+   updateFirstTimeReachGoal,
    updateLiquid,
    updateCupsize,
    resetSpecs,
-   resetDailyWater
+   resetDailyWater,
+   updateCustomCupsize
 } = WaterSlice.actions
 
 export default WaterSlice.reducer

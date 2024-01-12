@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { updateEndFastRemind } from '@store/setting'
 import { AppStore } from '@store/index'
@@ -13,26 +13,18 @@ import SettingToggle from '@components/shared/setting-toggle'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
-export default withPopupBehavior(
-   ({ 
-      setVisible,
-      onConfirm
-   }: { 
-      setVisible: Dispatch<SetStateAction<any>>,
-      onConfirm: (afterDisappear: () => Promise<void>) => void 
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const beforeEndFast = useSelector((state: AppStore) => state.setting.reminders.beforeEndFast)
       const [ enabled, setEnabled ] = useState<boolean>(!beforeEndFast)
       const [ mins, setMins ] = useState<number>(beforeEndFast)
       const dispatch = useDispatch()
 
       const onSave = async () => {
-         setVisible(false)
          if (enabled) {
-            dispatch(updateEndFastRemind(0))
+            dispatch(updateEndFastRemind({ beforeStartFast: 0 }))
             return
          }
-         dispatch(updateEndFastRemind(mins))
+         dispatch(updateEndFastRemind({ beforeStartFast: mins }))
       }
 
       const onTogglePress = () => {
@@ -45,7 +37,7 @@ export default withPopupBehavior(
                <Text style={styles.toggleText}>When time to end fast</Text>
                <SettingToggle value={enabled} onPress={onTogglePress} />
             </View>
-            { enabled && 
+            { !enabled && 
             <MeasureInput 
                contentCentered
                symb='mins' 

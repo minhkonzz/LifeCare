@@ -70,13 +70,13 @@ const SettingSlice = createSlice({
 
       updateStartFastRemind: (state, action) => {
          const { startFast, beforeStartFast } = action.payload
-         configPushStartFastNotification({ startFast, beforeStartFast })
+         // configPushStartFastNotification({ startFast, beforeStartFast })
          state.reminders.beforeStartFast = beforeStartFast
       },
 
       updateEndFastRemind: (state, action) => {
          const { endFast, beforeEndFast } = action.payload
-         configPushEndFastNotification({ endFast, beforeEndFast })
+         // configPushEndFastNotification({ endFast, beforeEndFast })
          state.reminders.beforeEndFast = action.payload
       },
 

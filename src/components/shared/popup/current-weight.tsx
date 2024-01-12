@@ -37,9 +37,10 @@ export default withPopupBehavior(
       const [ optionIndex, setOptionIndex ] = useState<number>(0)
 
       const onSave = async () => {
-         const payload = { currentWeight: weight }
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
+         const payload = { currentWeight: weight }
+         const reqPayload = { ...payload, newBodyRecId, currentDate }
          
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -49,13 +50,13 @@ export default withPopupBehavior(
                   actionId: autoId('qaid'),
                   invoker: 'updateWeight',
                   name: 'UPDATE_WEIGHT',
-                  params: [userId, payload]
+                  params: [userId, reqPayload]
                }))
             }
          }
          
          if (userId) {
-            const errorMessage: string = await UserService.updateWeight(userId, { ...payload, currentDate, newBodyRecId })
+            const errorMessage: string = await UserService.updateWeight(userId, reqPayload)
             if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             return
          }

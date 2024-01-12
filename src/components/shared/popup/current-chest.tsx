@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import useSession from '@hooks/useSession'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: string[] = ['cm', 'in']
@@ -29,29 +30,49 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppStore) => state.user)
-      const { chestMeasure } = metadata
+      let { chestMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ chest, setChest ] = useState<number>(chestMeasure)
       const { userId } = useSession()
 
       const onSave = async () => {
+         const currentDate: string = getCurrentUTCDateV2()
+         const newBodyRecId: string = autoId('br')
          const payload = { chestMeasure }
+         const reqPayload = { value: chestMeasure, type: 'chest', currentDate, newBodyRecId }
 
          const cache = () => {
             dispatch(updateMetadata(payload))
+
+            const i: number = bodyRecords.findIndex((e: any) => {
+               const createdAt: Date = new Date(e.createdAt)
+               return createdAt.toLocaleDateString() === currentDate && e.type === 'chest'
+            })
+
+            if (i === -1) {
+               const currentDatetime: string = getCurrentUTCDatetimeV1()
+               bodyRecords = [...bodyRecords, {
+                  id: newBodyRecId,
+                  value: chest,
+                  type: 'chest',
+                  createdAt: currentDatetime,
+                  updatedAt: currentDatetime
+               }]
+            } else bodyRecords[i].value = chest
+
+            dispatch(updateMetadata({ bodyRecords }))
             if (userId && !isOnline) {
                dispatch(enqueueAction({
                   userId,
                   actionId: autoId('qaid'),
+                  invoker: 'updateBodyRec',
                   name: 'UPDATE_CHEST',
-                  invoker: UserService.updatePersonalData,
-                  params: [userId, payload]
+                  params: [userId, reqPayload]
                }))
             }
          }
 
          if (userId) {
-            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            const errorMessage: string = await UserService.updateBodyRec(userId, reqPayload)
             if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             return
          }

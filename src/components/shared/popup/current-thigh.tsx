@@ -16,6 +16,7 @@ import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import useSession from '@hooks/useSession'
+import { getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 
 const { popupButton, popupButtonText, popupButtonBg } = commonStyles
 const options: string[] = ['cm', 'in']
@@ -30,29 +31,48 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppStore) => state.user)
-      const { thighMeasure } = metadata
+      let { thighMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
       const [ thigh, setThigh ] = useState<number>(thighMeasure)
 
       const onSave = async () => {
+         const currentDate: string = getCurrentUTCDateV2()
+         const newBodyRecId: string = autoId('br')
          const payload = { thighMeasure: thigh }
+         const reqPayload = { value: thighMeasure, type: 'thigh', currentDate, newBodyRecId }
          
          const cache = () => {
             dispatch(updateMetadata(payload))
+
+            const i: number = bodyRecords.findIndex((e: any) => {
+               const createdAt: Date = new Date(e.createdAt)
+               return createdAt.toLocaleDateString() === currentDate && e.type === 'thigh'
+            })
+
+            if (i === -1) {
+               const currentDatetime: string = getCurrentUTCDatetimeV1()
+               bodyRecords = [...bodyRecords, {
+                  id: newBodyRecId,
+                  value: thigh,
+                  type: 'thigh',
+                  createdAt: currentDatetime,
+                  updatedAt: currentDatetime
+               }]
+            } else bodyRecords[i].value = thigh
+
             if (userId && !isOnline) {
                dispatch(enqueueAction({
                   userId, 
                   actionId: autoId('qaid'),
-                  invoker: 'updatePersonalData',
+                  invoker: 'updateBodyRec',
                   name: 'UPDATE_THIGH',
-                  params: [userId, payload]
+                  params: [userId, reqPayload]
                }))
             }
          }
 
          if (userId) {
-            const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+            const errorMessage: string = await UserService.updateBodyRec(userId, reqPayload)
             if (errorMessage === NETWORK_REQUEST_FAILED) cache()
             return 
          }

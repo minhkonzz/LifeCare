@@ -2,37 +2,48 @@ import { useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '../store'
-import { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { darkHex, strongBlueHex, lightBlueHex, strongBlueRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
-import { updateLiquid, resetSpecs } from '../store/water'
+import { updateLiquid, resetSpecs, updateFirstTimeReachGoal } from '@store/water'
 import { BackIcon, SettingIcon, WhitePlusIcon, StrongBlueMinusIcon } from '@assets/icons'
+import useSession from '@hooks/useSession'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
 import WaterWave from '@components/water-wave'
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
+export default (): JSX.Element => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppStore) => state.water)
+   
+   const {
+      firstTimeReachGoal,
+      drinked: liquidDrinked, 
+      cupsize, 
+      needSync, 
+      specs, 
+      date, 
+      changes 
+   } = useSelector((state: AppStore) => state.water)
+
    const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
-   const { session } = useSelector((state: AppStore) => state.user)
-   const userId: string = session?.user?.id
+   const navigation = useNavigation<any>()
+   const { userId } = useSession()
    const dispatch = useDispatch()
 
    useEffect(() => {
       Animated.timing(animateValue, {
          toValue: 1, 
-         duration: 920, 
+         duration: 840, 
          useNativeDriver: true
       }).start()
 
       Animated.loop(
          Animated.timing(waveAnimateValue, {
             toValue: 1, 
-            duration: 1010, 
+            duration: 840, 
             useNativeDriver: true,
             easing: Easing.linear
          })
@@ -41,6 +52,13 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
 
    const increaseLiquid = () => {
       dispatch(updateLiquid(INCREASE))
+      if (firstTimeReachGoal && liquidDrinked + cupsize >= dailyWater) {
+         dispatch(updateFirstTimeReachGoal())
+         const timeout = setTimeout(() => {
+            clearTimeout(timeout)
+            navigation.navigate('water-reached-goal')
+         }, 2000)  
+      }
    }
 
    const decreaseLiquid = () => {
@@ -49,13 +67,8 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
    }
 
    const onSync = async () => {
-      await UserService.syncDailyWater({
-         userId,
-         date,
-         drinked: liquidDrinked,
-         goal: dailyWater,
-         specs
-      })
+      if (userId) 
+         await UserService.syncDailyWater({ userId, date, drinked: liquidDrinked, goal: dailyWater, specs })
       dispatch(resetSpecs())
    }
 

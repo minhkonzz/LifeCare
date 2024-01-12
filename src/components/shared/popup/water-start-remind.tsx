@@ -4,7 +4,7 @@ import { updateStartWaterRemind } from '@store/setting'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '@store/index'
 import { primaryHex, primaryRgb } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { horizontalScale as hS } from '@utils/responsive'
 import { commonStyles } from '@utils/stylesheet'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
@@ -12,12 +12,7 @@ import TimeInput from '@components/time-input'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
-export default withPopupBehavior(
-   ({ 
-      onConfirm
-   }: { 
-      onConfirm: (afterDisappear: () => Promise<void>) => void
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const { h, m } = useSelector((state: AppStore) => state.setting.reminders.startWater)
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)
@@ -46,6 +41,6 @@ export default withPopupBehavior(
       )
    }, 
    'centered', 
-   'Start water reminder', 
+   'Start reminder', 
    hS(315)
 )

@@ -16,8 +16,10 @@ import WaterGoalPopup from '@components/shared/popup/water-setting-goal'
 import WaterStartRemindPopup from '@components/shared/popup/water-setting-start-remind'
 import WaterEndRemindPopup from '@components/shared/popup/water-setting-end-remind'
 import WaterIntervalPopup from '@components/shared/popup/water-setting-interval'
+import CustomCupsizePopup from '@components/shared/popup/custom-watercup'
 
 const CupSizes = memo(() => {
+	const { setPopup } = useContext<any>(PopupContext)
 	const { initCupsize, cupsize, customCupsize } = useSelector((state: AppStore) => state.water)
 	const dispatch = useDispatch()
 	return (
@@ -35,14 +37,14 @@ const CupSizes = memo(() => {
 					key={i} 
 					style={{
 					...styles.cupSize, 
-					borderStyle: e === -1 && 'dashed' || 'solid',
+					borderStyle: !e && 'dashed' || 'solid',
 					marginLeft: i === 0 || i === 3 ? 0 : hS(12),
 					...(e === cupsize ? {
 						borderWidth: 3,
 						borderColor: '#749BC2'
 					} : {})
 					}}
-					onPress={() => dispatch(updateCupsize(e))}>
+					onPress={() => !e || customCupsize && setPopup(CustomCupsizePopup) ||dispatch(updateCupsize(e))}>
 					<Text style={styles.cupSizeText}>{`${e && e + ' ml' || 'Customize'}`}</Text>
 				</AnimatedPressable>
 			))

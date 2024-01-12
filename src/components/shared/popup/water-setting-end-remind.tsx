@@ -11,12 +11,7 @@ import withPopupBehavior from '@hocs/withPopupBehavior'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
-export default withPopupBehavior(
-   ({ 
-      onConfirm
-   }: { 
-      onConfirm: (afterDisappear: () => Promise<void>) => void
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const { h, m } = useSelector((state: AppStore) => state.setting.reminders.endWater)
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)
@@ -45,6 +40,6 @@ export default withPopupBehavior(
       )
    }, 
    'centered', 
-   'End water reminder',
+   'End reminder',
    hS(315)
 )

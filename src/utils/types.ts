@@ -32,6 +32,7 @@ export type FastingState = {
 
 export type DailyWaterState = {
    date: string, 
+   firstTimeReachGoal: boolean,
    drinked: number, 
    needSync: boolean,
    initCupsize: number,
@@ -78,6 +79,7 @@ export type SettingState = {
 export type UserState = {
    session: any,
    metadata: any,
+   isLoading: boolean,
    queuedActions: any
 }
 

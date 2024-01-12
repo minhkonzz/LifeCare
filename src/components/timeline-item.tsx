@@ -11,10 +11,11 @@ import LinearGradient from 'react-native-linear-gradient'
 
 interface TimelineItemProps {
    item?: any 
-   index?: any
+   index?: any,
+   isLast: boolean
 }
 
-const FastingTimeline = ({ item }: { item: any }) => {
+const FastingTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
    const navigation = useNavigation<any>()
    console.log('fasting item:', item)
 
@@ -57,19 +58,19 @@ const FastingTimeline = ({ item }: { item: any }) => {
                </View>
             </LinearGradient>
          </Pressable>
-         <View style={{...styles.iconIndicator, marginLeft: hS(14) }} />
+         { !isLast && <View style={{...styles.iconIndicator, marginLeft: hS(14) }} /> }
       </View>
    )
 }
 
-const WaterDrinkTimeline = ({ item }: { item: any }) => {
+const WaterDrinkTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
    return (
       <>
          <View style={styles.iconWrapper}>
             <View style={{...styles.iconBackground,  backgroundColor: 'rgba(177, 234, 238, .28)' }}>
                <WatercupIcon width={hS(17)} height={vS(23.5)} />
             </View>
-            <View style={styles.iconIndicator} />
+            { !isLast && <View style={styles.iconIndicator} /> }
          </View>
          <Pressable style={styles.timelineRight} >
             <Text style={styles.time}>{`${item.hour}:${item.min}`}</Text>
@@ -85,7 +86,7 @@ const WaterDrinkTimeline = ({ item }: { item: any }) => {
    )
 }
 
-const WeightTimeline = ({ item }: { item: any }) => {
+const WeightTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
    const { setPopup } = useContext<any>(PopupContext)
 
    const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) =>
@@ -98,7 +99,7 @@ const WeightTimeline = ({ item }: { item: any }) => {
             <View style={{...styles.iconBackground, backgroundColor: 'rgba(255, 211, 110, .28)' }}>
                <OrangeWeightIcon width={hS(17)} height={vS(23.5)} />
             </View>
-            <View style={styles.iconIndicator} />
+            { !isLast && <View style={styles.iconIndicator} /> }
          </View>
          <Pressable style={{...styles.timelineRight, marginTop: 0 }} onPress={() => setPopup(UpdatePopup)} >
             <View style={styles.detail}>
@@ -119,13 +120,13 @@ const timelineTypes = {
    fasting: FastingTimeline
 }
 
-export default ({ item, index }: TimelineItemProps): JSX.Element => {
+export default ({ item, index, isLast }: TimelineItemProps): JSX.Element => {
    const TimelineItem = timelineTypes[item.type]
 
    return (
       <View style={{...styles.container, marginTop: (index > 0 ? vS(12) : 0) }}>
          <Text style={styles.date}>{`${item.day}, ${getMonthTitle(item.month, true)} ${item.date}`}</Text>
-         <TimelineItem {...{ item }} />
+         <TimelineItem {...{ item, isLast }} />
       </View>
    )
 }

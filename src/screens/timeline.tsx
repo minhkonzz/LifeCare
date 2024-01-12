@@ -19,7 +19,7 @@ export default (): JSX.Element => {
             showsVerticalScrollIndicator={false}
             data={timelineData}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item, index }) => <TimelineItem {...{ item, index }} />} />
+            renderItem={({ item, index }) => <TimelineItem {...{ item, index, isLast: index === timelineData.length - 1 }} />} />
       </View>
    )
 }

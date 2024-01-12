@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { commonStyles } from '@utils/stylesheet'
-import { updateCupsize } from '@store/water'
+import { updateCustomCupsize } from '@store/water'
 import MeasureInput from '../measure-input'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import LinearGradient from 'react-native-linear-gradient'
@@ -17,7 +17,7 @@ export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: (
       const [ customValue, setCustomValue ] = useState<number>(customCupsize)
 
       const onSave = async () => {
-         dispatch(updateCupsize(customValue))
+         dispatch(updateCustomCupsize(customValue))
       }
 
       return (
@@ -44,7 +44,7 @@ export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: (
       )
    },
    'centered', 
-   'Goal', 
+   'Custom cupsize', 
    hS(300)
 )
 

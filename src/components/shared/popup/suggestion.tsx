@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { darkHex, darkRgb, primaryRgb, primaryHex } from '@utils/constants/colors' 
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { toDateTimeV1 } from '@utils/datetimes'
+import withFastingState from '@hocs/withFastingState'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 
 export default withPopupBehavior(
-   () => {
+   withFastingState(({ endTimeStamp }: { endTimeStamp: number }) => {
       return (
          <ScrollView
             showsVerticalScrollIndicator={false}
@@ -30,7 +32,7 @@ export default withPopupBehavior(
                      <Text style={styles.t2}>Follow reminder notifications</Text>
                   </View>
                   <View style={{...styles.v4, backgroundColor: `rgba(${primaryRgb.join(', ')}, .1)` }}>
-                     <Text style={{...styles.t2, color: primaryHex, fontFamily: 'Poppins-SemiBold' }}>{"Tomorrow, 14:23\n"}<Text style={{ fontFamily: 'Poppins-Medium' }}>Comeback and stop fasting</Text></Text>
+                     <Text style={{...styles.t2, color: primaryHex, fontFamily: 'Poppins-SemiBold' }}>{`${toDateTimeV1(endTimeStamp)}\n`}<Text style={{ fontFamily: 'Poppins-Medium' }}>Comeback and stop fasting</Text></Text>
                   </View>
                </View>
             </View>
@@ -44,7 +46,7 @@ export default withPopupBehavior(
             </View>
          </ScrollView>
       )
-   },
+   }),
    'bottomsheet', 
    'Fasting period already starts'
 )

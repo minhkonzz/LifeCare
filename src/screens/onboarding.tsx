@@ -41,9 +41,9 @@ export default (): JSX.Element => {
 			}), 
 			Animated.timing(descriptionEffectValue, {
 				toValue: 1, 
-				duration: 1100, 
+				duration: 320, 
 				delay: 400,
-				easing: Easing.bounce,
+				easing: Easing.linear,
 				useNativeDriver: true
 			})
 		]).start()	
@@ -63,8 +63,8 @@ export default (): JSX.Element => {
 			Animated.timing(descriptionEffectValue, {
 				toValue: 0, 
 				delay: 100,
-				duration: 1100, 
-				easing: Easing.bounce,
+				duration: 320, 
+				easing: Easing.linear,
 				useNativeDriver: true
 			})
 		]).start(() => { setIndex(index) })

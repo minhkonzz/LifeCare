@@ -1,10 +1,11 @@
-import { memo, useState, useEffect, useContext } from 'react'
+import { memo, useEffect, useContext } from 'react'
+import { AppState } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppStore } from '../store'
-import { updateTimes, updateCurrentPlan } from '../store/fasting'
-import { updateNetworkOnline } from '../store/network'
-import { updateMetadata, updateSession } from '../store/user'
+import { AppStore } from '@store/index'
+import { updateTimes, updateCurrentPlan } from '@store/fasting'
+import { updateNetworkOnline } from '@store/network'
+import { updateAppState, updateIsLoading, updateMetadata, updateSession } from '@store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
 import SyncDetector from '@components/shared/sync-detect'
@@ -21,6 +22,7 @@ import Survey from '@screens/survey'
 import Water from '@screens/water'
 import WaterOverview from '@screens/water-overview'
 import WaterSetting from '@screens/water-setting'
+import WaterReachedGoal from '@screens/water-reached-goal'
 import SurveyLoading from '@screens/survey-loading'
 import Setting from '@screens/setting'
 import Timeline from '@screens/timeline'
@@ -53,6 +55,7 @@ const StackNav = memo((): JSX.Element => {
          <Stack.Screen name='water' component={Water} />
          <Stack.Screen name='water-overview' component={WaterOverview} />
          <Stack.Screen name='water-setting' component={WaterSetting} />
+         <Stack.Screen name='water-reached-goal' component={WaterReachedGoal} />
          <Stack.Screen name='survey-loading' component={SurveyLoading} />
          <Stack.Screen name='splash' component={Splash} />
          <Stack.Screen name='main' component={BottomTabs} />
@@ -81,7 +84,6 @@ const StackNav = memo((): JSX.Element => {
 const Main = () => {
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-   const [ initialized, setInitialized ] = useState<boolean>(false)
    const { session: prevSession, metadata } = useSelector((state: AppStore) => state.user)
 
    const fetchPersonalData = async (userId: string): Promise<void> => {
@@ -98,8 +100,12 @@ const Main = () => {
    }
 
    useEffect(() => {
-      let channel: any
-      let supabaseAuthListener: any
+      let channel: any = null
+      let supabaseAuthListener: any = null
+
+      const appStateListener = AppState.addEventListener('change', nextAppState => {
+         dispatch(updateAppState(nextAppState))
+      })
 
       const netInfoUnsubscribe = NetInfo.addEventListener(state => {
          dispatch(updateNetworkOnline(state.isConnected))
@@ -110,7 +116,7 @@ const Main = () => {
          dispatch(updateNetworkOnline(isOnline))
 
          const { data } = supabase.auth.onAuthStateChange(async(event, session) => {
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            if (['SIGNED_IN', 'SIGNED_OUT'].includes(event)) {
                if (session) {
                   const userId: string = session.user.id
                   const { isSurveyed, error } = await UserService.checkUserSurveyed(userId)
@@ -126,37 +132,51 @@ const Main = () => {
                }
             }
             const currentSession = prevSession || session
-            if (currentSession && !channel) {
-               const userId: string = currentSession.user.id
-               channel = supabase.channel('schema-db-changes')
-               .on('postgres_changes', {
-                  event: 'UPDATE',
-                  schema: 'public',
-                  table: 'users',
-                  filter: `id=eq.${userId}`
-               }, (payload: any) => { 
-                  const convertedResponse = convertObjectKeysToCamelCase(payload.new)
-                  initializeUserData(convertedResponse)
-               })
-               .subscribe()
-            }
-            setInitialized(true)
+            if (!currentSession || channel) return
+            const userId: string = currentSession.user.id
+            channel = supabase.channel('schema-db-changes')
+            .on('postgres_changes', {
+               event: 'UPDATE',
+               schema: 'public',
+               table: 'users',
+               filter: `id=eq.${userId}`
+            }, (payload: any) => { 
+               const convertedResponse = convertObjectKeysToCamelCase(payload.new)
+               initializeUserData(convertedResponse)
+            })
+            .on('postgres_changes', {
+               event: '*',
+               schema: 'public',
+               table: 'body_records',
+               filter: `user_id=eq.${userId}`
+            }, (payload: any) => {
+               console.log('affected body record:', payload)
+            })
+            .on('postgres_changes', {
+               event: '*',
+               schema: 'public',
+               table: 'fasting_records',
+               filter: `user_id=eq.${userId}`
+            }, (payload: any) => {
+               console.log('affected fasting record:', payload)
+            })
+            .subscribe()
          })
          supabaseAuthListener = data
+         dispatch(updateIsLoading(false))
       })
 
       return () => {
          netInfoUnsubscribe()
          supabaseAuthListener.subscription.unsubscribe()
+         appStateListener.remove()
       }
    }, [])
 
-   if (!initialized) return <></>
-
    return (
       <>
-         <SyncDetector />
          <StackNav />
+         <SyncDetector />
          { Popup && <Popup setVisible={setPopup} /> }
       </>
    )

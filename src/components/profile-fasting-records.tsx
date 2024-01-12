@@ -45,7 +45,6 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			})
 		}
 
-		console.log('hp:', hoursPassed)
 		return (
 			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', position: 'relative' }} {...{ onPress }}>
 				<Text style={styles.recText}>{monthTitle}</Text>
@@ -91,7 +90,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 	return <View style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0}} />
 }
 
-export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
+export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
 
 	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
@@ -114,8 +113,6 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 	})
 
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
-
-	if (!isViewable) return <View style={styles.container} />
 
 	return (
 		<AnimatedLinearGradient

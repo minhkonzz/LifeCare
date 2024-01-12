@@ -139,8 +139,7 @@ const ExercisePerformanceSurvey = memo(() => {
 const GenderSurvey = memo(() => {
    const genderData = [
       { id: 1, title: 'Male' },
-      { id: 2, title: 'Female' },
-      { id: 3, title: 'Other' },
+      { id: 2, title: 'Female' }
    ]
    return (
       <View style={styles.surveyPart}>
@@ -166,7 +165,7 @@ const GoalWeightSurvey = memo(() => {
    const dispatch = useDispatch()
    const goalWeight = useSelector((state: AppStore) => state.survey.goalWeight)
    return (
-      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+      <View style={{...styles.surveyPart, paddingTop: vS(220), alignItems: 'center' }}>
          <MeasureInput 
             symb='kg' 
             value={goalWeight.toString()}
@@ -182,7 +181,7 @@ const CurrentWeightSurvey = memo(() => {
    const dispatch = useDispatch()
    const currentWeight = useSelector((state: AppStore) => state.survey.currentWeight)
    return (
-      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+      <View style={{...styles.surveyPart, paddingTop: vS(220), alignItems: 'center' }}>
          <MeasureInput 
             symb='kg' 
             value={currentWeight.toString()}
@@ -198,7 +197,7 @@ const CurrentHeightSurvey = memo(() => {
    const dispatch = useDispatch()
    const currentHeight = useSelector((state: AppStore) => state.survey.currentHeight)
    return (
-      <View style={[styles.surveyPart, { paddingTop: vS(220), alignItems: 'center' }]}>
+      <View style={{...styles.surveyPart, paddingTop: vS(220), alignItems: 'center' }}>
          <MeasureInput 
             symb='cm' 
             value={currentHeight.toString()}
@@ -311,7 +310,7 @@ export default (): JSX.Element => {
 
       Animated.timing(animateValue, {
          toValue: 0, 
-         duration: 920, 
+         duration: 640, 
          useNativeDriver: true
       }).start(() => { dispatch(updateSurveyIndex(newSurveyIndex)) })
    }
@@ -355,7 +354,7 @@ export default (): JSX.Element => {
                opacity: animateValue, 
                transform: [{ translateX: animateValue.interpolate({
                   inputRange: [0, 1], 
-                  outputRange: [-150, 0]
+                  outputRange: [-50, 0]
                }) }]
             }]}>
                <SurveyComponent />

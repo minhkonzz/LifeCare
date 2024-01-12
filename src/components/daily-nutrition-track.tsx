@@ -29,7 +29,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						<View style={styles.mainTitle}>
                      <View style={styles.hrz}>
                         <AnimatedText value={500} style={styles.largeTitle} />
-                        <Text style={styles.largeTitle}>cal</Text>
+                        <Text style={{...styles.largeTitle, marginLeft: hS(5) }}>cal</Text>
                      </View>
 							<Text style={[styles.smallTitle, styles.todayTitle]}>today</Text>
 						</View>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
 
    todayTitle: {
       marginLeft: hS(8), 
-      marginTop: vS(16)
+      marginTop: vS(20)
    },
 
 	largeTitle: {

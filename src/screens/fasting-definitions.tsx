@@ -1,9 +1,9 @@
 import { useRef, useEffect } from 'react'
 import { View, FlatList, Text, Animated, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb, lightBlueHex } from '@utils/constants/colors'
 import { AppStore } from '@store/index'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 import { BackIcon, DontEatTimeIcon, EatTimeIcon, PrimaryWeightIcon, StayHydratedIcon, WomenEatIcon } from '@assets/icons'
 import { LineChart, CurveType } from 'react-native-gifted-charts'
@@ -13,9 +13,56 @@ import LottieView from 'lottie-react-native'
 
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()
+   const route = useRoute()
+   const recommendation: any = route.params
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
    const { currentWeight, goalWeight } = useSelector((state: AppStore) => state.survey)
    const lose: number = goalWeight - currentWeight
+
+   const PersonalizedPlanRecommendation = () => {
+      if (recommendation) {
+         const { 
+            fasting_plan_name,
+            daily_water,
+            daily_calories,
+            other_tips,
+            plan_explain,
+            advise
+         } = recommendation
+
+         return (
+            <>
+               <Text style={styles.f12}>Personalized plan for you</Text>
+               <View>
+                  <Text style={styles.f14}>Based on your information you gave, we have some recommend for you</Text>
+                  <View style={{ marginTop: vS(12) }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(18), color: darkHex }}>Follow plan</Text>
+                     <Text style={{...styles.f14, color: primaryHex, fontFamily: 'Poppins-SemiBold' }}>{fasting_plan_name}</Text>
+                     <Text style={styles.f14}>{plan_explain}</Text>
+                  </View>
+                  <View style={{ marginTop: vS(12) }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(18), color: darkHex }}>Daily water goal</Text>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(22), color: lightBlueHex }}>{daily_water} <Text style={{ fontSize: hS(14) }}>ml</Text></Text>
+                  </View>
+                  <View style={{ marginTop: vS(12) }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(18), color: darkHex }}>Daily calories</Text>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(22), color: 'orange' }}>{daily_calories} <Text style={{ fontSize: hS(14) }}>cal</Text></Text>
+                  </View>
+                  <View style={{ marginTop: vS(12) }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(18), color: darkHex }}>Other tips</Text>
+                     <Text style={styles.f14}>{other_tips.map((e: any, i: number) => `${i + 1}. ${e}`).join('\n')}</Text>
+                  </View>
+                  <View style={{ marginTop: vS(12) }}>
+                     <Text style={{ fontFamily: 'Poppins-SemiBold', fontSize: hS(18), color: darkHex }}>Other tips</Text>
+                     <Text style={styles.f14}>{advise}</Text>
+                  </View>
+               </View>
+            </>
+         )
+      }
+
+      return <></>
+   }
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -40,7 +87,7 @@ export default (): JSX.Element => {
                      <View style={{ alignItems: 'center' }}>
                         <View style={{...styles.k1, marginRight: hS(22) }}>
                            <PrimaryWeightIcon width={hS(28)} height={vS(28)} />
-                           <Text style={styles.f1}>{`-${lose} kg`}</Text>
+                           <Text style={styles.f1}>{`${lose} kg`}</Text>
                         </View>
                         <View style={{...styles.k1, marginTop: vS(16) }}>
                            <Text style={{...styles.f2, color: `rgba(${darkRgb.join(', ')}, .5)` }}>
@@ -155,6 +202,7 @@ export default (): JSX.Element => {
                            <Text style={styles.f14}>Drink plenty of water, herbal tea or other non-caloric beverages during your fasting to stay hydrated and help suppress hunger.</Text>
                         </View>
                      </View>
+                     <PersonalizedPlanRecommendation />
                   </View>
                </>
             } 
@@ -305,7 +353,8 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins-Medium', 
       fontSize: hS(20), 
       color: darkHex, 
-      marginVertical: vS(16)
+      marginTop: vS(40),
+      marginBottom: vS(16)
    },
 
    f13: {

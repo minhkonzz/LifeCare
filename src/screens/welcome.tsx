@@ -1,15 +1,55 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
-import { primaryHex, primaryRgb, darkHex } from '@utils/constants/colors'
+import { useEffect, useRef } from 'react'
+import { View, Text, Image, StyleSheet, Animated } from 'react-native'
+import { primaryHex, primaryRgb, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
 
 export default (): JSX.Element => {
-	const navigation = useNavigation()
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: 1,
+			duration: 700,
+			useNativeDriver: true
+		}).start()
+	}, [])
+
+	const navigation = useNavigation<any>()
 	return (
 		<View style={styles.container}>
-			<Image style={styles.storyset} source={require('../assets/images/storyset/welcome.gif')} />
-			<Text style={styles.title}>{`Welcome to\nLifeCare`}</Text>
+			<Animated.Image 
+				style={{...styles.storyset, opacity: animateValue}} 
+				source={require('../assets/images/storyset/welcome.gif')} 
+			/>
+			<View style={styles.texts}>
+				<Animated.Text style={{
+					...styles.title,
+					opacity: animateValue,
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					}) }]
+				}}>
+					Fastiny
+				</Animated.Text>
+				<Animated.Text style={{
+					...styles.title, 
+					fontSize: hS(15), 
+					color: `rgba(${darkRgb.join(', ')}, .7)`, 
+					fontFamily: 'Poppins-Regular',
+					marginTop: vS(16),
+					lineHeight: vS(28),
+					opacity: animateValue,
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					}) }]
+				}}>
+					Intermittent fasting for people staying in shape
+				</Animated.Text>
+			</View>
 			<Button
 				title='Get started'
 				size='large'
@@ -33,10 +73,14 @@ const styles = StyleSheet.create({
 
 	title: {
 		fontSize: hS(36),
-		fontFamily: 'Poppins-Bold',
+		fontFamily: 'Poppins-SemiBold',
 		textAlign: 'center',
-		lineHeight: hS(52),
-		color: darkHex
+		color: primaryHex
+	},
+	
+	texts: {
+		justifyContent: 'center',
+		width: '100%'
 	},
 
 	storyset: {

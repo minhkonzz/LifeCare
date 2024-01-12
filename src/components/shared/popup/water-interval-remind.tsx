@@ -12,12 +12,7 @@ import TimeInput from '@components/time-input'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 
-export default withPopupBehavior(
-   ({ 
-      onConfirm
-   }: { 
-      onConfirm: (afterDisappear: () => Promise<void>) => void
-   }) => {
+export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
       const { h, m } = useSelector((state: AppStore) => state.setting.reminders.waterInterval)
       const [ hours, setHours ] = useState<number>(h)
       const [ mins, setMins ] = useState<number>(m)
@@ -46,6 +41,6 @@ export default withPopupBehavior(
       )
    },
    'centered', 
-   'Water reminder interval', 
+   'Reminder interval', 
    hS(315)
 )

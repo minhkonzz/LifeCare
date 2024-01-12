@@ -61,7 +61,9 @@ export default (): JSX.Element => {
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
-			<StackHeader title='Plans' />
+			<View style={{ width: '100%', paddingHorizontal: hS(22) }}>
+				<StackHeader title='Plans' />
+			</View>
 			<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
 				<PlanCategorySection
 					title='Beginner'

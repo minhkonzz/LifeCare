@@ -52,8 +52,8 @@ export default <P extends object>(BaseComponent: ComponentType<P>) => {
 
       const performSync = async () => {
          if (!userId) return 
-         const queuedActionsByUser: any[] = queuedActions[userId]
-         for (const action of queuedActionsByUser) {
+         const queuedActionsByUser = queuedActions[userId]
+         for (const action of Object.values(queuedActionsByUser) as any) {
             const { actionId, invoker, params } = action
             const caller = UserService[invoker]
             const errorMessage: string = await caller(...params)

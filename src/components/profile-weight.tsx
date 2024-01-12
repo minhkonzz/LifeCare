@@ -24,7 +24,6 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
    const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
 
    return (
-      isViewable && 
       <AnimatedLinearGradient
          style={{
             ...styles.container,
@@ -93,7 +92,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
             </View>
          </View>
          <ProfileWeightChart />
-      </AnimatedLinearGradient> || <View style={styles.container} />
+      </AnimatedLinearGradient>
    )
 })
 

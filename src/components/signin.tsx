@@ -63,7 +63,6 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 	}
 
 	const onBeforeNavigate = (onAnimateCompleted?: () => void) => {
-		invokeAuthMessage('Login success', 'success')
 		Animated.timing(animateValue, {
 			toValue: 0, 
 			duration: 640, 
@@ -113,7 +112,7 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 				}
 				const isSurveyed = await UserService.checkUserSurveyed(userId)
 				const routeName: string = isSurveyed && 'main' || 'survey'
-				onBeforeNavigate(() => { navigation.navigate(routeName) })
+				onBeforeNavigate(() => { invokeAuthMessage('Login success', 'success'); navigation.navigate(routeName) })
 			} catch (err) {
 				console.error(err)
 			}

@@ -37,21 +37,9 @@
 			"title": "Dark mode",
 			"type": "toggle",
 			"cbkey": "dark-mode"
-		},
-		{
-			"id": 6,
-			"title": "Sync to Google Fit",
-			"type": "toggle",
-			"cbkey": "sync-google-fit"
 		}
 	],
 	"Contact us": [
-		{
-			"id": 1,
-			"title": "Privacy policy",
-			"type": "redirect",
-			"cbkey": "privacy-policy"
-		},
 		{
 			"id": 3,
 			"title": "Feedback",
