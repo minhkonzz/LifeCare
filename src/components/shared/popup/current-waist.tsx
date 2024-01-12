@@ -16,7 +16,7 @@ import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import useSession from '@hooks/useSession'
-import { getCurrentUTCDatetimeV1 } from '@utils/datetimes'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: string[] = ['cm', 'in']
@@ -33,12 +33,14 @@ export default withPopupBehavior(
       let { waistMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
       const [ waist, setWaist ] = useState<number>(waistMeasure)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
 
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { waistMeasure: waist }
-         const reqPayload = { value: waistMeasure, type: 'waist', currentDate, newBodyRecId }
+         const value = selectedOptionIndex ? inchToCentimeter(waist) : waist
+         const payload = { waistMeasure: value }
+         const reqPayload = { value, type: 'waist', currentDate, newBodyRecId }
 
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -52,12 +54,12 @@ export default withPopupBehavior(
                const currentDatetime: string = getCurrentUTCDatetimeV1()
                bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
-                  value: waist,
+                  value,
                   type: 'waist',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else bodyRecords[i].value = waist
+            } else bodyRecords[i].value = value
 
             if (userId && !isOnline) {
                dispatch(enqueueAction({
@@ -78,8 +80,8 @@ export default withPopupBehavior(
          cache()
       }
 
-      const onChangeOption = (index: number) => {
-         if (index === 1) {
+      const onChangeOption = () => {
+         if (selectedOptionIndex === 1) {
             setWaist(centimeterToInch(waist))
             return
          }
@@ -88,7 +90,12 @@ export default withPopupBehavior(
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption }} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               onChangeOption, 
+               selectedOptionIndex,
+               setSelectedOptionIndex
+            }} />
             <MeasureInput 
                contentCentered
                symb='cm' 

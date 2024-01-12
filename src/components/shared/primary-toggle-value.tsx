@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { memo, useState, Dispatch, SetStateAction, useRef } from 'react'
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -8,19 +8,23 @@ const OPTION_WIDTH: number = hS(92)
 
 interface PrimaryToggleValue {
    options: string[],
+   selectedOptionIndex: number, 
+   setSelectedOptionIndex: Dispatch<SetStateAction<number>>
    toggleColor?: string[],
-   onChangeOption?: (selectedIndex: number) => void
+   onChangeOption?: () => void
    additionalStyles?: any
 }
 
-export default ({ 
+export default memo(({ 
    options, 
+   selectedOptionIndex, 
+   setSelectedOptionIndex,
    onChangeOption, 
    additionalStyles, 
    toggleColor = [`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex] 
 }: PrimaryToggleValue): JSX.Element => {
    const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
+   // const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
    const changeOption = (index: number) => {
       Animated.timing(translateX, {
@@ -28,8 +32,8 @@ export default ({
          duration: 300, 
          useNativeDriver: true
       }).start(() => {
-         if (onChangeOption) onChangeOption(index)
-         setSelectedIndex(index)
+         if (onChangeOption) onChangeOption()
+         setSelectedOptionIndex(index)
       })
    }
 
@@ -48,8 +52,8 @@ export default ({
                   onPress={() => changeOption(i)}>
                   <Text style={{
                      ...styles.optionText, 
-                     fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
-                     color: i === selectedIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
+                     fontFamily: `Poppins-${i === selectedOptionIndex && 'Bold' || 'Regular'}`,
+                     color: i === selectedOptionIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
                   }}>
                      {e}
                   </Text>
@@ -58,7 +62,7 @@ export default ({
          }
       </View>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {

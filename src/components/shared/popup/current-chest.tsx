@@ -32,13 +32,15 @@ export default withPopupBehavior(
       const dispatch = useDispatch()
       let { chestMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ chest, setChest ] = useState<number>(chestMeasure)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
       const { userId } = useSession()
 
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { chestMeasure }
-         const reqPayload = { value: chestMeasure, type: 'chest', currentDate, newBodyRecId }
+         const value = selectedOptionIndex ? inchToCentimeter(chest) : chest
+         const payload = { chestMeasure: value }
+         const reqPayload = { value, type: 'chest', currentDate, newBodyRecId }
 
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -52,12 +54,12 @@ export default withPopupBehavior(
                const currentDatetime: string = getCurrentUTCDatetimeV1()
                bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
-                  value: chest,
+                  value,
                   type: 'chest',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else bodyRecords[i].value = chest
+            } else bodyRecords[i].value = value
 
             dispatch(updateMetadata({ bodyRecords }))
             if (userId && !isOnline) {
@@ -79,17 +81,19 @@ export default withPopupBehavior(
          cache()
       }
    
-      const onChangeOption = (index: number) => {
-         if (index === 0) {
-            setChest(inchToCentimeter(chest))
-            return
-         }
-         setChest(centimeterToInch(chest))
+      const onChangeOption = () => {
+         const convertFunc = selectedOptionIndex && centimeterToInch || inchToCentimeter
+         setChest(convertFunc(chest))
       }
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption }} />
+            <PrimaryToggleValue {...{ 
+               options,
+               onChangeOption, 
+               selectedOptionIndex, 
+               setSelectedOptionIndex
+            }} />
             <MeasureInput 
                contentCentered
                symb='cm' 

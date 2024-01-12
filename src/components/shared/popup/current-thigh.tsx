@@ -16,7 +16,7 @@ import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import useSession from '@hooks/useSession'
-import { getCurrentUTCDatetimeV1 } from '@utils/datetimes'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 
 const { popupButton, popupButtonText, popupButtonBg } = commonStyles
 const options: string[] = ['cm', 'in']
@@ -34,12 +34,14 @@ export default withPopupBehavior(
       let { thighMeasure, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
       const [ thigh, setThigh ] = useState<number>(thighMeasure)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
 
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { thighMeasure: thigh }
-         const reqPayload = { value: thighMeasure, type: 'thigh', currentDate, newBodyRecId }
+         const value = selectedOptionIndex ? inchToCentimeter(thigh) : thigh
+         const payload = { thighMeasure: value }
+         const reqPayload = { value, type: 'thigh', currentDate, newBodyRecId }
          
          const cache = () => {
             dispatch(updateMetadata(payload))
@@ -53,12 +55,12 @@ export default withPopupBehavior(
                const currentDatetime: string = getCurrentUTCDatetimeV1()
                bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
-                  value: thigh,
+                  value,
                   type: 'thigh',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else bodyRecords[i].value = thigh
+            } else bodyRecords[i].value = value
 
             if (userId && !isOnline) {
                dispatch(enqueueAction({
@@ -79,8 +81,8 @@ export default withPopupBehavior(
          cache()
       }
 
-      const onChangeOption = (index: number) => {
-         if (index === 0) {
+      const onChangeOption = () => {
+         if (selectedOptionIndex === 0) {
             setThigh(inchToCentimeter(thigh))
             return
          }
@@ -89,7 +91,12 @@ export default withPopupBehavior(
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption }} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               selectedOptionIndex,
+               setSelectedOptionIndex,
+               onChangeOption
+            }} />
             <MeasureInput 
                contentCentered
                symb='cm' 

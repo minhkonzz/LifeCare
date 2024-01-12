@@ -74,169 +74,169 @@
 //    return new Date(`${year}-${formatNum(month)}-${formatNum(day)} ${formatNum(hours)}:${formatNum(mins)}:${formatNum(secs)}`)
 // }
 
-const queuedActions = {}
+// const queuedActions = {}
 
-const autoId = (prefix) => {
-   const timestamp = Date.now().toString(36)
-   const random = Math.random().toString(36).slice(2, 8)
-   return prefix + timestamp + random
-}
+// const autoId = (prefix) => {
+//    const timestamp = Date.now().toString(36)
+//    const random = Math.random().toString(36).slice(2, 8)
+//    return prefix + timestamp + random
+// }
 
-const getCurrentUTCDateV2 = () => {
-   const d = new Date()
-   const y = d.getUTCFullYear()
-   const m = (d.getUTCMonth() + 1).toString().padStart(2, '0')
-   const _d = (d.getUTCDate()).toString().padStart(2, '0')
-   return `${m}/${_d}/${y}`
-}
+// const getCurrentUTCDateV2 = () => {
+//    const d = new Date()
+//    const y = d.getUTCFullYear()
+//    const m = (d.getUTCMonth() + 1).toString().padStart(2, '0')
+//    const _d = (d.getUTCDate()).toString().padStart(2, '0')
+//    return `${m}/${_d}/${y}`
+// }
 
-function enqueueAction(newAction) {
-   const { userId, name, ...rest } = newAction
-   const userQueuedActions = queuedActions[userId] || {}
+// function enqueueAction(newAction) {
+//    const { userId, name, ...rest } = newAction
+//    const userQueuedActions = queuedActions[userId] || {}
 
-   if (![
-      'UPDATE_WEIGHT',
-      'UPDATE_WEIGHTS',
-      'UPDATE_BMI',
-      'UPDATE_HIPS',
-      'UPDATE_CHEST',
-      'UPDATE_WAIST',
-      'UPDATE_THIGH',
-      'UPDATE_START_FASTING_TIME',
-      'UPDATE_END_FASTING_TIME'
-   ].includes(name)) {
-      queuedActions[userId] = { ...userQueuedActions, [name]: rest }
-      return
-   }
+//    if (![
+//       'UPDATE_WEIGHT',
+//       'UPDATE_WEIGHTS',
+//       'UPDATE_BMI',
+//       'UPDATE_HIPS',
+//       'UPDATE_CHEST',
+//       'UPDATE_WAIST',
+//       'UPDATE_THIGH',
+//       'UPDATE_START_FASTING_TIME',
+//       'UPDATE_END_FASTING_TIME'
+//    ].includes(name)) {
+//       queuedActions[userId] = { ...userQueuedActions, [name]: rest }
+//       return
+//    }
 
-   if (['UPDATE_WEIGHT', 'UPDATE_WEIGHTS', 'UPDATE_BMI'].includes(name)) {
-      const { currentWeight, newBodyRecId, currentDate } = newAction.params[1]
-      queuedActions[userId] = {
-         ...userQueuedActions,
-         UPDATE_WEIGHT: {
-            actionId: autoId('qaid'),
-            invoker: 'updateWeight',
-            params: JSON.stringify([userId, { currentWeight, newBodyRecId, currentDate }])
-         },
-         ...((() => {
-            switch (name) {
-               case 'UPDATE_WEIGHTS': {
-                  const { goalWeight } = newAction.params[1]
-                  return {
-                     UPDATE_GOAL_WEIGHT: {
-                        actionId: autoId('qaid'),
-                        invoker: 'updatePersonalData',
-                        params: JSON.stringify([userId, { goalWeight }])
-                     }
-                  }
-               }
-               case 'UPDATE_BMI': {
-                  const { currentHeight } = newAction.params[1]
-                  return {
-                     UPDATE_HEIGHT: {
-                        actionId: autoId('qaid'),
-                        invoker: 'updatePersonalData',
-                        params: JSON.stringify([userId, { currentHeight }])
-                     }
-                  }
-               }
-            }
-         })())
-      }
-   }
+//    if (['UPDATE_WEIGHT', 'UPDATE_WEIGHTS', 'UPDATE_BMI'].includes(name)) {
+//       const { currentWeight, newBodyRecId, currentDate } = newAction.params[1]
+//       queuedActions[userId] = {
+//          ...userQueuedActions,
+//          UPDATE_WEIGHT: {
+//             actionId: autoId('qaid'),
+//             invoker: 'updateWeight',
+//             params: JSON.stringify([userId, { currentWeight, newBodyRecId, currentDate }])
+//          },
+//          ...((() => {
+//             switch (name) {
+//                case 'UPDATE_WEIGHTS': {
+//                   const { goalWeight } = newAction.params[1]
+//                   return {
+//                      UPDATE_GOAL_WEIGHT: {
+//                         actionId: autoId('qaid'),
+//                         invoker: 'updatePersonalData',
+//                         params: JSON.stringify([userId, { goalWeight }])
+//                      }
+//                   }
+//                }
+//                case 'UPDATE_BMI': {
+//                   const { currentHeight } = newAction.params[1]
+//                   return {
+//                      UPDATE_HEIGHT: {
+//                         actionId: autoId('qaid'),
+//                         invoker: 'updatePersonalData',
+//                         params: JSON.stringify([userId, { currentHeight }])
+//                      }
+//                   }
+//                }
+//             }
+//          })())
+//       }
+//    }
 
-   if (['UPDATE_HIPS', 'UPDATE_CHEST', 'UPDATE_WAIST', 'UPDATE_THIGH'].includes(name)) {
-      const { currentDate, type, value, newBodyRecId } = newAction.params[1]
-      queuedActions[userId] = {
-         ...userQueuedActions,
-         ...((() => {
-            switch (name) {
-               case 'UPDATE_HIPS': return {
-                  UPDATE_HIPS: {
-                     actionId: autoId('qaid'),
-                     invoker: 'updatePersonalData',
-                     params: JSON.stringify([userId, { hipsMeasure: value }])
-                  }
-               }
-               case 'UPDATE_WAIST': return {
-                  UPDATE_WAIST: {
-                     actionId: autoId('qaid'),
-                     invoker: 'updatePersonalData',
-                     params: JSON.stringify([userId, { waistMeasure: value }])
-                  }
-               }
-               case 'UPDATE_THIGH': return {
-                  UPDATE_THIGH: {
-                     actionId: autoId('qaid'),
-                     invoker: 'updatePersonalData',
-                     params: JSON.stringify([userId, { thighMeasure: value }])
-                  }
-               }
-               case 'UPDATE_CHEST': return {
-                  UPDATE_CHEST: {
-                     actionId: autoId('qaid'),
-                     invoker: 'updatePersonalData',
-                     params: JSON.stringify([userId, { chestMeasure: value }])
-                  }
-               }
-            }
-         })()),
-         [`UPDATE_BODY_REC_${currentDate}_${type}`]: {
-            actionId: autoId('qaid'),
-            invoker: 'updateBodyRec',
-            params: JSON.stringify([userId, { value, type, currentDate, newBodyRecId }])
-         }
-      }
-      return
-   }
+//    if (['UPDATE_HIPS', 'UPDATE_CHEST', 'UPDATE_WAIST', 'UPDATE_THIGH'].includes(name)) {
+//       const { currentDate, type, value, newBodyRecId } = newAction.params[1]
+//       queuedActions[userId] = {
+//          ...userQueuedActions,
+//          ...((() => {
+//             switch (name) {
+//                case 'UPDATE_HIPS': return {
+//                   UPDATE_HIPS: {
+//                      actionId: autoId('qaid'),
+//                      invoker: 'updatePersonalData',
+//                      params: JSON.stringify([userId, { hipsMeasure: value }])
+//                   }
+//                }
+//                case 'UPDATE_WAIST': return {
+//                   UPDATE_WAIST: {
+//                      actionId: autoId('qaid'),
+//                      invoker: 'updatePersonalData',
+//                      params: JSON.stringify([userId, { waistMeasure: value }])
+//                   }
+//                }
+//                case 'UPDATE_THIGH': return {
+//                   UPDATE_THIGH: {
+//                      actionId: autoId('qaid'),
+//                      invoker: 'updatePersonalData',
+//                      params: JSON.stringify([userId, { thighMeasure: value }])
+//                   }
+//                }
+//                case 'UPDATE_CHEST': return {
+//                   UPDATE_CHEST: {
+//                      actionId: autoId('qaid'),
+//                      invoker: 'updatePersonalData',
+//                      params: JSON.stringify([userId, { chestMeasure: value }])
+//                   }
+//                }
+//             }
+//          })()),
+//          [`UPDATE_BODY_REC_${currentDate}_${type}`]: {
+//             actionId: autoId('qaid'),
+//             invoker: 'updateBodyRec',
+//             params: JSON.stringify([userId, { value, type, currentDate, newBodyRecId }])
+//          }
+//       }
+//       return
+//    }
 
-   if (['UPDATE_START_FASTING_TIME', 'UPDATE_END_FASTING_TIME'].includes(name)) {
-      const [id, payload] = newAction.params
-      const rec = userQueuedActions[`UPDATE_FASTING_REC_${id}`] || null
-      queuedActions[userId] = {
-         ...userQueuedActions,
-         [`UPDATE_FASTING_REC_${id}`]: {
-            ...(rec && payload || {
-               actionId: autoId('qaid'),
-               invoker: 'updateFastingRec',
-               params: JSON.stringify([id, payload])
-            })
-         }
-      }
-      return
-   }
-}
+//    if (['UPDATE_START_FASTING_TIME', 'UPDATE_END_FASTING_TIME'].includes(name)) {
+//       const [id, payload] = newAction.params
+//       const rec = userQueuedActions[`UPDATE_FASTING_REC_${id}`] || null
+//       queuedActions[userId] = {
+//          ...userQueuedActions,
+//          [`UPDATE_FASTING_REC_${id}`]: {
+//             ...(rec && payload || {
+//                actionId: autoId('qaid'),
+//                invoker: 'updateFastingRec',
+//                params: JSON.stringify([id, payload])
+//             })
+//          }
+//       }
+//       return
+//    }
+// }
 
-enqueueAction({
-   userId: 'user1',
-   actionId: 'lorem1',
-   invoker: 'updateWeight',
-   name: 'UPDATE_WEIGHT',
-   params: ['user1', { currentWeight: 67, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
-})
+// enqueueAction({
+//    userId: 'user1',
+//    actionId: 'lorem1',
+//    invoker: 'updateWeight',
+//    name: 'UPDATE_WEIGHT',
+//    params: ['user1', { currentWeight: 67, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
+// })
 
-enqueueAction({
-   userId: 'user1',
-   actionId: 'lorem1',
-   invoker: 'updateBMI',
-   name: 'UPDATE_BMI',
-   params: ['user1', { currentHeight: 182, currentWeight: 65, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
-})
+// enqueueAction({
+//    userId: 'user1',
+//    actionId: 'lorem1',
+//    invoker: 'updateBMI',
+//    name: 'UPDATE_BMI',
+//    params: ['user1', { currentHeight: 182, currentWeight: 65, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
+// })
 
-enqueueAction({
-   userId: 'user2',
-   actionId: 'lorem1',
-   invoker: 'updatePersonalData',
-   name: 'UPDATE_HEIGHT',
-   params: ['user2', { currentHeight: 181 }]
-})
+// enqueueAction({
+//    userId: 'user2',
+//    actionId: 'lorem1',
+//    invoker: 'updatePersonalData',
+//    name: 'UPDATE_HEIGHT',
+//    params: ['user2', { currentHeight: 181 }]
+// })
 
-enqueueAction({
-   userId: 'user1',
-   actionId: 'lorem1',
-   invoker: 'updateWeight',
-   name: 'UPDATE_WEIGHT',
-   params: ['user1', { currentWeight: 62, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
-})
+// enqueueAction({
+//    userId: 'user1',
+//    actionId: 'lorem1',
+//    invoker: 'updateWeight',
+//    name: 'UPDATE_WEIGHT',
+//    params: ['user1', { currentWeight: 62, newBodyRecId: autoId('br'), currentDate: getCurrentUTCDateV2() }]
+// })
 
-console.log(queuedActions)
+// console.log(queuedActions)

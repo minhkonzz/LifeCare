@@ -9,7 +9,7 @@ import { kilogramsToPounds, poundsToKilograms } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { commonStyles } from '@utils/stylesheet'
-import { getCurrentUTCDateV2 } from '@utils/datetimes'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
@@ -30,9 +30,9 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
       const { userId } = useSession()
-      const { currentWeight, goalWeight } = useSelector((state: AppStore) => state.user.metadata)
+      const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+      let { currentWeight, goalWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ weight, setWeight ] = useState<any>(currentWeight)
       const [ goal, setGoal ] = useState<any>(goalWeight)
       const [ weightError, setWeightError ] = useState<boolean>(false)
@@ -62,6 +62,23 @@ export default withPopupBehavior(
 
          const cache = () => {
             dispatch(updateMetadata(payload))
+
+            const i: number = bodyRecords.findIndex((e: any) => {
+               const createdAt: Date = new Date(e.createdAt)
+               return createdAt.toLocaleDateString() === currentDate && e.type === 'weight'
+            })
+
+            if (i === -1) {
+               const currentDatetime: string = getCurrentUTCDatetimeV1()
+               bodyRecords = [...bodyRecords, {
+                  id: newBodyRecId,
+                  value: weight,
+                  type: 'weight',
+                  createdAt: currentDatetime,
+                  updatedAt: currentDatetime
+               }]
+            } else bodyRecords[i].value = weight
+
             if (userId && !isOnline) {
                dispatch(enqueueAction({
                   userId, 

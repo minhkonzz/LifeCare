@@ -9,7 +9,7 @@ import { poundsToKilograms, kilogramsToPounds } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { commonStyles } from '@utils/stylesheet'
-import { getCurrentUTCDateV2 } from '@utils/datetimes'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import PrimaryToggleValue from '../primary-toggle-value'
@@ -30,20 +30,37 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppStore) => state.user)
+      let { currentWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
-      const { currentWeight } = metadata
       const [ weight, setWeight ] = useState<number>(currentWeight)
-      const [ optionIndex, setOptionIndex ] = useState<number>(0)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
 
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { currentWeight: weight }
+         const value = selectedOptionIndex ? poundsToKilograms(weight) : weight
+         const payload = { currentWeight: value }
          const reqPayload = { ...payload, newBodyRecId, currentDate }
          
          const cache = () => {
             dispatch(updateMetadata(payload))
+
+            const i: number = bodyRecords.findIndex((e: any) => {
+               const createdAt: Date = new Date(e.createdAt)
+               return createdAt.toLocaleDateString() === currentDate && e.type === 'weight'
+            })
+
+            if (i === -1) {
+               const currentDatetime: string = getCurrentUTCDatetimeV1()
+               bodyRecords = [...bodyRecords, {
+                  id: newBodyRecId,
+                  value,
+                  type: 'weight',
+                  createdAt: currentDatetime,
+                  updatedAt: currentDatetime
+               }]
+            } else bodyRecords[i].value = value
+
             if (userId && !isOnline) {
                dispatch(enqueueAction({
                   userId, 
@@ -63,18 +80,23 @@ export default withPopupBehavior(
          cache()
       }
 
-      const onChangeOption = (index: number) => {
-         const convertFunc = !index && poundsToKilograms || kilogramsToPounds
+      const onChangeOption = () => {
+         const convertFunc = !selectedOptionIndex && poundsToKilograms || kilogramsToPounds
          setWeight(convertFunc(weight))
-         setOptionIndex(index)
       }
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption, additionalStyles: styles.toggle }} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               selectedOptionIndex,
+               setSelectedOptionIndex,
+               onChangeOption, 
+               additionalStyles: styles.toggle 
+            }} />
             <MeasureInput 
                contentCentered
-               symb={options[optionIndex]}
+               symb={options[selectedOptionIndex]}
                value={weight} 
                onChangeText={t => setWeight(+t)} 
                additionalStyles={styles.input} />
