@@ -1,4 +1,4 @@
-import { getLocalTimeV1, getDayTitle, getMonthTitle, timestampToDateTime } from "./datetimes"
+import { getLocalTimeV1, getDayTitle, getDatesRange, timestampToDateTime, getMonthTitle } from "./datetimes"
 
 export const handleErrorMessage = (message: string) => {
    const splits: string[] = message.split(': ')
@@ -42,36 +42,87 @@ export const convertObjectKeysToSnakeCase = (obj: any) => {
    }, {})
 }
 
-export const handleFastingRecords = (startTimestamp: number, endTimestamp: number) => {
-   const startDate = new Date(startTimestamp)
-   const endDate = new Date(endTimestamp)
-   const fastingData = {}
+// export const handleFastingRecords = (startTimestamp: number, endTimestamp: number) => {
+//    const startDate = new Date(startTimestamp)
+//    const endDate = new Date(endTimestamp)
+//    const fastingData = {}
 
-   const currentDate = new Date(startDate)
-   while (currentDate.getDate() <= endDate.getDate() + 1) {
-      const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
-      const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+//    const currentDate = new Date(startDate)
+//    while (currentDate.getDate() <= endDate.getDate() + 1) {
+//       const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+//       const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
 
-      const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
-      const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+//       const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+//       const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
 
-      const totalMilliseconds = endTimeStamp - startTimeStamp
-      const totalHours = totalMilliseconds / (1000 * 60 * 60)
+//       const totalMilliseconds = endTimeStamp - startTimeStamp
+//       const totalHours = totalMilliseconds / (1000 * 60 * 60)
 
-      if (totalHours >= 1) {
-         const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
-         const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
-         const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
-         const y = currentDate.getFullYear()
-         const m = formatNum(currentDate.getMonth() + 1)
-         const d = formatNum(currentDate.getDate())
-         const date: string = `${y}-${m}-${d}`
-         fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
+//       if (totalHours >= 1) {
+//          const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+//          const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
+//          const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
+//          const y = currentDate.getFullYear()
+//          const m = formatNum(currentDate.getMonth() + 1)
+//          const d = formatNum(currentDate.getDate())
+//          const date: string = `${y}-${m}-${d}`
+//          fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
+//       }
+
+//       currentDate.setDate(currentDate.getDate() + 1)
+//    }
+//    return fastingData
+// }
+
+export const handleFastingRecords = (records: any[]) => {
+   const transfom = (startTimestamp: number, endTimestamp: number) => {
+      const startDate = new Date(startTimestamp)
+      const endDate = new Date(endTimestamp)
+      const fastingData = {}
+
+      const currentDate = new Date(startDate)
+      while (currentDate.getDate() <= endDate.getDate() + 1) {
+         const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+         const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+
+         const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+         const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+
+         const totalMilliseconds = endTimeStamp - startTimeStamp
+         const totalHours = totalMilliseconds / (1000 * 60 * 60)
+
+         if (totalHours >= 1) {
+            const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+            const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
+            const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
+            const y = currentDate.getFullYear()
+            const m = formatNum(currentDate.getMonth() + 1)
+            const d = formatNum(currentDate.getDate())
+            const date: string = `${y}-${m}-${d}`
+            const e = fastingData[date] || []
+            fastingData[date] = [...e, { startTime, endTime, totalHours: Math.round(totalHours) }]
+         }
+         currentDate.setDate(currentDate.getDate() + 1)
       }
-
-      currentDate.setDate(currentDate.getDate() + 1)
+      return fastingData
    }
-   return fastingData
+
+   const standard = records.reduce((acc, cur) => {
+      const { startTimeStamp, endTimeStamp } = cur
+      const handled = transfom(startTimeStamp, endTimeStamp)
+      const dates = Object.keys(handled)
+      for (let i = 0; i < dates.length; i++) {
+         const v = handled[dates[i]]
+         const e = acc[dates[i]]
+         acc[dates[i]] = e && [...e, ...v] || v
+      }
+      return acc
+   }, {})
+
+   return getDatesRange(122).map(e => {
+		const r = standard[e.value]
+      return r && { date: e.value, records: r } || `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
+	})
 }
 
 export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fastingRecords: any[]) => {

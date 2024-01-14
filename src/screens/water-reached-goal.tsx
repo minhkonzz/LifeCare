@@ -2,9 +2,10 @@ import { useRef, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'       
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LottieView from 'lottie-react-native'
+import { useNavigation } from '@react-navigation/native'
 
 export default (): JSX.Element => {
-   // const navigation = useNavigation<any>()
+   const navigation = useNavigation<any>()
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 
    useEffect(() => {
@@ -52,7 +53,7 @@ export default (): JSX.Element => {
          <TouchableOpacity
             style={styles.button}
             activeOpacity={.8}
-            // onPress={() => navigation.navigate('water')}
+            onPress={() => navigation.goBack()}
             >
             <Text style={[styles.text, styles.buttonText]}>Continue</Text>
          </TouchableOpacity>

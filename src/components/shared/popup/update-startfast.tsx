@@ -1,4 +1,4 @@
-import { memo, Dispatch, SetStateAction } from 'react'
+import { memo, Dispatch, SetStateAction, useState } from 'react'
 import { toTimestampV1 } from '@utils/datetimes'
 import { useDispatch } from 'react-redux'
 import { enqueueAction, updateRec } from '@store/user'
@@ -13,18 +13,30 @@ export default memo(withSync(({
    setVisible,
    isOnline,
    fastingRecId,
-   datetime
+   datetime,
+   endTimeStamp,
+   setSavedStartTimeStamp
 }: { 
    setVisible: Dispatch<SetStateAction<any>>,
    isOnline: boolean, 
-   fastingRecId: string
+   fastingRecId: string,
+   endTimeStamp: number,
+   setSavedStartTimeStamp: Dispatch<SetStateAction<number>>,
    datetime?: { date: string, hour: number, min: number }
 }): JSX.Element => {
    const { userId } = useSession()
    const dispatch = useDispatch()
+   const [ error, setError ] = useState<string>('')
 
    const onSave = async (date: string, hours: number, mins: number) => {
       const startTimeStamp: number = toTimestampV1(date, hours, mins)
+      setError(startTimeStamp > endTimeStamp && 'Start time cannot after end time' || startTimeStamp === endTimeStamp && 'Start time cannot same with end time' || '')
+
+      if (!fastingRecId) {
+         setSavedStartTimeStamp(startTimeStamp)
+         return
+      }
+
       const payload = { startTimeStamp }
 
       const cache = () => {
@@ -48,5 +60,5 @@ export default memo(withSync(({
       cache()
    }
 
-   return <DatetimePicker {...{ setVisible, title: 'Start fasting time', onSave, datetime }} />
+   return <DatetimePicker {...{ setVisible, title: 'Start fasting time', onSave, error, datetime }} />
 }))

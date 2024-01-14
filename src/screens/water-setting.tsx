@@ -21,18 +21,21 @@ import CustomCupsizePopup from '@components/shared/popup/custom-watercup'
 const CupSizes = memo(() => {
 	const { setPopup } = useContext<any>(PopupContext)
 	const { initCupsize, cupsize, customCupsize } = useSelector((state: AppStore) => state.water)
+	const cupsizes = [
+		initCupsize,
+		initCupsize + 50,
+		initCupsize + 100,
+		initCupsize + 150,
+		initCupsize + 300,
+		customCupsize
+	]
 	const dispatch = useDispatch()
+	
+
 	return (
 		<>
 		{
-			[
-				initCupsize,
-				initCupsize + 50,
-				initCupsize + 100,
-				initCupsize + 150,
-				initCupsize + 300,
-				customCupsize
-			].map((e, i) => (
+			cupsizes.map((e, i) => (
 				<AnimatedPressable 
 					key={i} 
 					style={{
@@ -44,7 +47,7 @@ const CupSizes = memo(() => {
 						borderColor: '#749BC2'
 					} : {})
 					}}
-					onPress={() => !e || customCupsize && setPopup(CustomCupsizePopup) ||dispatch(updateCupsize(e))}>
+					onPress={() => i === cupsizes.length - 1 && setPopup(CustomCupsizePopup) || dispatch(updateCupsize(e))}>
 					<Text style={styles.cupSizeText}>{`${e && e + ' ml' || 'Customize'}`}</Text>
 				</AnimatedPressable>
 			))

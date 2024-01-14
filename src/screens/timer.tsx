@@ -5,17 +5,17 @@ import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { BackIcon, PrimaryBookIcon, SymptomsIcon } from '@assets/icons'
+import { BackIcon, PrimaryBookIcon } from '@assets/icons'
 import { PopupContext } from '@contexts/popup'
 import { AnimatedPressable } from '@components/shared/animated'
 import SyncDetector from '@components/shared/sync-detect'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
-import FastingSymptoms from '@components/shared/popup/fasting-symptoms'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
 import SuggestionPopup from '@components/shared/popup/suggestion'
+import withFastingState from '@hocs/withFastingState'
 
 const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
@@ -55,11 +55,21 @@ const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable:
 	)
 })
 
-const Tips = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const { setPopup } = useContext<any>(PopupContext)
+const Tips = withVisiblitySensor(
+	withFastingState(({
+		isFasting, 
+		isViewable, 
+		animateValue
+	}: { 
+		isFasting: boolean,
+		isViewable: boolean, 
+		animateValue: Animated.Value 
+	}): JSX.Element => {
 
+	const { setPopup } = useContext<any>(PopupContext)
 	return (
-		isViewable && 
+		isViewable && (
+		isFasting && 
 		<View style={styles.tips}>
 			<AnimatedPressable onPress={() => setPopup(SuggestionPopup)} style={{
 				...styles.tip,
@@ -75,23 +85,9 @@ const Tips = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: bo
 				</View>
 				<BackIcon style={styles.redirectIcon} width={10} height={10} />
 			</AnimatedPressable>
-			<AnimatedPressable onPress={() => setPopup(FastingSymptoms)} style={{
-				...styles.tip,
-				opacity: animateValue,
-				transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1],
-					outputRange: [-300, 0]
-				}) }]
-			}}>
-				<View style={styles.hrz}>
-					<SymptomsIcon style={styles.Ic} width={hS(36)} height={vS(36)} />
-					<Text style={styles.tipText}>Symptoms during fasting</Text>
-				</View>
-				<BackIcon style={styles.redirectIcon} width={10} height={10} />
-			</AnimatedPressable>
-		</View> || <View style={styles.tips} />
+		</View> || <></>) || <View style={styles.tips} />
 	)
-})
+}))
 
 export default memo((): JSX.Element => {
 	return (
@@ -112,9 +108,7 @@ const styles = StyleSheet.create({
 		marginBottom: vS(-7)
 	},
 
-	Ic: {
-		marginBottom: vS(5)
-	},
+	Ic: { marginBottom: vS(5) },
 
 	tips: {
 		width: hS(370),

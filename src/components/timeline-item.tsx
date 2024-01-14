@@ -17,7 +17,6 @@ interface TimelineItemProps {
 
 const FastingTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
    const navigation = useNavigation<any>()
-   console.log('fasting item:', item)
 
    const onPress = () => {
       navigation.navigate('fasting-result', { item })

@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 
    status: {
       fontFamily: 'Poppins-Medium',
-		fontSize: hS(8),
+		fontSize: hS(10),
 		color: darkHex,
 		letterSpacing: .4
    },

@@ -19,7 +19,6 @@ export default {
          token: idToken
       })
       if (error) throw new Error('Something went wrong when sign in with Google')
-      console.log(data)
    },
 
    signUpWithEmail: async (email: string, password: string) => {

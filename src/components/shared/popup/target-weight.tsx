@@ -28,10 +28,10 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppStore) => state.user)
+      const { goalWeight } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
-      const { goalWeight } = metadata
       const [ weight, setWeight ] = useState<number>(goalWeight)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
 
       const onSave = async () => {
          const payload = { goalWeight: weight }
@@ -59,10 +59,14 @@ export default withPopupBehavior(
 
       return (
          <>
-            <PrimaryToggleValue {...{ options }} />
+            <PrimaryToggleValue {...{ 
+               options,
+               selectedOptionIndex, 
+               setSelectedOptionIndex 
+            }} />
             <MeasureInput 
                contentCentered
-               symb='kg' 
+               symb={options[selectedOptionIndex]}
                value={weight} 
                onChangeText={t => setWeight(+t)} />
             <TouchableOpacity

@@ -70,39 +70,34 @@ const SettingSlice = createSlice({
 
       updateStartFastRemind: (state, action) => {
          const { startFast, beforeStartFast } = action.payload
-         // configPushStartFastNotification({ startFast, beforeStartFast })
-         state.reminders.beforeStartFast = beforeStartFast
+         configPushStartFastNotification({ startFast, beforeStartFast })
+         state.reminders = {...state.reminders, beforeStartFast }
       },
 
       updateEndFastRemind: (state, action) => {
          const { endFast, beforeEndFast } = action.payload
-         // configPushEndFastNotification({ endFast, beforeEndFast })
-         state.reminders.beforeEndFast = action.payload
+         configPushEndFastNotification({ endFast, beforeEndFast })
+         state.reminders = {...state.reminders, beforeEndFast }
       },
 
       updateWeightRemind: (state, action) => {
          const { days, h, m } = action.payload
-         state.reminders.repeatWeight.days = [...days]
-         state.reminders.repeatWeight.h = h
-         state.reminders.repeatWeight.m = m
+         state.reminders = {...state.reminders, repeatWeight: { days, h, m } }
       },
 
       updateStartWaterRemind: (state, action) => {
          const { h, m } = action.payload
-         state.reminders.startWater.h = h
-         state.reminders.startWater.m = m
+         state.reminders = {...state.reminders, startWater: { h, m }}
       }, 
 
       updateEndWaterRemind: (state, action) => {
          const { h, m } = action.payload
-         state.reminders.endWater.h = h
-         state.reminders.endWater.m = m
+         state.reminders = {...state.reminders, endWater: { h, m }}
       }, 
 
       updateWaterInterval: (state, action) => {
          const { h, m } = action.payload
-         state.reminders.waterInterval.h = h
-         state.reminders.waterInterval.m = m
+         state.reminders = { ...state.reminders, waterInterval: { h, m } }
       }
    }
 })

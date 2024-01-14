@@ -96,7 +96,7 @@ export default withPopupBehavior(
             }} />
             <MeasureInput 
                contentCentered
-               symb='cm' 
+               symb={options[selectedOptionIndex]}
                value={chest} 
                onChangeText={t => setChest(+t)} 
                additionalStyles={styles.input} />

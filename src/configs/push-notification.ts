@@ -1,14 +1,11 @@
 import { Platform } from 'react-native'
-import PushNotification from 'react-native-push-notification'
 import { NOTIFICATION_CHANNEL_ID } from '@utils/constants/notification'
 import { calculateAmountBetweenTimes } from '@utils/datetimes'
 import { WATER_REMIND, START_FAST_REMIND, END_FAST_REMIND, WEIGHT_REMIND } from '@utils/constants/notification'
+import PushNotification from 'react-native-push-notification'
 
 export const configPushStartFastNotification = (bundledConfig: any) => {
-   const {
-      startFast, 
-      beforeStartFast
-   } = bundledConfig
+   const { startFast, beforeStartFast } = bundledConfig
 
    const startFastDate = new Date(startFast)
    const hourStartFast = startFastDate.getHours()
@@ -38,10 +35,7 @@ export const configPushStartFastNotification = (bundledConfig: any) => {
 }
 
 export const configPushEndFastNotification = (bundledConfig: any) => {
-   const {
-      endFast, 
-      beforeEndFast
-   } = bundledConfig
+   const { endFast, beforeEndFast } = bundledConfig
 
    const endFastDate = new Date(endFast)
    const hourEndFast = endFastDate.getHours()

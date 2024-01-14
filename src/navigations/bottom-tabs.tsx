@@ -56,8 +56,6 @@ export default (): JSX.Element => {
 	const dispatch = useDispatch()
 	const { userId } = useSession()
    const { drinked, changes, date } = useSelector((state: AppStore) => state.water)
-	const metadata = useSelector((state: AppStore) => state.user.metadata)
-	console.log('metadata-1:', metadata)
    const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
 
 	const resetWaterTrack = async () => {

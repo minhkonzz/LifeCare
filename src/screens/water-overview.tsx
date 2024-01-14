@@ -28,7 +28,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
    }, [])
 
    const onPress = async () => {
-      const payload = { firstTimeWaterTrack: true }
+      const payload = { firstTimeWaterTrack: false }
 
       const cache = () => {
          dispatch(updateMetadata(payload))

@@ -8,6 +8,13 @@ export const commonStyles = StyleSheet.create({
       alignItems: 'center'
    },
 
+   errorText: {
+      fontFamily: 'Poppins-Regular', 
+      fontSize: hS(13), 
+      color: 'red', 
+      letterSpacing: .2
+   },
+
    popupButton: {
       width: '100%',
       height: vS(82),

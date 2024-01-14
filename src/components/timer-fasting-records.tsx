@@ -3,12 +3,13 @@ import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/color
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
-import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { getMonthTitle } from '@utils/datetimes'
 import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { AnimatedPressable } from './shared/animated'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
+import { useMemo } from 'react'
 
 const Record = ({ 
 	item, 
@@ -39,9 +40,10 @@ const Record = ({
 			)
 		}
 
-		const { date, totalHours } = item
+		const { date, records } = item 
 		const [ y, m, d ] = date.split('-')
 		const monthTitle = getMonthTitle(m - 1, true)
+		const totalHours = useMemo(() => records.reduce((acc: any, cur: any) => acc + cur.totalHours, 0), []) 
 
 		return (
 			<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
@@ -55,7 +57,7 @@ const Record = ({
 						style={{
 							...styles.recProgValue,
 							height: '100%',
-							top: `${100 - item.totalHours / 24 * 100}%`
+							top: `${100 - totalHours / 24 * 100}%`
 						}}
 						colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
@@ -82,20 +84,7 @@ const Record = ({
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
-	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
-		const { startTimeStamp, endTimeStamp } = cur
-		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp)}
-	}, {})
-
-	const chartData = getDatesRange(122).map(e => {
-		const r = standardFastingRecords[e.value]
-		if (r) return {
-			date: e.value,
-			totalHours: r.totalHours
-		}
-		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
-	})
-
+	const chartData = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	if (!isViewable) return <View style={styles.container} />

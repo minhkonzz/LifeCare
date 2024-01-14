@@ -240,3 +240,67 @@
 // })
 
 // console.log(queuedActions)
+
+const getLocalTimeV1 = (utcDate) => {
+   const year = utcDate.getFullYear()
+   const month = utcDate.getMonth() + 1
+   const day = utcDate.getDate()
+   const hours = utcDate.getHours()
+   const mins = utcDate.getMinutes()
+   const secs = utcDate.getSeconds()
+   return new Date(`${year}-${month}-${day} ${hours}:${mins}:${secs}`)
+}
+
+const formatNum = (value) => {
+   return value.toString().padStart(2, '0')
+}
+
+const handleFastingRecords = (startTimestamp, endTimestamp, detail = false) => {
+   const startDate = new Date(startTimestamp)
+   const endDate = new Date(endTimestamp)
+   const fastingData = {}
+
+   const currentDate = new Date(startDate)
+   while (currentDate.getDate() <= endDate.getDate()) {
+      const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
+      const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+
+      const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
+      const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+
+      const totalMilliseconds = endTimeStamp - startTimeStamp
+      const totalHours = totalMilliseconds / (1000 * 60 * 60)
+
+      if (totalHours >= 1) {
+         const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+         const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
+         const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
+         const y = currentDate.getFullYear()
+         const m = formatNum(currentDate.getMonth() + 1)
+         const d = formatNum(currentDate.getDate())
+         const date = `${y}-${m}-${d}`
+         const newRec = { startTime, endTime, totalHours: Math.round(totalHours) }
+         const e = fastingData[date] || []
+         fastingData[date] = detail && [...e, newRec] || newRec
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1)
+   }
+   return fastingData
+}
+
+let initialize = [{ startTimeStamp: 1704976215000, endTimeStamp: 1705012215000 }, { startTimeStamp: 1705023015000, endTimeStamp: 1705062615000 }, { startTimeStamp: 1705069428000, endTimeStamp: 1705101828000 }]
+
+const standardFastingRecords = initialize.reduce((acc, cur) => {
+   const { startTimeStamp, endTimeStamp } = cur
+   const handled = handleFastingRecords(startTimeStamp, endTimeStamp, true)
+   const dates = Object.keys(handled)
+   for (let i = 0; i < dates.length; i++) {
+      const v = handled[dates[i]]
+      const e = acc[dates[i]]
+      acc[dates[i]] = e && [...e, ...v] || v
+   }
+   return acc
+}, {})
+
+console.log(standardFastingRecords)

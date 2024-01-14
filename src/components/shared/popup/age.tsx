@@ -64,10 +64,11 @@ export default withPopupBehavior(
       return (
          <>
             <WheelPicker 
-            items={ages} 
-            itemHeight={vS(72)} 
-            onIndexChange={onChangeAge} 
-            initialScrollIndex={currentAgeIndex} />
+               items={ages} 
+               itemHeight={vS(72)} 
+               onIndexChange={onChangeAge} 
+               initialScrollIndex={currentAgeIndex} 
+            />
             <TouchableOpacity
                onPress={() => onConfirm(onSave)}
                activeOpacity={.7}

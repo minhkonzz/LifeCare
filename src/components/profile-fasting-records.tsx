@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
-import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { getMonthTitle } from '@utils/datetimes'
 import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
@@ -14,7 +14,6 @@ import LinearGradient from 'react-native-linear-gradient'
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail?: boolean }) => {
 	if (!hideDetail) {
-
 		if (typeof item === 'string') {
 			const [ month, date ] = item.split(' ')
 			return (
@@ -27,12 +26,41 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		}
 
 		const [ shown, setShown ] = useState<boolean>(false)
-		const { startTime, endTime, date, totalHours } = item
+		const { date, records } = item
 		const [ y, m, d ] = date.split('-')
 		const monthTitle = getMonthTitle(m - 1, true)
-		const [ s1, s2 ] = startTime.split(' ')
-		const [ hours, mins ] = s1.split(':').map(Number)
-		const hoursPassed = hours + (s2 === 'PM' && (hours === 12 ? 0 : 12)) + (mins > 50 ? 1 : 0)	
+
+		const detail = useMemo(() => {
+			return records.reduce((acc: any, cur: any) => {
+				const { startTime, endTime, totalHours } = cur
+				const [ s1, s2 ] = startTime.split(' ')
+				const [ hours, mins ] = s1.split(':').map(Number)
+				const hoursPassed = hours + (s2 === 'PM' && (hours === 12 ? 0 : 12)) + (mins > 50 ? 1 : 0)
+				
+				const Component = () =>
+					<LinearGradient
+						style={{...styles.recProgValue, height: `${totalHours / 24 * 100}%`, top: `${Math.floor(hoursPassed / 24 * 100)}%` }}
+						colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} 
+					/>
+	
+				return {
+					totalHours: acc.totalHours + totalHours,
+					times: [...acc.times, { startTime, endTime }],
+					components: [...acc.components, Component]
+				}
+	
+			}, { totalHours: 0, times: [], components: [] })
+		}, [])
+
+		const DayRecords = () => <>
+			{ detail.components.map((e: any) => {
+				const Component = e
+				return <Component />
+			}) }
+		</>
+
 		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
 
 		const onPress = () => {
@@ -49,16 +77,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			<Pressable style={{ marginLeft: index > 0 ? hS(18) : 0, alignItems: 'center', position: 'relative' }} {...{ onPress }}>
 				<Text style={styles.recText}>{monthTitle}</Text>
 				<View style={styles.recProg}>
-					<LinearGradient
-						style={{
-							...styles.recProgValue, 
-							height: `${totalHours / 24 * 100}%`,
-							top: `${Math.floor(hoursPassed / 24 * 100)}%`
-						}}
-						colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }} 
-					/>
+					<DayRecords />
 				</View>
 				<Text style={styles.recText}>{formatNum(d)}</Text>
 				{ shown && 
@@ -79,8 +98,8 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .52, y: .5 }}>
-					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Total: ${totalHours} hours`}</Text>
-					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(4) }}>{`${startTime} to ${endTime}`}</Text>
+					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Total: ${detail.totalHours} hours`}</Text>
+					{ detail.times.map((e: any) => <Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(4) }}>{`${e.startTime} to ${e.endTime}`}</Text>) }
 					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25), left: hS(60) }} width={16} />
 				</AnimatedLinearGradient> }
 			</Pressable>
@@ -92,26 +111,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 
 export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
-
-	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
-		const { startTimeStamp, endTimeStamp } = cur
-		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp) }
-	}, {})
-
-	const chartData = getDatesRange(122).map(e => {
-		const r = standardFastingRecords[e.value]
-		if (r) {
-			const { startTime, endTime, totalHours } = r
-			return {
-				date: e.value,
-				startTime,
-				endTime,
-				totalHours
-			}
-		}
-		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
-	})
-
+	const chartData = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	return (
@@ -158,7 +158,7 @@ export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.V
 			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
 			{ noDataFound && 
 			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={5} />
+				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={3} />
 				<Text style={styles.noDataText}>No data found</Text>
 			</View> }
 		</AnimatedLinearGradient>
@@ -309,14 +309,12 @@ const styles = StyleSheet.create({
 	recProg: { 
 		width: 20, 
 		height: vS(180), 
-		borderRadius: 100, 
 		backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, 
 		marginVertical: vS(10) 
 	},
 
 	recProgValue: {
 		width: '100%',
-		borderRadius: 100,
 		position: 'absolute'
 	}
 })

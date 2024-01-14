@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -81,11 +81,8 @@ export default withPopupBehavior(
       }
 
       const onChangeOption = () => {
-         if (selectedOptionIndex === 1) {
-            setWaist(centimeterToInch(waist))
-            return
-         }
-         setWaist(inchToCentimeter(waist))
+         const convertFunc = selectedOptionIndex && centimeterToInch || inchToCentimeter
+         setWaist(convertFunc(waist))
       }
 
       return (
@@ -98,7 +95,7 @@ export default withPopupBehavior(
             }} />
             <MeasureInput 
                contentCentered
-               symb='cm' 
+               symb={options[selectedOptionIndex]}
                value={waist} 
                onChangeText={t => setWaist(+t)} 
                additionalStyles={styles.input} />

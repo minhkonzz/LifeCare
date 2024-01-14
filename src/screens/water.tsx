@@ -52,7 +52,7 @@ export default (): JSX.Element => {
 
    const increaseLiquid = () => {
       dispatch(updateLiquid(INCREASE))
-      if (firstTimeReachGoal && liquidDrinked + cupsize >= dailyWater) {
+      if (!firstTimeReachGoal && (liquidDrinked + cupsize >= dailyWater)) {
          dispatch(updateFirstTimeReachGoal())
          const timeout = setTimeout(() => {
             clearTimeout(timeout)

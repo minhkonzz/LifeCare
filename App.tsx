@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { Platform, PermissionsAndroid, Alert } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context' 
-import { configPushNotification } from './src/configs/push-notification'
 import { Provider } from 'react-redux'
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -9,7 +8,6 @@ import { NavigationContainer } from '@react-navigation/native'
 import Stack from './src/navigations/stack'
 import store from './src/store'
 
-// configPushNotification()
 const persistor = persistStore(store)
 
 export default (): JSX.Element => {

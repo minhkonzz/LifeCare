@@ -34,6 +34,7 @@ export default withPopupBehavior(
       const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
       let { currentWeight, goalWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ weight, setWeight ] = useState<any>(currentWeight)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
       const [ goal, setGoal ] = useState<any>(goalWeight)
       const [ weightError, setWeightError ] = useState<boolean>(false)
       const [ goalError, setGoalError ] = useState<boolean>(false)
@@ -57,7 +58,8 @@ export default withPopupBehavior(
 
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { currentWeight: +weight, goalWeight: +goal }
+         const newWeight: number = selectedOptionIndex ? poundsToKilograms(weight) : weight
+         const payload = { currentWeight: +newWeight, goalWeight: +goal }
          const reqPayload = { ...payload, newBodyRecId, currentDate }
 
          const cache = () => {
@@ -72,12 +74,12 @@ export default withPopupBehavior(
                const currentDatetime: string = getCurrentUTCDatetimeV1()
                bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
-                  value: weight,
+                  value: +newWeight,
                   type: 'weight',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else bodyRecords[i].value = weight
+            } else bodyRecords[i].value = +newWeight
 
             if (userId && !isOnline) {
                dispatch(enqueueAction({
@@ -112,19 +114,20 @@ export default withPopupBehavior(
          setGoal(t)
       }
 
-      const onChangeOption = (index: number) => {
-         if (index === 0) {
-            setWeight(poundsToKilograms(+weight))
-            setGoal(poundsToKilograms(+goal))
-            return
-         }
-         setWeight(kilogramsToPounds(+weight))
-         setGoal(kilogramsToPounds(+goal))
+      const onChangeOption = () => {
+         const convertFunc = selectedOptionIndex && kilogramsToPounds || poundsToKilograms
+         setWeight(convertFunc(weight))
+         setGoal(convertFunc(goal))
       }
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption }} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               selectedOptionIndex, 
+               setSelectedOptionIndex,
+               onChangeOption 
+            }} />
             <View style={{...styles.input, marginTop: vS(10) }}>
                {
                   weightError &&
@@ -148,7 +151,7 @@ export default withPopupBehavior(
                }
                <MeasureInput 
                   contentCentered
-                  symb='kg' 
+                  symb={options[selectedOptionIndex]}
                   value={weight}
                   isError={weightError}
                   onChangeText={t => onChangeWeight(t)} />
@@ -170,13 +173,13 @@ export default withPopupBehavior(
                         })
                      }] 
                   }}>
-                     Invalid goal weigh
+                     Invalid goal weight
                   t</Animated.Text> ||
                   <Text style={styles.inputTitle}>Goal weight</Text>
                }
                <MeasureInput 
                   contentCentered
-                  symb='kg' 
+                  symb={options[selectedOptionIndex]}
                   value={goal} 
                   isError={goalError}
                   onChangeText={t => onChangeGoal(t)} />

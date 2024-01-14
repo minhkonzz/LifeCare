@@ -39,7 +39,7 @@ export default withPopupBehavior(
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const value = selectedOptionIndex && inchToCentimeter(hips) || hips
+         const value = selectedOptionIndex ? inchToCentimeter(hips) : hips
          const payload = { hipsMeasure: value }
          const reqPayload = { value, type: 'hips', currentDate, newBodyRecId }
 
@@ -99,7 +99,7 @@ export default withPopupBehavior(
             />
             <MeasureInput 
                contentCentered
-               symb='cm' 
+               symb={options[selectedOptionIndex]}
                value={hips} 
                onChangeText={t => setHips(+t)} 
                additionalStyles={styles.input} />

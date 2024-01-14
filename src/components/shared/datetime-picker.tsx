@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { getDatesRange, getMonthTitle, toDateTimeV2 } from '@utils/datetimes'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
+import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
 import WheelPicker from './wheel-picker'
@@ -39,11 +40,13 @@ const Main = ({
    setVisible,
    animateValue,
    datetime,
+   error,
    onSave 
 }: {
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<any>>,
-   datetime?: { date: string, hour: number, min: number }
+   datetime?: { date: string, hour: number, min: number },
+   error?: string,
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }): JSX.Element => {
 
@@ -116,6 +119,7 @@ const Main = ({
 
    return (
       <>
+         { error && <Text style={commonStyles.errorText}>{error}</Text> }
          <View style={styles.main}>
             <View style={styles.indicator} />
             <View style={styles.wheelpickers}>
@@ -141,10 +145,14 @@ const Main = ({
 export default memo(({
    setVisible,
    title,
+   error,
+   datetime,
    onSave
 }: {
    setVisible: Dispatch<SetStateAction<any>>,
    title: string,
+   error?: string,
+   datetime?: { date: string, hour: number, min: number }
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }) => {
    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
@@ -157,7 +165,7 @@ export default memo(({
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue, setVisible, onSave }} />
+         <Main {...{ animateValue, setVisible, datetime, onSave, error }} />
       </Popup>
    )
 })

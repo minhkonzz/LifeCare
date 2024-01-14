@@ -29,11 +29,10 @@ export default withPopupBehavior(
       isOnline: boolean
    }) => {
       const dispatch = useDispatch()
-      const { metadata } = useSelector((state: AppStore) => state.user)
+      const { currentHeight } = useSelector((state: AppStore) => state.user.metadata)
       const { userId } = useSession()
-      const { currentHeight } = metadata
       const [ height, setHeight ] = useState<number>(currentHeight)
-      const [ optionIndex, setOptionIndex ] = useState<number>(0)
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
    
       const onSave = async () => {
          const payload = { currentHeight: height }
@@ -59,19 +58,23 @@ export default withPopupBehavior(
          cache()
       }
    
-      const onChangeOption = (index: number) => {
-         const convertFunc = !index && inchToCentimeter || centimeterToInch
+      const onChangeOption = () => {
+         const convertFunc = !selectedOptionIndex && inchToCentimeter || centimeterToInch
          setHeight(convertFunc(height))
-         setOptionIndex(index)
       }
-   
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption }} additionalStyles={styles.toggle} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               selectedOptionIndex,
+               setSelectedOptionIndex,
+               onChangeOption,
+               additionalStyles: styles.toggle
+            }} />
             <MeasureInput 
                contentCentered
-               symb={options[optionIndex]}
+               symb={options[selectedOptionIndex]}
                value={height} 
                onChangeText={t => setHeight(+t)} 
                additionalStyles={styles.input} />

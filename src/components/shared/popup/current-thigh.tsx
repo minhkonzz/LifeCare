@@ -26,7 +26,6 @@ export default withPopupBehavior(
       onConfirm,
       isOnline
    }: { 
-      setVisible: Dispatch<SetStateAction<boolean>>, 
       onConfirm: (afterDisappear: () => Promise<void>) => void,
       isOnline: boolean
    }) => {
@@ -99,7 +98,7 @@ export default withPopupBehavior(
             }} />
             <MeasureInput 
                contentCentered
-               symb='cm' 
+               symb={options[selectedOptionIndex]}
                value={thigh} 
                onChangeText={t => setThigh(+t)} 
                additionalStyles={styles.input} />

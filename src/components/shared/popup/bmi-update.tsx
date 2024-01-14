@@ -1,4 +1,4 @@
-import { useState, ReactNode, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '@store/index'
@@ -26,7 +26,6 @@ export default withPopupBehavior(
       onConfirm,
       isOnline 
    }: { 
-      setVisible: Dispatch<SetStateAction<ReactNode>>,
       onConfirm: (afterDisappear: () => Promise<void>) => void,
       isOnline: boolean
    }) => {
@@ -35,13 +34,14 @@ export default withPopupBehavior(
       let { currentHeight, currentWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ height, setHeight ] = useState<number>(currentHeight)
       const [ weight, setWeight ] = useState<number>(currentWeight)
-      const [ optionIndex, setOptionIndex ] = useState<number>(0) 
-      const symbSplits = options[optionIndex].split('/')
+      const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0) 
+      const symbSplits = options[selectedOptionIndex].split('/')
 
       const onSave = async () => {
          const currentDate: string = getCurrentUTCDateV2()
          const newBodyRecId: string = autoId('br')
-         const payload = { currentHeight: height, currentWeight: weight }
+         const newWeight: number = selectedOptionIndex ? poundsToKilograms(weight) : weight
+         const payload = { currentHeight: selectedOptionIndex ? inchToCentimeter(height) : height, currentWeight: newWeight } 
          const reqPayload = { ...payload, newBodyRecId, currentDate }
 
          const cache = () => {
@@ -55,12 +55,12 @@ export default withPopupBehavior(
                const currentDatetime: string = getCurrentUTCDatetimeV1()
                bodyRecords = [...bodyRecords, {
                   id: newBodyRecId,
-                  value: weight,
+                  value: newWeight,
                   type: 'weight',
                   createdAt: currentDatetime,
                   updatedAt: currentDatetime
                }]
-            } else bodyRecords[i].value = weight
+            } else bodyRecords[i].value = newWeight
 
             dispatch(updateMetadata({ bodyRecords }))
             if (userId && !isOnline) {
@@ -82,20 +82,21 @@ export default withPopupBehavior(
          cache()
       }
 
-      const onChangeOption = (index: number) => {
-         if (index === 0) {
-            setHeight(inchToCentimeter(height))
-            setWeight(poundsToKilograms(weight))
-         } else {
-            setHeight(centimeterToInch(height))
-            setWeight(kilogramsToPounds(weight))
-         }
-         setOptionIndex(index)
+      const onChangeOption = () => {
+         const [ heightConvertFunc, weightConvertFunc ] = selectedOptionIndex && [ centimeterToInch, kilogramsToPounds ] || [ inchToCentimeter, poundsToKilograms ]
+         setHeight(heightConvertFunc(height))
+         setWeight(weightConvertFunc(weight))
       }
 
       return (
          <>
-            <PrimaryToggleValue {...{ options, onChangeOption, additionalStyles: styles.toggle }} />
+            <PrimaryToggleValue {...{ 
+               options, 
+               selectedOptionIndex, 
+               setSelectedOptionIndex,
+               onChangeOption, 
+               additionalStyles: styles.toggle 
+            }} />
             <View style={styles.input}>
                <Text style={styles.inputTitle}>Height</Text>
                <MeasureInput 

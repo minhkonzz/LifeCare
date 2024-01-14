@@ -81,7 +81,7 @@ export default withPopupBehavior(
       }
 
       const onChangeOption = () => {
-         const convertFunc = !selectedOptionIndex && poundsToKilograms || kilogramsToPounds
+         const convertFunc = selectedOptionIndex && kilogramsToPounds || poundsToKilograms
          setWeight(convertFunc(weight))
       }
 

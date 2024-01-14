@@ -44,6 +44,10 @@ export default withPopupBehavior(
                <Text style={styles.t1}>Important tips</Text>
                <Text style={styles.t2}>{"1. Drink a lot of water\n2. Being hungry is normal\n3. If you feel discomfort, stop the fasting process and consult your doctor"}</Text>
             </View>
+            <View style={styles.v5}>
+               <Text style={styles.t1}>Symptoms during fasting period</Text>
+               <Text style={styles.t2}>{`Dring fasting period, you may feel a little tired, hungry and irritable, but you should never feel unwell.\n\nPlease pay close attention to your body, especially if you are new to fasting. If you feel uncomfortable of the plan is too hard to follow, try lowering the difficulty of the plan.\n\nIf the tired of weakness prevents you from completing your daily tasks, or you're experiencing unexpected feelings of sickness and discomfort, you should stop fasting straight away and ask your doctor for advice.`}</Text>
+            </View>
          </ScrollView>
       )
    }),

@@ -1,4 +1,4 @@
-import { memo, Dispatch, SetStateAction, useRef, useEffect, useCallback, useContext } from 'react'
+import { memo, Dispatch, SetStateAction, useRef, useEffect, useCallback, useContext, useState } from 'react'
 import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView, Pressable } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -26,24 +26,40 @@ import useSession from '@hooks/useSession'
 
 const TimeSetting = memo(({ 
 	fastingRecId,
-	startTimeStamp, 
+	startTimeStamp,
+	setSavedStartTimeStamp, 
 	endTimeStamp, 
+	setSavedEndTimeStamp,
 	planName 
 }: {
 	fastingRecId?: string,
 	startTimeStamp: number,
+	setSavedStartTimeStamp: Dispatch<SetStateAction<number>>,
 	endTimeStamp: number,
+	setSavedEndTimeStamp: Dispatch<SetStateAction<number>>,
 	planName: string
 }) => {
 	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { setPopup } = useContext<any>(PopupContext)
 
 	const UpdateStartFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
-		return <UpdateStartFastPopup {...{ setVisible, datetime: toDateTimeV2(startTimeStamp), fastingRecId }} />
+		return <UpdateStartFastPopup {...{ 
+			setVisible, 
+			datetime: toDateTimeV2(startTimeStamp), 
+			fastingRecId,
+			endTimeStamp,
+			setSavedStartTimeStamp
+		}} />
 	}), [])
 
 	const UpdateEndFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
-		return <UpdateEndFastPopup {...{ setVisible, datetime: toDateTimeV2(endTimeStamp), fastingRecId }} />
+		return <UpdateEndFastPopup {...{ 
+			setVisible, 
+			datetime: toDateTimeV2(endTimeStamp), 
+			fastingRecId,
+			startTimeStamp,
+			setSavedEndTimeStamp
+		}} />
 	}), [])
 
 	useEffect(() => {
@@ -210,19 +226,20 @@ const TrackWeight = memo((): JSX.Element => {
 })
 
 export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const bottomBarHeight = useDeviceBottomBarHeight()
 	const navigation = useNavigation<any>()
 	const dispatch = useDispatch()
 	const route = useRoute()
 	const screenParams: any = route.params
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppStore) => state.fasting)
 
-	let startTimeStamp: number, endTimeStamp: number, planName: string
+	let fastingRecId: string = '', startTimeStamp: number, endTimeStamp: number, planName: string
 		 
 	if (screenParams) {
 		const { item } = screenParams
-		const { plan, startTimeStamp: _start, endTimeStamp: _end } = item
+		const { id, plan, startTimeStamp: _start, endTimeStamp: _end } = item
+		fastingRecId = id
 		startTimeStamp = _start
 		endTimeStamp = _end
 		planName = plan
@@ -233,7 +250,9 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	}
 	
 	const { userId } = useSession()
-	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
+	const [ savedStartTimeStamp, setSavedStartTimeStamp ] = useState<number>(startTimeStamp)
+	const [ savedEndTimeStamp, setSavedEndTimeStamp ] = useState<number>(endTimeStamp)
+	const totalMins: number = Math.floor((savedEndTimeStamp - savedStartTimeStamp) / (1000 * 60))
 	const hours: number = Math.floor(totalMins / 60)
 	const mins: number = totalMins % 60
 
@@ -271,8 +290,8 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 		}
 
 		const onSave = async () => {
-			let payload: any = { startTimeStamp, endTimeStamp, planName, notes: '' }
-			
+			let payload: any = { startTimeStamp: savedStartTimeStamp, endTimeStamp: savedEndTimeStamp, planName, notes: '' }
+	
 			const cache = () => {
 				const createdAt: string = getLocalDatetimeV2()
 				payload = {
@@ -376,7 +395,14 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 					<Text style={styles.symbolTitle}>m</Text>
 				</Animated.View>
 			</View>
-			<TimeSetting {...{ startTimeStamp, endTimeStamp, planName }} />
+			<TimeSetting {...{ 
+				fastingRecId,
+				startTimeStamp: savedStartTimeStamp, 
+				setSavedStartTimeStamp,
+				endTimeStamp: savedEndTimeStamp,
+				setSavedEndTimeStamp, 
+				planName 
+			}} />
 			<TrackWeight />
 			<BottomButtons />
 		</ScrollView>
