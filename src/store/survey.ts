@@ -14,7 +14,6 @@ const initialState: SurveyState = {
    firstMealTime: '',
    lastMealTime: '',
    healthConcerns: [],
-   sleepHours: ''
 }
 
 const SurveySlice = createSlice({

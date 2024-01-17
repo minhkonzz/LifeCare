@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '../store'
 import { resetTimes } from '@store/fasting'
 import { addRec, enqueueAction } from '@store/user'
-import { getLocalDatetimeV2, toDateTimeV1, toDateTimeV2 } from '@utils/datetimes'
+import { getLocalDatetimeV2, milisecondsToHoursMins, toDateTimeV1, toDateTimeV2 } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
 import { WhiteBackIcon, WhiteEditIcon, PrimaryEditIcon } from '@assets/icons'
 import { autoId } from '@utils/helpers'
@@ -252,9 +252,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	const { userId } = useSession()
 	const [ savedStartTimeStamp, setSavedStartTimeStamp ] = useState<number>(startTimeStamp)
 	const [ savedEndTimeStamp, setSavedEndTimeStamp ] = useState<number>(endTimeStamp)
-	const totalMins: number = Math.floor((savedEndTimeStamp - savedStartTimeStamp) / (1000 * 60))
-	const hours: number = Math.floor(totalMins / 60)
-	const mins: number = totalMins % 60
+	const { hours, mins } = milisecondsToHoursMins(savedEndTimeStamp - savedStartTimeStamp)
 
    useEffect(() => {
       Animated.timing(animateValue, {

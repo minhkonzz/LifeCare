@@ -4,12 +4,12 @@ import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/color
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { Message } from '@utils/types'
 import { MessageIcon, BackIcon, MicrophoneIcon } from '@assets/icons'
-// import { SERVER_URL } from '@env'
 import { AnimatedLinearGradient } from '@components/shared/animated'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GOOGLE_AI_KEY } from '@env'
 import LottieView from 'lottie-react-native'
 import LinearGradient from 'react-native-linear-gradient'
+import { autoId } from '@utils/helpers'
 
 const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.Element => {
    const isUserMessage = item.sender === 'user'
@@ -65,7 +65,11 @@ const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY)
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
  
 export default (): JSX.Element => {
-   const [ messages, setMessages ] = useState<Message[]>([])
+   const [ messages, setMessages ] = useState<Message[]>([{
+      id: autoId('mess'),
+      text: "Hi mate! Let's ask anything you want",
+      sender: 'bot'
+   }])
    const [ question, setQuestion ] = useState<string>('')
    const flatListRef = useRef<any>()
 
@@ -73,14 +77,14 @@ export default (): JSX.Element => {
       if (sender === 'user' && !message.trim()) return
 
       const newMessage = {
-         id: `${messages.length + 1 * Math.round(Math.random() * 100)}`,
+         id: autoId('mess'),
          text: message,
          sender
       }
 
       if (sender === 'user') {
          const botMessageAwait = {
-            id: `${messages.length + 1 * Math.round(Math.random() * 100)}`,
+            id: autoId('mess'),
             text: '',
             sender: 'bot'
          }
@@ -95,12 +99,6 @@ export default (): JSX.Element => {
       setQuestion('')
       const ans = await model.generateContent(message)
       const res = ans.response.text()
-      // const botResponse = await fetch(`${SERVER_URL}/chat/q`, {
-      //    method: 'POST',
-      //    body: JSON.stringify({ question: message }),
-      //    headers: { 'Content-type': 'application/json; charset=UTF-8' }
-      // })
-      // const { text } = await botResponse.json()
       pushMessage({ message: res, sender: 'bot' })
    }
 

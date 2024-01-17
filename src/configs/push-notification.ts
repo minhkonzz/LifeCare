@@ -104,6 +104,8 @@ export const configPushWaterDrinkNotification = (bundledConfig: any) => {
       endTime: `${startHour}:${startMin}`
    })
 
+   PushNotification.cancelLocalNotification(`WATER${WATER_REMIND}`)
+
    PushNotification.localNotificationSchedule({
       channelId: NOTIFICATION_CHANNEL_ID,
       id: `WATER${WATER_REMIND}`,
@@ -141,8 +143,7 @@ export const configPushNotification = (bundledConfig: any) => {
                return
             }
             case WATER_REMIND: {
-               PushNotification.cancelLocalNotification(`WATER${WATER_REMIND}`)
-               configPushWaterDrinkNotification(bundledConfig)
+               configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
                return
             }
          }
@@ -169,6 +170,4 @@ export const configPushNotification = (bundledConfig: any) => {
       soundName: 'default',
       vibrate: true
    }, created => console.log(`created channel ${created}`))
-
-   configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
 }

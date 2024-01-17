@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { LineChart } from 'react-native-gifted-charts'
 import { View, StyleSheet } from 'react-native'
 import { darkHex } from '@utils/constants/colors'
@@ -15,6 +15,7 @@ let endIndex: number = 0
 
 export default (): JSX.Element => {
    const { bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
+   const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
    const weightRecords = bodyRecords.filter((e: any) => e.type === 'weight')
    const standardWeightRecords = weightRecords.reduce((acc: any, cur: any) => {
       const { id, createdAt, value } = cur
@@ -59,9 +60,10 @@ export default (): JSX.Element => {
    return (
       <>
          <PrimaryToggleValue 
+            {...{ selectedOptionIndex, setSelectedOptionIndex }}
             additionalStyles={styles.visualOptions}
             options={['Day', 'Week', 'Month']} 
-            toggleColor={['rgba(255, 183, 43, .6)', '#FFB72B']} 
+            toggleColor={['rgba(255, 183, 43, .6)', '#FFB72B']}
          />
          <LineChart 
             {...{ data: chartData, customDataPoint: CustomDataPoint, startIndex, endIndex }} 

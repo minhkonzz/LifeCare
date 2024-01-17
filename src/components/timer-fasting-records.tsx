@@ -84,7 +84,7 @@ const Record = ({
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
-	const chartData = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
+	const { chartData } = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	if (!isViewable) return <View style={styles.container} />

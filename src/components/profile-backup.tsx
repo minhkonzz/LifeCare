@@ -1,58 +1,30 @@
-import { memo } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { CloudBackupIcon } from '@assets/icons'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { AnimatedLinearGradient, createAnimatedIcon } from './shared/animated'
+import LinearGradient from 'react-native-linear-gradient'
 
-const AnimatedCloudBackupIcon = createAnimatedIcon(CloudBackupIcon)
-
-export default memo(({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
+export default (): JSX.Element => {
    return (
-      <AnimatedLinearGradient 
-         style={{...styles.container, opacity: animateValue }}
+      <LinearGradient 
+         style={styles.container}
          colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
          start={{ x: .5, y: 0 }}
          end={{ x: .52, y: .5 }}>
          <View>
-            <Animated.Text style={{
-               ...styles.title,
-               opacity: animateValue, 
-               transform: [{ translateX: animateValue.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [-50, 0]
-               }) }]
-            }}>
-               Backup & Restore
-            </Animated.Text>
-            <Animated.Text style={{
-               ...styles.desc,
-               opacity: animateValue, 
-               transform: [{ translateY: animateValue.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [10, 0]
-               }) }]
-            }}>
-               Sign in and synchronize your data
-            </Animated.Text>
+            <Text style={styles.title}>Backup & Restore</Text>
+            <Text style={styles.desc}>Sign in and synchronize your data</Text>
             <TouchableOpacity style={styles.syncDataButton} activeOpacity={.8}>
                <Text style={styles.syncDataButtonText}>Sync data</Text>
             </TouchableOpacity>
          </View>
-         <AnimatedCloudBackupIcon 
-            style={{
-               ...styles.cloudSvg,
-               opacity: animateValue, 
-               transform: [{ translateX: animateValue.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [50, 0]
-               }) }]
-            }} 
+         <CloudBackupIcon 
+            style={styles.cloudSvg} 
             width={hS(92)} 
             height={vS(92)} />
-      </AnimatedLinearGradient>
+      </LinearGradient>
    )
-})
+}
 
 const styles = StyleSheet.create({
    container: {

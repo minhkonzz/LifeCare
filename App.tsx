@@ -11,18 +11,16 @@ import store from './src/store'
 const persistor = persistStore(store)
 
 export default (): JSX.Element => {
-   // const requestNotificationPermission = async() => {
-   //    if (Platform.OS !== 'android') return
-   //    try {
-   //       await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
-   //    } catch (err) {
-   //       console.error(err)
-   //    }
-   // }
+   const requestNotificationPermission = async() => {
+      if (Platform.OS !== 'android') return
+      try {
+         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+      } catch (err) {
+         console.error(err)
+      }
+   }
 
-   useEffect(() => {
-      // requestNotificationPermission()
-   }, [])
+   useEffect(() => { requestNotificationPermission() }, [])
 
    return (
       <Provider {...{ store }}>

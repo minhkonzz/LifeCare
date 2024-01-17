@@ -8,7 +8,8 @@ import { updateNetworkOnline } from '@store/network'
 import { updateAppState, updateIsLoading, updateMetadata, updateSession } from '@store/user'
 import { supabase } from '@configs/supabase'
 import { convertObjectKeysToCamelCase } from '@utils/helpers'
-import SyncDetector from '@components/shared/sync-detect'
+import NotifiDetector from '@components/sensors/notifi-detect'
+import SyncDetector from '@components/sensors/sync-detect'
 import PopupProvider, { PopupContext } from '@contexts/popup'
 import plansData from '@assets/data/plans.json'
 import UserService from '@services/user'
@@ -84,7 +85,7 @@ const StackNav = memo((): JSX.Element => {
 const Main = () => {
    const dispatch = useDispatch()
    const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-   const { session: prevSession, metadata } = useSelector((state: AppStore) => state.user)
+   const { session: prevSession, metadata } = useSelector((state: AppStore) => state.user) 
 
    const fetchPersonalData = async (userId: string): Promise<void> => {
       const { res, error } = await UserService.getPersonalData(userId)
@@ -176,6 +177,7 @@ const Main = () => {
    return (
       <>
          <StackNav />
+         <NotifiDetector />
          <SyncDetector />
          { Popup && <Popup setVisible={setPopup} /> }
       </>

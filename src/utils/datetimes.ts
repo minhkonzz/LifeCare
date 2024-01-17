@@ -145,27 +145,21 @@ export const getDatesRange = (limit: number, inWeeks = false) => {
    return dateArray
 }
 
-export const calculateAmountBetweenTimes = ({ 
-   startTime, 
-   endTime
-}: {
-   startTime: string, 
-   endTime: string
-}) => {
-   /* startTime: "22:30" */
+export const calculateAmountBetweenTimes = ({ startTime, endTime }: { startTime: string, endTime: string }) => {
    const startDate: Date = new Date("2000-01-01 " + startTime)
    const endDate: Date = new Date("2000-01-01 " + endTime)
-
    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1)
-
    return endDate - startDate
 }
 
-export const timestampToDateTime = (time: number) => {
-   // const s = formatNum(Math.floor((time / 1000) % 60))
-   // const m = formatNum(Math.floor((time / 1000 / 60) % 60))
-   // const h = formatNum(Math.floor((time / 1000 / 60 / 60) % 24))
+export const milisecondsToHoursMins = (miliseconds: number) => {
+   const totalMins: number = Math.floor(miliseconds / (1000 * 60))
+	const hours: number = Math.floor(totalMins / 60)
+	const mins: number = totalMins % 60
+   return { hours, mins }
+}
 
+export const timestampToDateTime = (time: number) => {
    const h = formatNum(Math.floor(time / (1000 * 60 * 60)))
    const m = formatNum(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)))
    const s = formatNum(Math.floor((time % (1000 * 60)) / 1000))

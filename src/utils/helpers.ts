@@ -42,40 +42,34 @@ export const convertObjectKeysToSnakeCase = (obj: any) => {
    }, {})
 }
 
-// export const handleFastingRecords = (startTimestamp: number, endTimestamp: number) => {
-//    const startDate = new Date(startTimestamp)
-//    const endDate = new Date(endTimestamp)
-//    const fastingData = {}
+export const handleHydrateRecords = (records: any[]) => {
+   const daysIntake: any[] = []
 
-//    const currentDate = new Date(startDate)
-//    while (currentDate.getDate() <= endDate.getDate() + 1) {
-//       const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())
-//       const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+   const standard = records.reduce((acc: any, cur: any) => {
+		const { id, date, value, goal } = cur
+		acc[date] = { id, value, goal }
+		return acc
+	}, {})
 
-//       const startTimeStamp = Math.max(startOfDay.getTime(), startDate.getTime())
-//       const endTimeStamp = Math.min(endOfDay.getTime(), endDate.getTime())
+	const chartData = getDatesRange(122).map(e => {
+		const r = standard[e.value]
+		if (r) {
+			const { value, goal, id } = r
+         daysIntake.push(value)
+			return { date: e.value, value, goal, id }
+		}
+		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
+	})
 
-//       const totalMilliseconds = endTimeStamp - startTimeStamp
-//       const totalHours = totalMilliseconds / (1000 * 60 * 60)
-
-//       if (totalHours >= 1) {
-//          const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
-//          const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
-//          const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
-//          const y = currentDate.getFullYear()
-//          const m = formatNum(currentDate.getMonth() + 1)
-//          const d = formatNum(currentDate.getDate())
-//          const date: string = `${y}-${m}-${d}`
-//          fastingData[date] = { startTime, endTime, totalHours: Math.round(totalHours) }
-//       }
-
-//       currentDate.setDate(currentDate.getDate() + 1)
-//    }
-//    return fastingData
-// }
+   const avgIntake: number = daysIntake.reduce((acc: any, cur: any) => acc + cur, 0) / daysIntake.length
+   return { chartData, avgIntake }
+}
 
 export const handleFastingRecords = (records: any[]) => {
-   const transfom = (startTimestamp: number, endTimestamp: number) => {
+   let maxMiliseconds: number = 0
+   const daysHours: any[] = []
+
+   const transform = (startTimestamp: number, endTimestamp: number) => {
       const startDate = new Date(startTimestamp)
       const endDate = new Date(endTimestamp)
       const fastingData = {}
@@ -92,7 +86,7 @@ export const handleFastingRecords = (records: any[]) => {
          const totalHours = totalMilliseconds / (1000 * 60 * 60)
 
          if (totalHours >= 1) {
-            const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' })
+            const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: false })
             const startTime = formatter.format(getLocalTimeV1(new Date(startTimeStamp)))
             const endTime = formatter.format(getLocalTimeV1(new Date(endTimeStamp)))
             const y = currentDate.getFullYear()
@@ -109,7 +103,9 @@ export const handleFastingRecords = (records: any[]) => {
 
    const standard = records.reduce((acc, cur) => {
       const { startTimeStamp, endTimeStamp } = cur
-      const handled = transfom(startTimeStamp, endTimeStamp)
+      const totalMiliseconds: number = endTimeStamp - startTimeStamp
+      if (totalMiliseconds > maxMiliseconds) maxMiliseconds = totalMiliseconds
+      const handled = transform(startTimeStamp, endTimeStamp)
       const dates = Object.keys(handled)
       for (let i = 0; i < dates.length; i++) {
          const v = handled[dates[i]]
@@ -118,30 +114,40 @@ export const handleFastingRecords = (records: any[]) => {
       }
       return acc
    }, {})
-
-   return getDatesRange(122).map(e => {
+ 
+   const chartData = getDatesRange(122).map(e => {
 		const r = standard[e.value]
-      return r && { date: e.value, records: r } || `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
+      if (r) {
+         const totalDayHours: number = r.reduce((acc: any, cur: any) => acc + cur.totalHours, 0)
+         daysHours.push(totalDayHours)
+         return { date: e.value, records: r }
+      }
+      return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
 	})
+   
+   const avgHoursPerDay: number = daysHours.reduce((acc: number, cur: number) => acc + cur, 0) / daysHours.length
+   return { chartData, maxMiliseconds, avgHoursPerDay }
 }
 
 export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fastingRecords: any[]) => {
    const handled = [
       ...waterRecords.reduce((acc, cur) => {
-         const { date, times } = cur
+         const { date, times, goal } = cur
          const d = new Date(date)
          const day = getDayTitle(d, true)
          const _d = d.getDate()
-         const month = d.getMonth() + 1
+         const month = d.getMonth()
          const year = d.getFullYear()
          return [...acc, ...times.map((e: any) => {
-            const datetimeCreated: Date = new Date(e.createdAt)
+            const timeRec = convertObjectKeysToCamelCase(e)
+            const datetimeCreated: Date = new Date(timeRec.createdAt)
             const hour: number = datetimeCreated.getHours()
             const min: number = datetimeCreated.getMinutes()
             const sec: number = datetimeCreated.getSeconds()
             return {
-               id: e.id,
-               value: e.value,
+               id: timeRec.id,
+               value: timeRec.value,
+               goal,
                type: 'water',
                day,
                date: _d,
@@ -158,7 +164,7 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fast
          const datetimeCreated: Date = new Date(cur.createdAt)
          const day = getDayTitle(datetimeCreated, true)
          const date = datetimeCreated.getDate()
-         const month = datetimeCreated.getMonth() + 1
+         const month = datetimeCreated.getMonth()
          const year = datetimeCreated.getFullYear()
          const hour = datetimeCreated.getHours()
          const min = datetimeCreated.getMinutes()
@@ -181,7 +187,7 @@ export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fast
          const datetimeCreated: Date = new Date(cur.createdAt.split('+')[0])
          const day = getDayTitle(datetimeCreated, true)
          const date = datetimeCreated.getDate()
-         const month = datetimeCreated.getMonth() + 1
+         const month = datetimeCreated.getMonth()
          const year = datetimeCreated.getFullYear()
          const hour = datetimeCreated.getHours()
          const min = datetimeCreated.getMinutes()

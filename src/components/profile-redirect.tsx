@@ -1,9 +1,9 @@
-import { ReactNode, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated } from 'react-native'
+import { ReactNode } from 'react'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon } from '@assets/icons'
-import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 
 interface ProfileRedirectProps {
    title: string, 
@@ -12,34 +12,14 @@ interface ProfileRedirectProps {
 }
 
 export default ({ title, onPress, children }: ProfileRedirectProps): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1,
-         duration: 840,
-         useNativeDriver: true
-      }).start()
-   }, [])
-
    return (
-      <AnimatedPressable 
-         style={{
-            ...styles.horz, 
-            ...styles.container,
-            opacity: animateValue,
-            transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1], 
-					outputRange: [-50, 0]
-				}) }]
-         }} 
-         {...{ onPress }}>
-         <View style={styles.horz}>
+      <Pressable style={{...commonStyles.hrz, ...styles.container }} {...{ onPress }}>
+         <View style={commonStyles.hrz}>
             { children }
             <Text style={styles.title}>{title}</Text>
          </View>
          <BackIcon style={styles.redirectIc} width={hS(7)} height={vS(12)} />
-      </AnimatedPressable>
+      </Pressable>
    )
 }
 
@@ -52,11 +32,6 @@ const styles = StyleSheet.create({
       borderRadius: hS(24), 
       backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, 
       marginTop: vS(16)
-   }, 
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    }, 
 
    title: {

@@ -6,8 +6,8 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon, BodyIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
-import { AnimatedLinearGradient } from './shared/animated'
-import withVisiblitySensor from '@hocs/withVisiblitySensor'
+import { commonStyles } from '@utils/stylesheet'
+import LinearGradient from 'react-native-linear-gradient'
 
 interface BodyPartProps {
    title: string,
@@ -27,33 +27,18 @@ const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
    )
 }
 
-export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
+export default (): JSX.Element => {
    const navigation = useNavigation<any>()
    const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppStore) => state.user.metadata)
 
    return (
-      isViewable && 
-      <AnimatedLinearGradient
-         style={{
-            ...styles.container,
-            opacity: animateValue,
-            transform: [{ translateX: animateValue.interpolate({
-               inputRange: [0, 1], 
-               outputRange: [-50, 0]
-            }) }]
-         }}
+      <LinearGradient
+         style={styles.container}
          colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
          start={{ x: .5, y: 0 }}
          end={{ x: .52, y: .5 }}>
-         <View style={[styles.horz, styles.header]}>
-            <Animated.Text style={{
-               ...styles.title,
-               opacity: animateValue,
-               transform: [{ translateY: animateValue.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [20, 0]
-               }) }]
-            }}>Body measurement</Animated.Text>
+         <View style={[commonStyles.hrz, styles.header]}>
+            <Animated.Text style={styles.title}>Body measurement</Animated.Text>
             <TouchableOpacity 
                style={styles.editButton} 
                activeOpacity={.8} 
@@ -61,31 +46,15 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>
-         <View style={styles.horz}>
-            <Animated.View
-               style={{
-                  opacity: animateValue,
-                  transform: [{ translateX: animateValue.interpolate({
-                     inputRange: [0, 1], 
-                     outputRange: [-30, 0]
-                  }) }]
-               }}>
+         <View style={commonStyles.hrz}>
+            <View>
                <BodyIcon width={hS(105)} height={vS(105)} />
                <View style={[styles.bodyIndicator, styles.chestIndicator]} />
                <View style={[styles.bodyIndicator, styles.waistIndicator]} />
                <View style={[styles.bodyIndicator, styles.hipsIndicator]} />
                <View style={[styles.bodyIndicator, styles.thighIndicator]} />
-            </Animated.View>
-            <Animated.View 
-               style={{
-                  ...styles.detail, 
-                  ...styles.horz, 
-                  opacity: animateValue,
-                  transform: [{ translateX: animateValue.interpolate({
-                     inputRange: [0, 1], 
-                     outputRange: [30, 0]
-                  }) }]
-               }}>
+            </View>
+            <View style={{...styles.detail, ...commonStyles.hrz}}>
                <View style={styles.detailPart}>
                   <BodyPart title='Chest' indicatorColor={primaryHex} value={chestMeasure} />
                   <BodyPart title='Hips' indicatorColor='#7B3DFF' value={hipsMeasure} />
@@ -95,11 +64,11 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                   <BodyPart title='Waist' indicatorColor='#FAFF00' value={waistMeasure} />
                   <BodyPart title='Thigh' indicatorColor='#FF8A00' value={thighMeasure} />
                </View>
-            </Animated.View>
+            </View>
          </View>
-      </AnimatedLinearGradient> || <View style={styles.container} />
+      </LinearGradient>
    )
-})
+}
 
 const styles = StyleSheet.create({
    container: {
@@ -111,11 +80,6 @@ const styles = StyleSheet.create({
       paddingTop: vS(12), 
       paddingRight: hS(12),
       paddingBottom: vS(18)
-   }, 
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    }, 
    
    header: {

@@ -1,18 +1,17 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { View, Text, StyleSheet, Animated, ScrollView, Pressable } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BluePlusIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
-import { getDatesRange, getMonthTitle } from '@utils/datetimes'
-import { formatNum } from '@utils/helpers'
+import { getMonthTitle } from '@utils/datetimes'
+import { autoId, formatNum, handleHydrateRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { AnimatedLinearGradient, AnimatedTouchableOpacity } from './shared/animated'
 import { commonStyles } from '@utils/stylesheet'
-import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
 const { blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
@@ -58,7 +57,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 				<Text style={styles.recText}>{monthTitle}</Text>
 				<View style={styles.recProg}>
 					<AnimatedLinearGradient
-						style={{...styles.recProgValue, height: `${value / goal * 100}%` }}
+						style={{...styles.recProgValue, height: `${value < goal && (value / goal * 100) || 100}%` }}
 						colors={['rgba(120, 193, 243, .36)', '#78C1F3']}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }} 
@@ -94,59 +93,44 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 	return <View style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0 }} />
 }
 
-export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
-	const waterRecords = useSelector((state: AppStore) => state.user.metadata.waterRecords)
+export default (): JSX.Element => {
 	const navigation = useNavigation<any>()
-
-	const standardWaterRecords = waterRecords.reduce((acc: any, cur: any) => {
-		const { id, date, value, goal } = cur
-		acc[date] = { id, value, goal }
-		return acc
-	}, {})
-
-	const chartData = getDatesRange(122).map(e => {
-		const r = standardWaterRecords[e.value]
-		if (r) {
-			const { value, goal, id } = r
-			return { date: e.value, value, goal, id }
-		}
-		return `${getMonthTitle(e.month, true)} ${formatNum(e.date)}`
-	})
-
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const waterRecords = useSelector((state: AppStore) => state.user.metadata.waterRecords)
+	const { chartData, avgIntake } = useMemo(() => handleHydrateRecords(waterRecords), [waterRecords])
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
-	// if (!isViewable) return <View style={styles.container} />
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: 1,
+			duration: 320,
+			useNativeDriver: true
+		}).start()
+	}, [])
 
 	return (
-		<AnimatedLinearGradient
-			style={{...styles.container, opacity: animateValue }}
+		<LinearGradient
+			style={styles.container}
 			colors={['rgba(154, 197, 244, .24)', 'rgba(154, 197, 244, .7)']}
 			start={{ x: .5, y: 0 }}
 			end={{ x: .5, y: 1 }}>
 			<View style={styles.header}>
-				<Animated.View style={{ 
-					opacity: animateValue, 
-					transform: [{ translateX: animateValue.interpolate({
-						inputRange: [0, 1],
-						outputRange: [-50, 0]
-					}) }]
-				}}>
-					<Text style={styles.headerMainText}>Keep hydrate records</Text>
-					<View style={styles.headerNotes}>
-						<View style={styles.headerNotePart}>
-							<LinearGradient
-								style={styles.headerNoteCircle}
-								colors={[`rgba(${[120, 193, 243].join(', ')}, .6)`, '#78C1F3']}
-								start={{ x: .5, y: 0 }}
-								end={{ x: .5, y: 1 }} />
-							<Text style={styles.headerNoteText}>Completed</Text>
-						</View>
-						<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
-							<View style={{...styles.headerNoteCircle, backgroundColor: '#fafafa' }} />
-							<Text style={styles.headerNoteText}>Goal</Text>
-						</View>
-					</View>
-				</Animated.View>
+				<View>				
+					<Animated.Text style={{
+						...styles.headerMainText,
+						opacity: animateValue, 
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [-50, 0]
+						}) }]
+					}}>
+						Keep hydrate
+					</Animated.Text>
+					{ !noDataFound && <View style={{ marginTop: vS(4) }}>
+						<Text style={{...styles.headerNoteText, marginLeft: 0 }}>Avg. intake</Text>
+						<Text style={styles.value}>{avgIntake.toFixed(1)} <Text style={styles.headerNoteText}>ml</Text></Text>
+					</View> }
+				</View>
 				<AnimatedTouchableOpacity 
 					style={{...styles.hydrateRecsUpdateButton, transform: [{ scale: animateValue }] }} 
 					activeOpacity={.8}
@@ -155,23 +139,36 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				</AnimatedTouchableOpacity>
 			</View>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records} contentContainerStyle={{ alignItems: 'center' }}>
-				{ chartData.map((e, i) => <Record key={i} {...{ item: e, index: i, hideDetail: noDataFound }} />) }
+				{ chartData.map((e, i) => <Record key={`${i}-${autoId('k')}`} {...{ item: e, index: i, hideDetail: noDataFound }} />) }
 			</ScrollView>
-			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
+			<View style={styles.headerNotes}>
+				<View style={styles.headerNotePart}>
+					<LinearGradient
+						style={styles.headerNoteCircle}
+						colors={[`rgba(${[120, 193, 243].join(', ')}, .6)`, '#78C1F3']}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} />
+					<Text style={styles.headerNoteText}>Completed</Text>
+				</View>
+				<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
+					<View style={{...styles.headerNoteCircle, backgroundColor: '#fafafa' }} />
+					<Text style={styles.headerNoteText}>Goal</Text>
+				</View>
+			</View>
 			{ noDataFound && 
 			<View style={blurOverlayWrapper}>
 				<BlurView style={blurOverlay} blurType='light' blurAmount={3} />
 				<Text style={noDataText}>No data found</Text>
 			</View> }
-		</AnimatedLinearGradient>
+		</LinearGradient>
 	)
-})
+}
 
 const styles = StyleSheet.create({
 	container: {
 		marginTop: vS(24),
 		width: hS(370),
-		height: vS(400),
+		height: vS(440),
 		justifyContent: 'space-between',
 		paddingVertical: vS(16),
 		paddingHorizontal: hS(18),
@@ -194,8 +191,9 @@ const styles = StyleSheet.create({
 	},
 
 	headerNotes: {
-		marginTop: vS(6),
+		width: '100%',
 		flexDirection: 'row',
+		justifyContent: 'center',
 		alignItems: 'center'
 	},
 
@@ -227,21 +225,20 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff'
 	},
 
+	value: {
+		fontFamily: 'Poppins-SemiBold',
+      fontSize: hS(28), 
+      color: darkHex, 
+      letterSpacing: .2
+	},
+
 	records: {
 		position: 'absolute',
-		top: 0, 
+		top: vS(36), 
 		left: 0,
 		width: '100%',
 		height: vS(450),
 		overflow: 'visible',
-	},
-
-	lastUpdatedText: {
-		fontFamily: 'Poppins-Regular', 
-		fontSize: hS(11), 
-		color: darkHex,
-		letterSpacing: .2,
-		alignSelf: 'center'
 	},
 
 	rec: {

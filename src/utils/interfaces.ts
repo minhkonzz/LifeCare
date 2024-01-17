@@ -23,7 +23,8 @@ export interface WheelPickerProps {
 export interface OptionProps {
    item: string 
    index: number
-   stateKey: string
+   stateKey: string,
+   setError: Dispatch<SetStateAction<string>>
 }
 
 export interface AnimatedNumberProps {
@@ -55,7 +56,6 @@ export interface SurveyState {
    firstMealTime: string
    lastMealTime: string
    healthConcerns: string[]
-   sleepHours: string
 }
 
 export interface InitialPersonalData {

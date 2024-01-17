@@ -57,19 +57,23 @@ export default (): JSX.Element => {
       let dailyWater = 2500
 
       if (isOnline) {
-         const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY)
-         const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
-         const prompt = getPrompt()
-         const ans = await model.generateContent(prompt)
-         const res = ans.response.text()
-         const startIndex = res.indexOf('{')
-         const endIndex = res.lastIndexOf('}')
-         const subRes = res.substring(startIndex, endIndex + 1)
-         const recommendResult = JSON.parse(subRes)
-         if (recommendResult) {
-            recommendation = recommendResult
-            const { daily_water } = recommendResult
-            if (daily_water) dailyWater = daily_water
+         try {
+            const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY)
+            const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+            const prompt = getPrompt()
+            const ans = await model.generateContent(prompt)
+            const res = ans.response.text()
+            const startIndex = res.indexOf('{')
+            const endIndex = res.lastIndexOf('}')
+            const subRes = res.substring(startIndex, endIndex + 1)
+            const recommendResult = JSON.parse(subRes)
+            if (recommendResult) {
+               recommendation = recommendResult
+               const { daily_water } = recommendResult
+               if (daily_water) dailyWater = daily_water
+            }
+         } catch (error) {
+            console.log('Cannot get recommendation')
          }
       }
 

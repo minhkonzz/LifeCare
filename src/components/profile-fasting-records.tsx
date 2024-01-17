@@ -1,16 +1,16 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { View, StyleSheet, ScrollView, Text, Animated, Pressable } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
-import { getMonthTitle } from '@utils/datetimes'
-import { formatNum, handleFastingRecords } from '@utils/helpers'
+import { getMonthTitle, milisecondsToHoursMins } from '@utils/datetimes'
+import { autoId, formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { PolygonIcon } from '@assets/icons'
 import { AnimatedLinearGradient } from './shared/animated'
-import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
+import { commonStyles } from '@utils/stylesheet'
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail?: boolean }) => {
 	if (!hideDetail) {
@@ -29,21 +29,25 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		const { date, records } = item
 		const [ y, m, d ] = date.split('-')
 		const monthTitle = getMonthTitle(m - 1, true)
+		console.log('\n')
 
 		const detail = useMemo(() => {
 			return records.reduce((acc: any, cur: any) => {
 				const { startTime, endTime, totalHours } = cur
 				const [ s1, s2 ] = startTime.split(' ')
 				const [ hours, mins ] = s1.split(':').map(Number)
-				const hoursPassed = hours + (s2 === 'PM' && (hours === 12 ? 0 : 12)) + (mins > 50 ? 1 : 0)
-				
-				const Component = () =>
+				const hoursPassed = hours + (s2 === 'PM' && (hours === 12 ? 0 : 12)) + mins / 60
+
+				const Component = () => {
+					return (
 					<LinearGradient
-						style={{...styles.recProgValue, height: `${totalHours / 24 * 100}%`, top: `${Math.floor(hoursPassed / 24 * 100)}%` }}
+						style={{...styles.recProgValue, height: `${totalHours / 24 * 100}%`, top: `${hoursPassed / 24 * 100}%` }}
 						colors={[`rgba(${primaryRgb.join(', ')}, .36)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }} 
 					/>
+					)
+				}
 	
 				return {
 					totalHours: acc.totalHours + totalHours,
@@ -54,10 +58,12 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 			}, { totalHours: 0, times: [], components: [] })
 		}, [])
 
+		const { totalHours, times, components } = detail
+
 		const DayRecords = () => <>
-			{ detail.components.map((e: any) => {
+			{ components.map((e: any, i: number) => {
 				const Component = e
-				return <Component />
+				return <Component key={`${i}-${autoId('k')}`} />
 			}) }
 		</>
 
@@ -85,10 +91,9 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					style={{
 						position: 'absolute',
 						top: hS(20),
-						width: hS(140),
-						height: vS(70),
+						width: hS(132),
 						borderRadius: hS(12),
-						padding: hS(12),
+						padding: hS(14),
 						opacity: detailAnimateValue,
 						transform: [{ translateY: detailAnimateValue.interpolate({
 							inputRange: [0, 1],
@@ -98,8 +103,29 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .52, y: .5 }}>
-					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Total: ${detail.totalHours} hours`}</Text>
-					{ detail.times.map((e: any) => <Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(4) }}>{`${e.startTime} to ${e.endTime}`}</Text>) }
+					<Text style={{ 
+						color: '#fff', 
+						fontFamily: 'Poppins-Medium', 
+						fontSize: hS(10), 
+						letterSpacing: .2, 
+						height: vS(15), 
+						marginVertical: 3
+					}}>
+						{`Total: ${detail.totalHours} hours`}
+					</Text>
+					{ 	
+						totalHours !== 24 && times.map((e: any) => 
+						<Text style={{ 
+							color: '#fff', 
+							fontFamily: 'Poppins-Medium', 
+							fontSize: hS(10), 
+							letterSpacing: .2, 
+							marginVertical: 3, 
+							height: vS(15) 
+						}}>
+							{`${e.startTime} to ${e.endTime}`}
+						</Text> ) 
+					}
 					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25), left: hS(60) }} width={16} />
 				</AnimatedLinearGradient> }
 			</Pressable>
@@ -109,14 +135,24 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 	return <View style={{...styles.recProg, marginLeft: index > 0 ? hS(18) : 0}} />
 }
 
-export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
+export default (): JSX.Element => {
+	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
-	const chartData = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
+	const { chartData, avgHoursPerDay, maxMiliseconds } = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
+	const { hours, mins } = milisecondsToHoursMins(maxMiliseconds)
 	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: 1,
+			duration: 320,
+			useNativeDriver: true
+		}).start()
+	}, [])
+
 	return (
-		<AnimatedLinearGradient
-			style={{...styles.container, opacity: animateValue }}
+		<LinearGradient
+			style={styles.container}
 			colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
 			start={{ x: .5, y: 0 }}
 			end={{ x: .5, y: 1 }}>
@@ -128,21 +164,17 @@ export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.V
 					outputRange: [-50, 0]
 				}) }]
 			}}>
-				<Text style={styles.headerMainText}>Recent Fasting</Text>
-				<View style={styles.headerNotes}>
-					<View style={styles.headerNotePart}>
-						<LinearGradient
-							style={styles.headerNoteCircle}
-							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-							start={{ x: .5, y: 0 }}
-							end={{ x: .5, y: 1 }} />
-						<Text style={styles.headerNoteText}>Fasting</Text>
+				<Text style={styles.headerMainText}>Fasting</Text>
+				{ !noDataFound && <View style={commonStyles.hrz}>
+					<View>
+						<Text style={{...styles.headerNoteText, marginLeft: 0 }}>Avg. per day</Text>
+						<Text style={styles.value}>{avgHoursPerDay.toFixed(1)} <Text style={styles.headerNoteText}>hrs</Text></Text>
 					</View>
-					<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
-						<View style={{...styles.headerNoteCircle, backgroundColor: `rgba(${darkRgb.join(', ')}, .28)` }} />
-						<Text style={styles.headerNoteText}>Eating</Text>
+					<View style={styles.longestFast}>
+						<Text style={{...styles.headerNoteText, marginLeft: 0 }}>Longest fast</Text>
+						<Text style={styles.value}>{hours} <Text style={styles.headerNoteText}>h</Text> {mins} <Text style={styles.headerNoteText}>m</Text></Text>
 					</View>
-				</View>
+				</View> }
 			</Animated.View>
 			<View style={styles.main}>
 				<View style={styles.dayHours}>
@@ -152,18 +184,31 @@ export default withVisiblitySensor(({ animateValue }: { animateValue: Animated.V
 				}
 				</View>
 				<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records}>
-					{ chartData.map((e, i) => <Record key={i} {...{ item: e, index: i, hideDetail: noDataFound }}/>) }
+					{ chartData.map((e, i) => <Record key={`${i}-${autoId('k')}`} {...{ item: e, index: i, hideDetail: noDataFound }}/>) }
 				</ScrollView>
 			</View>
-			<Animated.Text style={{...styles.lastUpdatedText, opacity: animateValue }}>Last updated 3 minutes</Animated.Text>
+			<View style={styles.headerNotes}>
+				<View style={styles.headerNotePart}>
+					<LinearGradient
+						style={styles.headerNoteCircle}
+						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} />
+					<Text style={styles.headerNoteText}>Fasting</Text>
+				</View>
+				<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
+					<View style={{...styles.headerNoteCircle, backgroundColor: `rgba(${darkRgb.join(', ')}, .28)` }} />
+					<Text style={styles.headerNoteText}>Eating</Text>
+				</View>
+			</View>
 			{ noDataFound && 
 			<View style={styles.blurOverlayWrapper}>
 				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={3} />
 				<Text style={styles.noDataText}>No data found</Text>
 			</View> }
-		</AnimatedLinearGradient>
+		</LinearGradient>
 	)
-})
+}
 
 const styles = StyleSheet.create({
 	blurOverlayWrapper: {		
@@ -206,14 +251,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 
-	lastUpdatedText: {
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(11),
-		color: darkHex,
-		letterSpacing: .2,
-		alignSelf: 'center'
-	},
-
 	headerNoteCircle: {
 		width: hS(10),
 		height: vS(10),
@@ -228,14 +265,16 @@ const styles = StyleSheet.create({
 	},
 
 	headerNotes: {
-		marginTop: vS(6),
+		width: '100%',
 		flexDirection: 'row',
+		justifyContent: 'center',
 		alignItems: 'center'
 	},
 
 	headerNotePart: {
 		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		marginHorizontal: hS(18)
 	},
 
 	headerNoteText: {
@@ -251,7 +290,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		width: hS(369),
-		height: vS(400),
+		height: vS(440),
 		borderRadius: hS(32),
 		paddingHorizontal: hS(18),
 		paddingTop: vS(18),
@@ -287,6 +326,17 @@ const styles = StyleSheet.create({
 		color: darkHex,
 		letterSpacing: .2,
 		marginLeft: hS(8)
+	},
+
+	value: {
+		fontFamily: 'Poppins-SemiBold',
+      fontSize: hS(28), 
+      color: darkHex, 
+      letterSpacing: .2
+	},
+
+	longestFast: {
+		marginLeft: hS(36)
 	},
 
 	records: {

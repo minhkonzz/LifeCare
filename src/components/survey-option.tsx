@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Pressable, Text, StyleSheet } from 'react-native'
 import { CheckmarkIcon } from '@assets/icons'
 import { OptionProps } from '@utils/interfaces'
@@ -7,12 +8,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '../store'
 import { submitSurveyOption } from '@store/survey'
 
-export default ({ item, index, stateKey }: OptionProps) => {
+export default memo(({ item, index, stateKey, setError }: OptionProps) => {
    const dispatch = useDispatch()
    const value = useSelector((state: AppStore) => state.survey[stateKey])
    const isChecked = Array.isArray(value) && value.includes(item) || value === item
 
    const onPress = () => {
+      setError('')
       if (typeof value === 'string') {
          dispatch(submitSurveyOption({ k: stateKey, v: item }))
          return
@@ -34,7 +36,7 @@ export default ({ item, index, stateKey }: OptionProps) => {
          { isChecked && <CheckmarkIcon width={hS(32)} height={vS(32)} /> }
       </Pressable>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {

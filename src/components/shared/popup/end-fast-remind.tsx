@@ -20,11 +20,7 @@ export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: (
       const dispatch = useDispatch()
 
       const onSave = async () => {
-         if (enabled) {
-            dispatch(updateEndFastRemind({ beforeStartFast: 0 }))
-            return
-         }
-         dispatch(updateEndFastRemind({ beforeStartFast: mins }))
+         dispatch(updateEndFastRemind(enabled ? 0 : mins))
       }
 
       const onTogglePress = () => {

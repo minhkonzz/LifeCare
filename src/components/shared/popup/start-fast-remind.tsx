@@ -11,17 +11,13 @@ import MeasureInput from '../measure-input'
 import SettingToggle from '@components/shared/setting-toggle'
 
 export default withPopupBehavior(({ onConfirm }: { onConfirm: (afterDisappear: () => Promise<void>) => void }) => {
-      const beforeStartFast = useSelector((state: AppStore) => state.setting.reminders.beforeStartFast)
+      const { beforeStartFast } = useSelector((state: AppStore) => state.setting.reminders)
       const [ enabled, setEnabled ] = useState<boolean>(!beforeStartFast)
       const [ mins, setMins ] = useState<number>(beforeStartFast)
       const dispatch = useDispatch()
 
       const onSave = async () => {
-         if (enabled) {
-            dispatch(updateStartFastRemind({ beforeStartFast: 0 }))
-            return
-         }
-         dispatch(updateStartFastRemind({ beforeStartFast: mins }))
+         dispatch(updateStartFastRemind(enabled ? 0 : mins))
       }
 
       const onTogglePress = () => {

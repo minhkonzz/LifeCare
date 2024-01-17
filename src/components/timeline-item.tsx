@@ -6,6 +6,8 @@ import { WatercupIcon, OrangeWeightIcon } from '@assets/icons'
 import { getMonthTitle } from '@utils/datetimes'
 import { PopupContext } from '@contexts/popup'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
+import { AppStore } from '@store/index'
 import TimelineWeightUpdate from '@components/shared/popup/timeline-weight-update'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -57,12 +59,14 @@ const FastingTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
                </View>
             </LinearGradient>
          </Pressable>
-         { !isLast && <View style={{...styles.iconIndicator, marginLeft: hS(14) }} /> }
+         { !isLast && <View style={{...styles.iconIndicator, marginLeft: hS(14), height: vS(48) }} /> }
       </View>
    )
 }
 
 const WaterDrinkTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
+   const { hour, min, goal, value } = item
+   
    return (
       <>
          <View style={styles.iconWrapper}>
@@ -72,12 +76,12 @@ const WaterDrinkTimeline = ({ item, isLast }: { item: any, isLast: boolean }) =>
             { !isLast && <View style={styles.iconIndicator} /> }
          </View>
          <Pressable style={styles.timelineRight} >
-            <Text style={styles.time}>{`${item.hour}:${item.min}`}</Text>
+            <Text style={styles.time}>{`${formatNum(hour)}:${formatNum(min)}`}</Text>
             <View style={styles.detail}>
                <Text style={styles.name}>Drink water</Text>
                <View style={styles.valueWrapper}>
-                  <Text style={{...styles.value, color: 'rgba(70, 130, 169, .6)' }}>{`${item.value} ml`}</Text>
-                  <Text style={styles.bonus}>2.5</Text>
+                  <Text style={{...styles.value, color: 'rgba(70, 130, 169, .6)' }}>{`${value} ml`}</Text>
+                  <Text style={styles.bonus}>{`Goal: ${goal}`}</Text>
                </View>
             </View>
          </Pressable>
@@ -87,6 +91,8 @@ const WaterDrinkTimeline = ({ item, isLast }: { item: any, isLast: boolean }) =>
 
 const WeightTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
    const { setPopup } = useContext<any>(PopupContext)
+   const { startWeight } = useSelector((state: AppStore) => state.user.metadata)
+   const { value } = item
 
    const UpdatePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) =>
       <TimelineWeightUpdate {...{ setVisible, timelineTimeRecord: item }} />
@@ -98,14 +104,14 @@ const WeightTimeline = ({ item, isLast }: { item: any, isLast: boolean }) => {
             <View style={{...styles.iconBackground, backgroundColor: 'rgba(255, 211, 110, .28)' }}>
                <OrangeWeightIcon width={hS(17)} height={vS(23.5)} />
             </View>
-            { !isLast && <View style={styles.iconIndicator} /> }
+            { !isLast && <View style={{...styles.iconIndicator, height: vS(48) }} /> }
          </View>
          <Pressable style={{...styles.timelineRight, marginTop: 0 }} onPress={() => setPopup(UpdatePopup)} >
             <View style={styles.detail}>
                <Text style={styles.name}>Weight</Text>
                <View style={styles.valueWrapper}>
-                  <Text style={{...styles.value, color: '#FFD36E' }}>{`${item.value} kg`}</Text>
-                  <Text style={styles.bonus}>2.5</Text>
+                  <Text style={{...styles.value, color: '#FFD36E' }}>{`${value} kg`}</Text>
+                  <Text style={styles.bonus}>{`Loss: ${startWeight - value} kg`}</Text>
                </View>
             </View>
          </Pressable>
@@ -121,7 +127,6 @@ const timelineTypes = {
 
 export default ({ item, index, isLast }: TimelineItemProps): JSX.Element => {
    const TimelineItem = timelineTypes[item.type]
-
    return (
       <View style={{...styles.container, marginTop: (index > 0 ? vS(12) : 0) }}>
          <Text style={styles.date}>{`${item.day}, ${getMonthTitle(item.month, true)} ${item.date}`}</Text>
@@ -212,7 +217,7 @@ const styles = StyleSheet.create({
 
    bonus: {
       fontFamily: 'Poppins-Medium', 
-      fontSize: hS(9), 
+      fontSize: hS(12), 
       color: `rgba(${darkRgb.join(', ')}, .6)`, 
       marginTop: vS(4)
    }

@@ -1,14 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { SettingState } from '@utils/types'
 
-import { 
-   configPushNotification,
-   configPushWeightNotification,
-   configPushStartFastNotification,
-   configPushEndFastNotification,
-   configPushWaterDrinkNotification
-} from '@configs/push-notification'
-
 const initialState: SettingState = {
    notification: false, 
    darkmode: false, 
@@ -31,8 +23,8 @@ const initialState: SettingState = {
          m: 30
       },
       waterInterval: {
-         h: 1,
-         m: 30
+         h: 0,
+         m: 10
       }
    }
 }
@@ -57,47 +49,34 @@ const SettingSlice = createSlice({
          state.lang = action.payload 
       }, 
 
-      initReminders: (state, action) => {
-         const drinked = action.payload
-         const { startWater, endWater, waterInterval } = state.reminders
-         configPushNotification({
-            startWater,
-            endWater,
-            waterInterval,
-            drinked
-         })
-      },
-
       updateStartFastRemind: (state, action) => {
-         const { startFast, beforeStartFast } = action.payload
-         configPushStartFastNotification({ startFast, beforeStartFast })
+         const beforeStartFast = action.payload
          state.reminders = {...state.reminders, beforeStartFast }
       },
 
       updateEndFastRemind: (state, action) => {
-         const { endFast, beforeEndFast } = action.payload
-         configPushEndFastNotification({ endFast, beforeEndFast })
+         const beforeEndFast = action.payload
          state.reminders = {...state.reminders, beforeEndFast }
       },
 
       updateWeightRemind: (state, action) => {
          const { days, h, m } = action.payload
-         state.reminders = {...state.reminders, repeatWeight: { days, h, m } }
+         state.reminders.repeatWeight = { days, h, m }
       },
 
       updateStartWaterRemind: (state, action) => {
          const { h, m } = action.payload
-         state.reminders = {...state.reminders, startWater: { h, m }}
+         state.reminders.startWater = { h, m }
       }, 
 
       updateEndWaterRemind: (state, action) => {
          const { h, m } = action.payload
-         state.reminders = {...state.reminders, endWater: { h, m }}
+         state.reminders.endWater = { h, m }
       }, 
 
       updateWaterInterval: (state, action) => {
          const { h, m } = action.payload
-         state.reminders = { ...state.reminders, waterInterval: { h, m } }
+         state.reminders.waterInterval = { h, m }
       }
    }
 })
@@ -107,7 +86,6 @@ export const {
    updateLang, 
    updateNotififcation,
    updateSyncGoogleFit,
-   initReminders,
    updateStartFastRemind,
    updateEndFastRemind,
    updateWeightRemind,
