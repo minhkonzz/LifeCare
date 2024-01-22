@@ -1,20 +1,21 @@
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { darkHex, strongBlueHex } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
-import { enqueueAction, updateMetadata } from '../store/user'
-
+import { enqueueAction, updateMetadata } from '@store/user'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
 import useSession from '@hooks/useSession'
-import { autoId } from '@utils/helpers'
-import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+
+import useAnimValue from '@hooks/useAnimValue'
 
 export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const { userId } = useSession()
    const dispatch = useDispatch()
    const navigation = useNavigation<any>()

@@ -5,6 +5,7 @@ import { updateEmail, updatePassword, updatePasswordConfirm, updateName } from '
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { darkRgb } from '@utils/constants/colors'
 import { EyeIcon, EyeHidedIcon } from '@assets/icons'
+import useAnimValue from '@hooks/useAnimValue'
 
 const onChangeTextActions = {
    'email': updateEmail,
@@ -34,7 +35,7 @@ export default ({
    hide = false,
    onFocus
 }: AuthInputProps): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const dispatch = useDispatch()
    const [ hided, setHided ] = useState<boolean>(hide)
    const onChangeTextAction = onChangeTextActions[type]

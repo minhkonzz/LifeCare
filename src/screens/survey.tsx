@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useEffect, useRef, useContext, Dispatch, SetStateAction } from 'react'
+import { memo, useMemo, useState, useEffect, useContext, Dispatch, SetStateAction } from 'react'
 
 import {
    View,
@@ -27,10 +27,12 @@ import ValueWheelPicker from '@components/shared/value-wheel-picker'
 import Button from '@components/shared/button/Button'
 import MeasureInput from '@components/shared/measure-input'
 import DoctorAdvisePopup from '@components/shared/popup/doctor-advise'
+import useAnimValue from '@hooks/useAnimValue'
 
 const SCREEN_WIDTH: number = Dimensions.get('window').width
 const PADDING_SIDE: number = hS(24)
 const MAX_CONTENT_WIDTH: number = SCREEN_WIDTH - (PADDING_SIDE * 2)
+const { errorText } = commonStyles
 
 const surveyTitles: Array<{ title: string, error: string }> = [
    { title: 'Choose your goal', error: 'Please choose at least 1 option' },
@@ -54,7 +56,7 @@ const withSelectOptions = (surveyData: Array<{id: number, title: string}>, state
       return (
          <View style={styles.surveyPart}>
             <Text style={styles.optionsTitle}>{title}</Text>
-            { error && <Text style={commonStyles.errorText}>{error}</Text> }
+            { error && <Text style={errorText}>{error}</Text> }
             <FlatList
                {...{ data }}
                style={styles.options}
@@ -91,7 +93,7 @@ const withBodySurvey = (k: string, symb: string) => {
                contentCentered 
                additionalStyles={{ marginLeft: hS(10) }}
             />
-            { error && <Text style={{...commonStyles.errorText, marginTop: vS(10) }}>{error}</Text> }
+            { error && <Text style={{...errorText, marginTop: vS(10) }}>{error}</Text> }
          </View>
       )
    })
@@ -219,7 +221,7 @@ const surveyComponents = [
 
 export default (): JSX.Element => {
    const dispatch = useDispatch()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const bottomBarHeight: number = useDeviceBottomBarHeight()
    const [ error, setError ] = useState<string>('')
    const { setPopup } = useContext<any>(PopupContext)

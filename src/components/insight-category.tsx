@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { View, FlatList, Animated, StyleSheet } from 'react-native'
 import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import InsightHorizontalItem from './insight-horizontal-item'
 import InsightListItem from './insight-list-item'
 import InsightGridItem from './insight-grid-item'
+import useAnimValue from '@hooks/useAnimValue'
 
 const insightTypes = {
 	"grid": InsightGridItem,
@@ -13,7 +14,7 @@ const insightTypes = {
 }
 
 export default ({ item, index }: { item: any, index: number }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 	const { title: category, viewType } = item
 
 	const InsightItem = insightTypes[viewType]

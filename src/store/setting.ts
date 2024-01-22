@@ -24,7 +24,7 @@ const initialState: SettingState = {
       },
       waterInterval: {
          h: 0,
-         m: 10
+         m: 6
       }
    }
 }
@@ -47,7 +47,7 @@ const SettingSlice = createSlice({
 
       updateLang: (state, action) => {
          state.lang = action.payload 
-      }, 
+      },
 
       updateStartFastRemind: (state, action) => {
          const beforeStartFast = action.payload

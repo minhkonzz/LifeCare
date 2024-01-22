@@ -16,7 +16,7 @@ interface Props {
    onPressEdit: Dispatch<SetStateAction<boolean>>
 }
 
-const { blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
+const { hrz, blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
 
 let visitedMonth: string = ''
 let visitedValue: number = 0
@@ -53,10 +53,10 @@ export default memo(({ title, value, onPressEdit, hd }: Props): JSX.Element => {
 
    return (
       <View style={styles.container}>
-         <View style={{...styles.hrz, width: '100%', justifyContent: 'space-between' }}>
+         <View style={{...hrz, width: '100%', justifyContent: 'space-between' }}>
             <View>
                <Text style={styles.title}>{title}</Text>
-               <View style={styles.hrz}>
+               <View style={hrz}>
                   <Text style={styles.currentValue}>{value || '--'}</Text>
                   <Text style={styles.symb}>cm</Text>
                </View>
@@ -123,11 +123,6 @@ const styles = StyleSheet.create({
       color: darkHex,
       letterSpacing: .2
    },
-
-   hrz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
-   }, 
 
    title: {
       fontFamily: 'Poppins-SemiBold', 

@@ -26,30 +26,29 @@ export const formatNum = (value: number): string => {
    return value.toString().padStart(2, '0')
 }
 
-export const convertObjectKeysToCamelCase = (obj: any): any => {
-   return Object.keys(obj).reduce((convertedObj, key) => {
+export const convertObjectKeysToCamelCase = (obj: any): any =>
+   Object.keys(obj).reduce((convertedObj, key) => {
       const convertedKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase())
       convertedObj[convertedKey] = obj[key]
       return convertedObj
    }, {})
-}
 
-export const convertObjectKeysToSnakeCase = (obj: any) => {
-   return Object.keys(obj).reduce((convertedObj, key) => {
+export const convertObjectKeysToSnakeCase = (obj: any) =>
+   Object.keys(obj).reduce((convertedObj, key) => {
       const convertedKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
       convertedObj[convertedKey] = obj[key]
       return convertedObj
    }, {})
-}
 
-export const handleHydrateRecords = (records: any[]) => {
+export const handleHydrateRecords = (records: any[], todayRecord: { id: string, goal: number, value: number, date: string }) => {
    const daysIntake: any[] = []
+   const { id, date, goal, value } = todayRecord
 
    const standard = records.reduce((acc: any, cur: any) => {
 		const { id, date, value, goal } = cur
 		acc[date] = { id, value, goal }
 		return acc
-	}, {})
+	}, { [date]: { id, value, goal } })
 
 	const chartData = getDatesRange(122).map(e => {
 		const r = standard[e.value]
@@ -127,6 +126,40 @@ export const handleFastingRecords = (records: any[]) => {
    
    const avgHoursPerDay: number = daysHours.reduce((acc: number, cur: number) => acc + cur, 0) / daysHours.length
    return { chartData, maxMiliseconds, avgHoursPerDay }
+}
+
+export const handleWeightRecords = (records: any[]) => {
+   let visitedMonth: string = ''
+   let visitedValue: number = 0
+   let startIndex: number = 0
+   let endIndex: number = 0
+
+   const weightRecords = records.filter((e: any) => e.type === 'weight')
+   const standard = weightRecords.reduce((acc: any, cur: any) => {
+      const { id, createdAt, value } = cur
+      const d = new Date(createdAt)
+      acc[`${d.getFullYear()}-${formatNum(d.getMonth() + 1)}-${formatNum(d.getDate())}`] = { id, value }
+      return acc
+   }, {})
+
+   const chartData = getDatesRange(122).map((e, i) => {
+      const r = standard[e.value]
+      const { month, date } = e
+      const monthTitle: string = getMonthTitle(month, true)
+      const isNextMonth: boolean = monthTitle !== visitedMonth
+      if (isNextMonth) visitedMonth = monthTitle
+      const currentPointTitle = `${isNextMonth ? monthTitle + ' ' : '' }${date}`
+      if (r) {
+         const { value } = r
+         if (!startIndex) startIndex = i
+         visitedValue = value
+         endIndex = i
+         return { value, label: currentPointTitle }
+      }
+      return { value: visitedValue, label: currentPointTitle, hideDataPoint: true }
+   })
+
+   return { chartData, startIndex, endIndex }
 }
 
 export const handleTimelineData = (waterRecords: any[], bodyRecords: any[], fastingRecords: any[]) => {

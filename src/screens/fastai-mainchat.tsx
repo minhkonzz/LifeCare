@@ -7,13 +7,14 @@ import { MessageIcon, BackIcon, MicrophoneIcon } from '@assets/icons'
 import { AnimatedLinearGradient } from '@components/shared/animated'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GOOGLE_AI_KEY } from '@env'
+import { autoId } from '@utils/helpers'
 import LottieView from 'lottie-react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { autoId } from '@utils/helpers'
+import useAnimValue from '@hooks/useAnimValue'
 
 const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.Element => {
    const isUserMessage = item.sender === 'user'
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    useEffect(() => {
       if (!sent) {
@@ -36,12 +37,11 @@ const RenderMessage = memo(({ item, sent }: { item: any, sent: boolean }): JSX.E
    )
 
    return (
-      <View
-         style={{
-            flexDirection: isUserMessage ? 'row-reverse' : 'row',
-            alignItems: 'center',
-            paddingVertical: vS(14)
-         }}>
+      <View style={{
+         flexDirection: isUserMessage ? 'row-reverse' : 'row',
+         alignItems: 'center',
+         paddingVertical: vS(14)
+      }}>
          <AnimatedLinearGradient
             style={{
                ...styles.message,
@@ -145,7 +145,8 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between', 
       alignItems: 'center', 
       paddingBottom: vS(27), 
-      paddingHorizontal: hS(24)
+      paddingHorizontal: hS(24),
+      backgroundColor: '#fff'
    }, 
 
    message: {

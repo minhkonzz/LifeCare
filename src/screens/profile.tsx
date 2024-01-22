@@ -21,6 +21,10 @@ import LogoutPopup from '@components/shared/popup/logout'
 import useSession from '@hooks/useSession'
 import LinearGradient from 'react-native-linear-gradient'
 
+const { hrz } = commonStyles
+
+const Blank = () => <View style={styles.blank} />
+
 const Header = (): JSX.Element => {
 	const { metadata } = useSelector((state: AppStore) => state.user)
 	const { setPopup } = useContext<any>(PopupContext)
@@ -29,8 +33,8 @@ const Header = (): JSX.Element => {
 	if (userId) {
 		const { name, email } = metadata
 		return ( 
-			<View style={{...styles.profileUser, ...commonStyles.hrz}}>
-				<View style={styles.horz}>
+			<View style={{...styles.profileUser, ...hrz}}>
+				<View style={hrz}>
 					<Image 
 						style={styles.avatar} 
 						source={require('../assets/images/UserAvatar.png')} />
@@ -49,13 +53,13 @@ const Header = (): JSX.Element => {
 			</View>
 		)
 	}
-	return <Backup />
+	return <></>
 }
 
 const PlanUpgrade = () => {
 	return (
 		<LinearGradient
-			style={{...commonStyles.hrz, ...styles.upgradePlan }}
+			style={{...hrz, ...styles.upgradePlan }}
 			colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
 			start={{ x: .5, y: 0 }}
 			end={{ x: .5, y: 1 }}>
@@ -91,6 +95,7 @@ const SettingRef = () => {
 export default (): JSX.Element => {
 	return (
 		<Screen paddingHorzContent header='tab' title='Me' content={[
+			Blank,
 			Header, 
 			PlanUpgrade, 
 			LatestBMI, 
@@ -106,11 +111,7 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({	
 	container: { flex: 1 },
-
-	horz: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
+	blank: { height: vS(65) },
 
 	profileUser: {
 		width: hS(366),

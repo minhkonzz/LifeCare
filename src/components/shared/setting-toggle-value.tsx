@@ -1,15 +1,17 @@
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Animated, StyleSheet, Easing, Pressable, View, Text } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface SettingToggleValueProps {
    value: [string, string]
    w?: number,
    onPress?: () => void
 }
+
 export default ({ value, w, onPress }: SettingToggleValueProps): JSX.Element => {
-   const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const translateX = useAnimValue(0)
    const [enabled, setEnabled] = useState<boolean>(false)
 
    useEffect(() => {

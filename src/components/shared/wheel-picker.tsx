@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react'
+import { memo } from 'react'
 import {
 	Animated,
 	ListRenderItemInfo,
@@ -10,11 +10,12 @@ import {
 
 import { darkHex } from '@utils/constants/colors'
 import { WheelPickerProps } from '@utils/interfaces'
+import useAnimValue from '@hooks/useAnimValue'
 
 let valueScrolledTo: string | number = 0
 
 export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex }: WheelPickerProps): JSX.Element => {
-	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
+	const scrollY = useAnimValue(0)
 
 	const momentumScrollEnd = (
 		event: NativeSyntheticEvent<NativeScrollEvent>,

@@ -1,10 +1,11 @@
-import { FC, useState, useRef, useContext } from 'react'
+import { FC, useState, useContext } from 'react'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
 import { AppStore } from '../store'
 import { useSelector } from 'react-redux'
 import { formatNum } from '@utils/helpers'
 import { PopupContext } from '@contexts/popup'
+import { commonStyles } from '@utils/stylesheet'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
 import reminderData from '@assets/data/reminder.json'
@@ -14,6 +15,7 @@ import RemindEndFastPopup from '@components/shared/popup/end-fast-remind'
 import WaterStartRemindPopup from '@components/shared/popup/water-start-remind'
 import WaterEndRemindPopup from '@components/shared/popup/water-end-remind'
 import WaterRemindIntervalPopup from '@components/shared/popup/water-interval-remind'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface ReminderSectionProps {
 	title: string,
@@ -24,7 +26,7 @@ const reminderCallbacks = {}
 const reminderValues = {}
 
 const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 	const [ isEnabled, setIsEnabled ] = useState<boolean>(false)
 
 	const onPress = () => {
@@ -107,7 +109,7 @@ export default (): JSX.Element => {
 	return (
 		<View style={styles.container}>
 			<StackHeader title='Reminder' />
-			<View style={{ width: '100%' }}>
+			<View style={commonStyles.wfull}>
 			{
 				[
 					'Start fasting',

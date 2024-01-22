@@ -6,9 +6,12 @@ import { AppStore } from '../store'
 import { BluePlusIcon, WatercupIcon } from '@assets/icons'
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import WaterWave from '@components/water-wave'
+
+const { hrz } = commonStyles
 
 export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
    const drinked = useSelector((state: AppStore) => state.water.drinked)
@@ -36,7 +39,7 @@ export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element
             </Animated.View>
             <View style={styles.main}>
                <Animated.View style={{
-                  ...styles.horz, 
+                  ...hrz, 
                   ...styles.header, 
                   transform: [{ translateX: animateValue.interpolate({
                      inputRange: [0, 1], 
@@ -54,7 +57,7 @@ export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element
                   }) }]
                }}>
                   <Text style={styles.currentValueText}>{`${drinked} / `}</Text>
-                  <View style={styles.horz}>
+                  <View style={hrz}>
                      <AnimatedText value={dailyWater} style={styles.currentValue} /> 
                      <Text style={styles.symbolText}>ml</Text>
                   </View>
@@ -114,11 +117,6 @@ const styles = StyleSheet.create({
    main: {
       height: vS(127),
 		justifyContent: 'space-between'
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    header: {

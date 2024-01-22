@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState, useCallback, useEffect, useRef, memo, useContext } from 'react'
+import { Dispatch, SetStateAction, useState, useCallback, useEffect, memo, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { updateTimes, updateCurrentPlan } from '../store/fasting'
 import { toDateTimeV1, getCurrentTimestamp, toTimestampV1 } from '@utils/datetimes'
@@ -12,11 +12,13 @@ import { BackIcon, WhiteBackIcon, PrimaryEditIcon, RestaurantIcon, ElectroIcon, 
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { PopupContext } from '@contexts/popup'
+import { commonStyles } from '@utils/stylesheet'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import DatetimePicker from '@components/shared/datetime-picker'
 import Button from '@components/shared/button/Button'
 import LinearGradient from 'react-native-linear-gradient'
+import useSession from '@hooks/useSession'
 
 import {
 	View,
@@ -28,8 +30,9 @@ import {
 	Animated,
 	ScrollView
 } from 'react-native'
+import useAnimValue from '@hooks/useAnimValue'
 
-import useSession from '@hooks/useSession'
+const { wfull, hrz } = commonStyles
 
 const TimeSetting = ({ 
 	startTime, 
@@ -60,30 +63,30 @@ const TimeSetting = ({
 	return (
 		<View style={styles.fastingTimes}>
 			<View style={styles.fastingTimesHeader}>
-				<View style={styles.horz}>
+				<View style={hrz}>
 					<ElectroIcon width={hS(10)} height={vS(12.5)} />
 					<Text style={styles.hrsDesc}>{`${hrsFast} hours for fasting`}</Text>
 				</View>
-				<View style={{...styles.horz, marginTop: vS(12) }}>
+				<View style={{...hrz, marginTop: vS(12) }}>
 					<RestaurantIcon width={hS(11)} height={vS(11)} />
 					<Text style={styles.hrsDesc}>{`${hrsEat} hours for eating`}</Text>
 				</View>
 			</View>
-			<View style={styles.wfull}>
-				<View style={[styles.horz, styles.timeSetting]}>
-					<View style={styles.horz}>
+			<View style={wfull}>
+				<View style={[hrz, styles.timeSetting]}>
+					<View style={hrz}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
-					<View style={styles.horz}>
+					<View style={hrz}>
 						<Text style={styles.timeSettingValueText}>{startTime}</Text>
 						<Pressable onPress={() => setPopup(DatetimePopup)}>
 							<PrimaryEditIcon width={hS(16)} height={vS(16)} />
 						</Pressable>
 					</View>
 				</View>
-				<View style={{...styles.horz, ...styles.timeSetting, marginTop: vS(28) }}>
-					<View style={styles.horz}>
+				<View style={{...hrz, ...styles.timeSetting, marginTop: vS(28) }}>
+					<View style={hrz}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
@@ -150,7 +153,7 @@ const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 					colors={[`rgba(${lightRgb.join(', ')}, .3)`, lightHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .52, y: .5 }}>
-					<View style={{...styles.horz, marginBottom: vS(5) }}>
+					<View style={{...hrz, marginBottom: vS(5) }}>
 						<LightIcon width={hS(12)} height={vS(16.5)} />
 						<Text style={styles.notesTitle}>PREPARE FOR FASTING</Text>
 					</View>
@@ -180,7 +183,7 @@ const Content = memo(withSync(({ isOnline }: { isOnline: boolean }) => {
 
 export default (): JSX.Element => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const headerColor = useRef<Animated.Value>(new Animated.Value(0)).current
+	const headerColor = useAnimValue(0)
 	const [ headerStyles, setHeaderStyles ] = useState<string>('')
 
 	useEffect(() => {
@@ -214,7 +217,7 @@ export default (): JSX.Element => {
 			</ScrollView>
 			<Animated.View
 				style={{
-					...styles.horz,
+					...hrz,
 					...styles.header,
 					backgroundColor: headerColor.interpolate({
 						inputRange: [0, 1],
@@ -237,15 +240,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#fff',
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
-	},
-
-	wfull: {
-		width: '100%'
-	},
-
-	horz: {
-		flexDirection: 'row',
-		alignItems: 'center'
 	},
 
 	header: {

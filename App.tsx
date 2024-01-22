@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Platform, PermissionsAndroid, Alert } from 'react-native'
+import { Platform, PermissionsAndroid } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context' 
 import { Provider } from 'react-redux'
 import { persistStore } from 'redux-persist'

@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
+import { commonStyles } from '@utils/stylesheet'
 import GenderPopup from '@components/shared/popup/gender'
 import AgePopup from '@components/shared/popup/age'
 import CurrentWeightPopup from '@components/shared/popup/current-weight'
@@ -14,6 +15,7 @@ import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import personalData from '@assets/data/personal-data.json'
 
+const { wfull } = commonStyles
 const settingRowCallbacks = {}
 const settingRowValues = {}
 
@@ -48,7 +50,7 @@ const Main = () => {
 
 	return (
 		<>
-			<View style={styles.wfull}>
+			<View style={wfull}>
 			{
 				personalData['personal-data-01'].map((e, i) =>
 					<SettingRow 
@@ -63,7 +65,7 @@ const Main = () => {
 			}
 			</View>
 			{/* <PrimaryToggleValue additionalStyles={styles.primaryToggle} {...{ options, onChangeOption }} /> */}
-			<View style={styles.wfull}>
+			<View style={wfull}>
 			{
 				personalData['personal-data-02'].map((e, i) =>
 					<SettingRow 
@@ -97,8 +99,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: hS(24),
 		backgroundColor: '#fff'
 	},
-
-	wfull: { width: '100%' },
 
 	primaryToggle: { marginBottom: vS(28) }
 })

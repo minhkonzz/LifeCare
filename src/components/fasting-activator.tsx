@@ -25,12 +25,19 @@ import ConfirmStopFastingPopup from '@components/shared/popup/confirm-stop-fasti
 
 interface ActivateTimeProps {
 	title: string
+	borderColor?: string
 	editable?: boolean
 	current?: boolean
 	value?: string
 }
 
-const FastingActivateTime = ({ title, editable, current, value = '' }: ActivateTimeProps): JSX.Element => {
+const FastingActivateTime = memo(({ 
+	title, 
+	editable,
+	borderColor, 
+	current, 
+	value = '' 
+}: ActivateTimeProps): JSX.Element => {
 	
 	const EditButton = useCallback(() => {
 		const { setPopup } = useContext<any>(PopupContext)
@@ -45,7 +52,7 @@ const FastingActivateTime = ({ title, editable, current, value = '' }: ActivateT
 	return (
 		<View style={styles.fastingActivateTime}>
 			<View style={styles.fastingActivateTimeMain}>
-				<View style={{...styles.boundaryC, borderColor: current && primaryHex || '#ff9b85' }}>
+				<View style={{...styles.boundaryC, borderColor }}>
 					<View style={styles.coreC} />
 				</View>
 				<Text style={styles.text}>{title}</Text>
@@ -61,7 +68,7 @@ const FastingActivateTime = ({ title, editable, current, value = '' }: ActivateT
 			{ editable && <EditButton /> }
 		</View>
 	)
-}
+})
 
 const CurrentFastingStage = memo(withFastingStage(({ stageData: data }: { stageData: any }) => {
 	const navigation = useNavigation<any>()
@@ -113,16 +120,12 @@ const CurrentFastingStage = memo(withFastingStage(({ stageData: data }: { stageD
 export default withSync(withVisiblitySensor(withFastingStage(({ 
 	isViewable, 
 	animateValue,
-	startTimeStamp,
-	endTimeStamp,
-	isFasting,
+	stageData,
 	isOnline
 }: { 
 	isViewable: boolean, 
 	animateValue: Animated.Value,
-	startTimeStamp: number,
-	endTimeStamp: number,
-	isFasting: boolean,
+	stageData: any,
 	isOnline: boolean
 }): JSX.Element => {
 	const dispatch = useDispatch()
@@ -136,19 +139,19 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 			navigation.navigate('plans')
 			return
 		}
-		if (isFasting) {
+		if (stageData) {
 			setPopup(ConfirmStopFastingPopup)
 			return 
 		}
 		setPopup(StartFastingPopup)
 	}
 
-	if (isFasting) {
+	if (stageData) {
 		const currentTimeStamp: number = getCurrentTimestamp()
+		const { startTimeStamp, endTimeStamp } = stageData
 		const isOnFastingTime: boolean = startTimeStamp < currentTimeStamp
 		
 		if (!isOnFastingTime) {
-
 			const onEndPlan = async () => {
 				const payload = { startTimeStamp: 0, endTimeStamp: 0 }
 				const cache = () => {
@@ -241,9 +244,9 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 						outputRange: [-50, 0]
 					}) }]
 				}}>
-					<FastingActivateTime title='Start' editable current={isOnStartDate} value={toDateTimeV1(startTimeStamp)} />
+					<FastingActivateTime title='Start' editable current={isOnStartDate} value={toDateTimeV1(startTimeStamp)} borderColor={primaryHex} />
 					<View style={styles.line} />
-					<FastingActivateTime title='End' current={isOnEndDate} value={toDateTimeV1(endTimeStamp)} />
+					<FastingActivateTime title='End' current={isOnEndDate} value={toDateTimeV1(endTimeStamp)} borderColor='#ff9b85' />
 				</Animated.View> 
 				<AnimatedTouchableOpacity 
 					activeOpacity={.7} 
@@ -289,7 +292,7 @@ export default withSync(withVisiblitySensor(withFastingStage(({
 			</LinearGradient>
 		</AnimatedTouchableOpacity> || <View style={styles.startStopButton} /> 
 	)
-})))
+}, true)))
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react'
 import { View, Text, StyleSheet, Animated } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -7,11 +8,21 @@ import { getMonthTitle } from '@utils/datetimes'
 import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
 import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
-import { useMemo } from 'react'
 
-const Record = ({ 
+const { 
+	wfull,
+	hrz, 
+	blurOverlayWrapper, 
+	blurOverlay, 
+	noDataText,
+	headerMainText,
+	headerNoteCircle 
+} = commonStyles
+
+const Record = memo(({ 
 	item, 
 	index, 
 	hideDetail
@@ -80,7 +91,7 @@ const Record = ({
 				end={{ x: .5, y: 1 }} />
 		</View>
 	)
-}
+})
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
@@ -91,20 +102,19 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 
 	return (
 		<Animated.View style={{...styles.container, opacity: animateValue }}>
-			<View style={styles.header}>
-				<Animated.Text 
-					style={{
-						...styles.title, 
-						opacity: animateValue, 
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-50, 0]
-						}) }]
-					}}>
+			<View style={wfull}>
+				<Animated.Text style={{
+					...headerMainText, 
+					opacity: animateValue, 
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-50, 0]
+					}) }]
+				}}>
 					Fasting records
 				</Animated.Text>
 				<Animated.View style={{
-					...styles.hrz, 
+					...hrz, 
 					marginTop: vS(8), 
 					opacity: animateValue, 
 					transform: [{ translateY: animateValue.interpolate({
@@ -112,18 +122,18 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						outputRange: [-30, 0]
 					}) }]
 				}}>
-					<View style={styles.hrz}>
+					<View style={hrz}>
 						<LinearGradient
-							style={styles.noteColor}
+							style={headerNoteCircle}
 							colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
 						/>
 						<Text style={styles.noteTitle}>Completed</Text>
 					</View>
-					<View style={{...styles.hrz, marginLeft: hS(38) }}>
+					<View style={{...hrz, marginLeft: hS(38) }}>
 						<LinearGradient
-							style={styles.noteColor}
+							style={headerNoteCircle}
 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
@@ -143,9 +153,9 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 				<Text style={styles.timelineText}>Timeline</Text>
 			</AnimatedPressable>
 			{ noDataFound && 
-			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={6} />
-				<Text style={styles.noDataText}>No data found</Text>
+			<View style={blurOverlayWrapper}>
+				<BlurView style={blurOverlay} blurType='light' blurAmount={6} />
+				<Text style={noDataText}>No data found</Text>
 			</View> }
 		</Animated.View>
 	)
@@ -163,50 +173,6 @@ const styles = StyleSheet.create({
 		paddingTop: vS(18),
 		paddingBottom: vS(8),
 		marginTop: vS(27)
-	},
-
-	blurOverlayWrapper: {		
-		position: 'absolute',
-		top: 0,
-		left: 0, 
-		right: 0,
-		bottom: 0,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-
-	blurOverlay: {
-		position: 'absolute',
-		width: '100%',
-		height: '100%'
-	},
-
-	noDataText: {
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(14),
-		color: darkHex,
-		letterSpacing: .2
-	},
-
-	header: {
-		width: '100%'
-	},
-
-	title: {
-		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(15),
-		color: darkHex
-	},
-
-	hrz: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
-
-	noteColor: {
-		width: hS(10),
-		height: vS(10),
-		borderRadius: 25
 	},
 
 	noteTitle: {

@@ -14,6 +14,7 @@ import { WhiteBackIcon, WhiteEditIcon, PrimaryEditIcon } from '@assets/icons'
 import { autoId } from '@utils/helpers'
 import { AnimatedLinearGradient } from '@components/shared/animated'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
 import UpdateStartFastPopup from '@components/shared/popup/update-startfast'
 import UpdateEndFastPopup from '@components/shared/popup/update-endfast'
 import Button from '@components/shared/button/Button'
@@ -23,6 +24,9 @@ import LinearGradient from 'react-native-linear-gradient'
 import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
 import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
+
+const { wfull, hrz } = commonStyles
 
 const TimeSetting = memo(({ 
 	fastingRecId,
@@ -39,7 +43,7 @@ const TimeSetting = memo(({
 	setSavedEndTimeStamp: Dispatch<SetStateAction<number>>,
 	planName: string
 }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 	const { setPopup } = useContext<any>(PopupContext)
 
 	const UpdateStartFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
@@ -82,13 +86,13 @@ const TimeSetting = memo(({
 			}}>
 				<Text style={styles.planNameText}>{planName}</Text>
 			</Animated.View>
-			<View style={styles.wfull}>
+			<View style={wfull}>
 				<View style={styles.timeSetting}>
 					<View style={styles.timeSettingTitle}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
-					<View style={styles.horz}>
+					<View style={hrz}>
 						<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
 						<Pressable onPress={() => setPopup(UpdateStartFastTimePopup)}>
 							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
@@ -100,7 +104,7 @@ const TimeSetting = memo(({
 						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
-					<View style={styles.horz}>
+					<View style={hrz}>
 						<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
 						<Pressable onPress={() => setPopup(UpdateEndFastTimePopup)}>
 							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
@@ -113,8 +117,8 @@ const TimeSetting = memo(({
 })
 
 const TrackWeight = memo((): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
+	const progressAnimateValue = useAnimValue(0)
 	const { setPopup } = useContext<any>(PopupContext)
 	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
 
@@ -137,25 +141,23 @@ const TrackWeight = memo((): JSX.Element => {
 		<Animated.View style={{...styles.trackWeight, opacity: animateValue }}>
 			<View style={styles.trackWeightHeader}>
 				<View>
-					<Animated.Text 
-						style={{
-							...styles.trackWeightTitle,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-30, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.trackWeightTitle,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-30, 0]
+						}) }]
+					}}>
 						Track your weight
 					</Animated.Text>
 					<View style={styles.trackWeightValue}>
-						<Animated.Text 
-							style={{
-								...styles.trackWeightValueText,
-								transform: [{ translateY: animateValue.interpolate({
-									inputRange: [0, 1], 
-									outputRange: [10, 0]
-								}) }]
-							}}>
+						<Animated.Text style={{
+							...styles.trackWeightValueText,
+							transform: [{ translateY: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [10, 0]
+							}) }]
+						}}>
 							{`${currentWeight} kg`}
 						</Animated.Text>
 						<Animated.Text style={{
@@ -197,26 +199,24 @@ const TrackWeight = memo((): JSX.Element => {
 						end={{ x: .5, y: 1 }} />
 				</Animated.View>
 				<View style={styles.weightProcessTexts}>
-					<Animated.Text 
-						style={{
-							...styles.weightProcessText,
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-10, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.weightProcessText,
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-10, 0]
+						}) }]
+					}}>
 						{`Start: ${startWeight} kg`}
 					</Animated.Text>
-					<Animated.Text 
-						style={{
-							...styles.weightProcessText,
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [10, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.weightProcessText,
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [10, 0]
+						}) }]
+					}}>
 						{`Goal: ${goalWeight} kg`}
 					</Animated.Text>
 				</View>
@@ -231,7 +231,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	const dispatch = useDispatch()
 	const route = useRoute()
 	const screenParams: any = route.params
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppStore) => state.fasting)
 
 	let fastingRecId: string = '', startTimeStamp: number, endTimeStamp: number, planName: string
@@ -408,13 +408,6 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 })
 
 const styles = StyleSheet.create({
-	wfull: { width: '100%' },
-
-	horz: {
-		flexDirection: 'row', 
-		alignItems: 'center'
-	},
-
 	container: {
 		backgroundColor: '#fff',
 		flex: 1,

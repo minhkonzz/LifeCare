@@ -1,8 +1,12 @@
 import { StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { darkHex } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 
 export const commonStyles = StyleSheet.create({
+   wfull: {
+      width: '100%'
+   },
+
    hrz: {
       flexDirection: 'row',
       alignItems: 'center'
@@ -59,4 +63,33 @@ export const commonStyles = StyleSheet.create({
 		color: darkHex,
 		letterSpacing: .2
 	},
+
+   headerNoteCircle: {
+		width: hS(10),
+		height: vS(10),
+		borderRadius: 50
+	},
+
+   headerMainText: {
+		fontFamily: 'Poppins-SemiBold',
+		fontSize: hS(15),
+		color: darkHex,
+		letterSpacing: .2
+	},
+
+   headerNotes: {
+		width: '100%',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+
+   headerNoteText: {
+      fontFamily: 'Poppins-Regular',
+		fontSize: hS(12),
+		color: `rgba(${darkRgb.join(', ')}, .7)`,
+		letterSpacing: .2,
+		marginLeft: hS(8),
+      marginTop: vS(4)
+   }
 })

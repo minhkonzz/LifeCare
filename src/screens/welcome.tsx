@@ -1,12 +1,13 @@
-import { useEffect, useRef } from 'react'
-import { View, Text, Image, StyleSheet, Animated } from 'react-native'
+import { useEffect } from 'react'
+import { View, StyleSheet, Animated } from 'react-native'
 import { primaryHex, primaryRgb, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
+import useAnimValue from '@hooks/useAnimValue'
 
 export default (): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 
 	useEffect(() => {
 		Animated.timing(animateValue, {

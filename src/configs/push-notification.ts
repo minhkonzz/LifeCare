@@ -104,12 +104,11 @@ export const configPushWaterDrinkNotification = (bundledConfig: any) => {
       endTime: `${startHour}:${startMin}`
    })
 
-   PushNotification.cancelLocalNotification(`WATER${WATER_REMIND}`)
+   const date: Date = new Date(Date.now() + totalMsUntilPush)
 
    PushNotification.localNotificationSchedule({
       channelId: NOTIFICATION_CHANNEL_ID,
-      id: `WATER${WATER_REMIND}`,
-      date: new Date(Date.now() + totalMsUntilPush),
+      date,
       title: 'Remember to keep track your water',
       message: `Time to drink more water. You drinked ${drinked} ml today`,
       allowWhileIdle: true, 
@@ -120,33 +119,30 @@ export const configPushWaterDrinkNotification = (bundledConfig: any) => {
 }
 
 export const configPushNotification = (bundledConfig: any) => {
-   
-   const { 
-      startWater,
-      endWater, 
-      waterInterval, 
-      drinked
-   } = bundledConfig
-
    PushNotification.configure({
       onRegister: function (token) {},
 
+      onAction: function(notification) {
+         console.log('pushed notification 1', notification)
+      },
+
       onNotification: function (notification) {
-         const { data } = notification
-         const notificationType = data.type
-         switch (notificationType) {
-            case START_FAST_REMIND: {
+         // console.log('pushed notification')
+         // const { data } = notification
+         // const notificationType = data.type
+         // switch (notificationType) {
+         //    case START_FAST_REMIND: {
                
-               return
-            }
-            case END_FAST_REMIND: {  
-               return
-            }
-            case WATER_REMIND: {
-               configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
-               return
-            }
-         }
+         //       return
+         //    }
+         //    case END_FAST_REMIND: {  
+         //       return
+         //    }
+         //    case WATER_REMIND: {
+         //       // configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
+         //       return
+         //    }
+         // }
       },
 
       onRegistrationError: function (err) {

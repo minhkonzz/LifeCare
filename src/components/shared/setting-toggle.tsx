@@ -1,8 +1,8 @@
-import { useRef } from 'react'
 import { StyleSheet, Pressable, Animated, Easing } from 'react-native'
 import { primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface SettingToggleProps {
 	value: boolean, 
@@ -10,7 +10,7 @@ interface SettingToggleProps {
 }
 
 export default ({ value, onPress }: SettingToggleProps): JSX.Element => {
-	const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(hS(value && 40 || 4))).current
+	const translateX = useAnimValue(hS(value && 40 || 4))
 
 	const onToggle = () => {
 		Animated.timing(translateX, {
@@ -18,7 +18,7 @@ export default ({ value, onPress }: SettingToggleProps): JSX.Element => {
 			duration: 100,
 			easing: Easing.bounce,
 			useNativeDriver: true
-		}).start(({ finished }) => {
+		}).start(() => {
 			if (onPress) onPress()
 		})
 	}
@@ -34,7 +34,7 @@ export default ({ value, onPress }: SettingToggleProps): JSX.Element => {
 				}
 				start={{ x: .5, y: 0 }}
 				end={{ x: .5, y: 1 }}>
-				<Animated.View style={[styles.circle, { transform: [{ translateX }] }]} />
+				<Animated.View style={{...styles.circle, transform: [{ translateX }] }} />
 			</LinearGradient>
 		</Pressable>
 	)

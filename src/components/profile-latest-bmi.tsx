@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useMemo, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { PopupContext } from '@contexts/popup'
 import { darkHex, darkRgb } from '@utils/constants/colors'
@@ -15,8 +15,12 @@ import bmiRangesData from '@assets/data/bmi-range-data.json'
 export default (): JSX.Element => {
 	const { setPopup } = useContext<any>(PopupContext)
 	const { currentWeight, currentHeight } = useSelector((state: AppStore) => state.user.metadata)
-	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
-	const bmiStatus: string = getBMIStatus(bmiValue)
+
+	const { bmiValue, bmiStatus } = useMemo(() => {
+		const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
+		const bmiStatus: string = getBMIStatus(bmiValue)
+		return { bmiValue, bmiStatus }
+	}, [currentHeight, currentWeight])
 
 	return (
 		<LinearGradient
@@ -40,7 +44,7 @@ export default (): JSX.Element => {
 				</View>
 			</View>
 			<View>
-				<View style={{ marginLeft: `${(bmiValue - 16) / 24 * 100}%` }}>
+				<View style={{ marginLeft: `${6 + (bmiValue - 16) / 24 * 100}%` }}>
 					<PolygonIcon width={hS(14)} height={vS(14)} />
 				</View>
 				<View style={styles.rangeColors}>

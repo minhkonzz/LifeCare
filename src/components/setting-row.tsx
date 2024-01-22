@@ -1,10 +1,11 @@
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon } from '@assets/icons'
 import SettingToggle from '@components/shared/setting-toggle'
 import SettingToggleValue from './shared/setting-toggle-value'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface SettingRowProps {
     title: string,
@@ -36,7 +37,7 @@ const settingTypes: any = {
 }
 
 export default ({ title, type, value, boldTitle, onPress, additionalStyles }: SettingRowProps): JSX.Element => {
-    const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+    const animateValue = useAnimValue(0)
 
     useEffect(() => {
         Animated.timing(animateValue, {

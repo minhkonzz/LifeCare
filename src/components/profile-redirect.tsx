@@ -5,6 +5,8 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon } from '@assets/icons'
 import { commonStyles } from '@utils/stylesheet'
 
+const { hrz } = commonStyles
+
 interface ProfileRedirectProps {
    title: string, 
    onPress?: () => void
@@ -13,8 +15,8 @@ interface ProfileRedirectProps {
 
 export default ({ title, onPress, children }: ProfileRedirectProps): JSX.Element => {
    return (
-      <Pressable style={{...commonStyles.hrz, ...styles.container }} {...{ onPress }}>
-         <View style={commonStyles.hrz}>
+      <Pressable style={{...hrz, ...styles.container }} {...{ onPress }}>
+         <View style={hrz}>
             { children }
             <Text style={styles.title}>{title}</Text>
          </View>

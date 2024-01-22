@@ -1,11 +1,12 @@
-import { memo, ComponentType, useRef } from 'react'
+import { memo, ComponentType } from 'react'
 import { Animated } from 'react-native'
 import Popup from '@components/shared/popup'
+import useAnimValue from '@hooks/useAnimValue'
 
 export default <P extends object>(MainPopup: ComponentType<P>, type: 'bottomsheet' | 'centered', title: string, width?: number) => {
    return memo((props: any) => {
       const { setVisible } = props
-      const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+      const animateValue = useAnimValue(0)
 
       const onConfirm = (afterDisappear: () => Promise<void>) => {
          Animated.timing(animateValue, {

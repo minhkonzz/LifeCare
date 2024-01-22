@@ -8,6 +8,7 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BackIcon, PrimaryBookIcon } from '@assets/icons'
 import { PopupContext } from '@contexts/popup'
 import { AnimatedPressable } from '@components/shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import SyncDetector from '@components/sensors/sync-detect'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import FastingClock from '@components/fasting-clock'
@@ -16,6 +17,8 @@ import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
 import SuggestionPopup from '@components/shared/popup/suggestion'
 import withFastingState from '@hocs/withFastingState'
+
+const { hrz } = commonStyles
 
 const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
@@ -79,7 +82,7 @@ const Tips = withVisiblitySensor(
 					outputRange: [-50, 0]
 				}) }]
 			}}>
-				<View style={styles.hrz}>
+				<View style={{...hrz, marginBottom: vS(-7) }}>
 					<PrimaryBookIcon style={styles.Ic} width={hS(28)} height={vS(28)} />
 					<Text style={styles.tipText}>Tips during fasting period</Text>
 				</View>
@@ -102,12 +105,6 @@ export default memo((): JSX.Element => {
 })
 
 const styles = StyleSheet.create({
-	hrz: {
-		flexDirection: 'row', 
-		alignItems: 'center',
-		marginBottom: vS(-7)
-	},
-
 	Ic: { marginBottom: vS(5) },
 
 	tips: {

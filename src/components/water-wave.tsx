@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { Animated, Easing } from 'react-native'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
 import WaveSvg from '@assets/images/strong_wave.svg'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface WaterWaveProps {
    w: number,
@@ -11,9 +12,9 @@ interface WaterWaveProps {
 
 export default ({ w, full }: WaterWaveProps): JSX.Element => {
    const h = w * 6
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
+   const waveAnimateValue = useAnimValue(0)
+   const waterTranslateY = useAnimValue(0)
 
    const { drinked } = useSelector((state: AppStore) => state.water)
    const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)

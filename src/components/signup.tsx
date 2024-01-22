@@ -1,16 +1,20 @@
-import { memo, Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import { memo, Dispatch, SetStateAction, useEffect } from 'react'
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { UserFieldIcon, LockIcon, AtIcon, BackIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
 import { AppStore } from '../store'
+import { commonStyles } from '@utils/stylesheet'
 import Button from '@components/shared/button/Button'
 import AuthInput from './auth-input'
 import AuthService from '@services/user'
+import useAnimValue from '@hooks/useAnimValue'
+
+const { hrz } = commonStyles
 
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -25,9 +29,7 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
          toValue: 0,
          duration: 640,
          useNativeDriver: true
-      }).start(({ finished }) => {
-         setIsLogin(true)
-      })
+      }).start(() => { setIsLogin(true) })
    }
 
    const SignupButton = (): JSX.Element => {
@@ -50,7 +52,7 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
          <Animated.Image style={{...styles.storyset, transform: [{ scale: animateValue }] }} source={require('../assets/images/storyset/signup.gif')} />
          <Animated.View style={{
             ...styles.titleWrapper,
-            ...styles.horz, 
+            ...hrz, 
             opacity: animateValue,
             transform: [{ translateX: animateValue.interpolate({
                inputRange: [0, 1],
@@ -104,11 +106,6 @@ const styles = StyleSheet.create({
    storyset: {
       width: hS(292), 
       height: vS(292)
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    titleWrapper: {

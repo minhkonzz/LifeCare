@@ -1,45 +1,17 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { LineChart } from 'react-native-gifted-charts'
 import { View, StyleSheet } from 'react-native'
 import { darkHex } from '@utils/constants/colors'
 import { useSelector } from 'react-redux'
 import { AppStore } from '@store/index'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { handleWeightRecords } from '@utils/helpers'
 import PrimaryToggleValue from './shared/primary-toggle-value'
-
-let visitedMonth: string = ''
-let visitedValue: number = 0
-let startIndex: number = 0
-let endIndex: number = 0
 
 export default (): JSX.Element => {
    const { bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
    const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
-   const weightRecords = bodyRecords.filter((e: any) => e.type === 'weight')
-   const standardWeightRecords = weightRecords.reduce((acc: any, cur: any) => {
-      const { id, createdAt, value } = cur
-      const d = new Date(createdAt)
-      acc[`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`] = { id, value }
-      return acc
-   }, {})
-
-   const chartData = getDatesRange(122).map((e, i) => {
-      const r = standardWeightRecords[e.value]
-      const { month, date } = e
-      const monthTitle: string = getMonthTitle(month, true)
-      const isNextMonth: boolean = monthTitle !== visitedMonth
-      if (isNextMonth) visitedMonth = monthTitle
-      const currentPointTitle = `${isNextMonth ? monthTitle + ' ' : '' }${date}`
-      if (r) {
-         const { value } = r
-         if (!startIndex) startIndex = i
-         visitedValue = value
-         endIndex = i
-         return { value, label: currentPointTitle }
-      }
-      return { value: visitedValue, label: currentPointTitle, hideDataPoint: true }
-   })
+   const { chartData, startIndex, endIndex } = useMemo(() => handleWeightRecords(bodyRecords), [bodyRecords])
 
    const CustomDataPoint = useCallback(() => <View style={styles.customPoint} />, [])
 

@@ -4,9 +4,12 @@ import { primaryHex, primaryRgb, darkHex, lightHex, lightRgb, darkRgb } from '@u
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon } from '@assets/icons'
 import { AnimatedPressable, AnimatedTouchableOpacity } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedText from '@components/shared/animated-text'
+
+const { hrz } = commonStyles
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    return (
@@ -27,7 +30,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                }}>
 						<Text style={styles.smallTitle}>You have consumed</Text>
 						<View style={styles.mainTitle}>
-                     <View style={styles.hrz}>
+                     <View style={hrz}>
                         <AnimatedText value={500} style={styles.largeTitle} />
                         <Text style={{...styles.largeTitle, marginLeft: hS(5) }}>cal</Text>
                      </View>
@@ -67,8 +70,8 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
                {
                   [
                      { id: 'nt1', title: 'Carbs', current: 0, max: 150 },
-                     { id: 'nt2', title: 'Protein', current: 17.9, max: 150 },
-                     { id: 'nt3', title: 'Fat', current: 7.2, max: 33 }
+                     { id: 'nt2', title: 'Protein', current: 0, max: 150 },
+                     { id: 'nt3', title: 'Fat', current: 0, max: 33 }
                   ]
                   .map((e, i) =>
                      <View key={`${e.id}-${i}`} style={{ marginTop: vS(i > 0 ? 18 : 2) }}>
@@ -95,11 +98,6 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 })
 
 const styles = StyleSheet.create({
-   hrz: {
-      flexDirection: 'row',
-      alignItems: 'center'
-   },
-
    container: {
       marginTop: vS(23),
       height: vS(295)

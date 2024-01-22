@@ -1,24 +1,17 @@
 import { useState, useRef } from 'react'
-import {
-	StyleSheet,
-	TextInput,
-	ScrollView,
-	Animated,
-	TouchableOpacity,
-	Image
-} from 'react-native'
-
+import { StyleSheet, TextInput, ScrollView, Animated, TouchableOpacity, Image } from 'react-native'
 import { ImagePickerIcon } from '@assets/icons'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { launchImageLibrary } from 'react-native-image-picker'
+import useAnimValue from '@hooks/useAnimValue'
 
 const LINE_THRESHOLD = 3
 const FIXED_HEIGHT = vS(159)
 
 export default (): JSX.Element => {
 	const [ text, setText ] = useState<string>('')
-	const textInputHeight = useRef<Animated.Value>(new Animated.Value(FIXED_HEIGHT)).current
+	const textInputHeight = useAnimValue(FIXED_HEIGHT)
 	const [ attachedImages, setAttachedImages ] = useState<string[]>([])
 
 	const handleTextChange = (text: string) => {
@@ -65,7 +58,7 @@ export default (): JSX.Element => {
 				{
 					attachedImages.map((e, i) =>
 						<Image
-							style={[styles.imageUploadWrapper, { marginLeft: hS(12) }]}
+							style={{...styles.imageUploadWrapper, marginLeft: hS(12) }}
 							key={`image-${i + 1}`}
 							source={{ uri: e }}
 						/>

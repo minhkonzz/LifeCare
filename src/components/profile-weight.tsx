@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react'
+import { useMemo, useContext, useEffect } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -7,11 +7,12 @@ import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
 import { kilogramsToPounds } from '@utils/fomular'
 import { BackIcon, EditIcon } from '@assets/icons'
+import { commonStyles } from '@utils/stylesheet'
 import AnimatedText from './shared/animated-text'
 import ProfileWeightChart from './profile-weight-chart'
 import UpdateWeightsPopup from '@components/shared/popup/weights'
 import LinearGradient from 'react-native-linear-gradient'
-import { commonStyles } from '@utils/stylesheet'
+import useAnimValue from '@hooks/useAnimValue'
 
 // export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
 //    const { setPopup } = useContext<any>(PopupContext)
@@ -96,9 +97,11 @@ import { commonStyles } from '@utils/stylesheet'
 //    )
 // })
 
+const { wfull, hrz } = commonStyles
+
 export default (): JSX.Element => {
    const { setPopup } = useContext<any>(PopupContext)
-   const animateValue = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    const {
       currentWeight, 
@@ -106,7 +109,10 @@ export default (): JSX.Element => {
       startWeight
    } = useSelector((state: AppStore) => state.user.metadata)
 
-   const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
+   const { percent, loss } = useMemo(() => ({ 
+      percent: Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100),
+      loss: startWeight - currentWeight >= 0 ? startWeight - currentWeight : 0
+   }), [goalWeight, startWeight, currentWeight])
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -122,9 +128,9 @@ export default (): JSX.Element => {
          colors={[`rgba(255, 211, 110, .2)`, `rgba(255, 211, 110, .8)`]}
          start={{ x: .5, y: 0 }}
          end={{ x: 1, y: 1 }}>
-         <View style={[commonStyles.hrz, styles.header]}>
+         <View style={[hrz, styles.header]}>
             <Animated.View style={{
-               ...commonStyles.hrz,
+               ...hrz,
                opacity: animateValue,
                transform: [{ translateY: animateValue.interpolate({
                   inputRange: [0, 1],
@@ -134,7 +140,7 @@ export default (): JSX.Element => {
                <Text style={styles.title}>Weight</Text>
                <TouchableOpacity
                   activeOpacity={.8} 
-                  style={[commonStyles.hrz, styles.symb]}>
+                  style={[hrz, styles.symb]}>
                   <Text style={styles.symbTitle}>lb</Text>
                   <BackIcon style={styles.symbIndicator} width={hS(5)} height={vS(8.5)} />
                </TouchableOpacity>
@@ -146,18 +152,18 @@ export default (): JSX.Element => {
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>
-         <View style={styles.main}>
-            <View style={{...commonStyles.hrz, width: '100%', justifyContent: 'space-between' }}>
-               <View style={commonStyles.hrz}>
+         <View style={wfull}>
+            <View style={{...hrz, width: '100%', justifyContent: 'space-between' }}>
+               <View style={hrz}>
                   <AnimatedText style={styles.weightValue} value={kilogramsToPounds(currentWeight)} />
                   <Text style={styles.weightSymb}>lb</Text>
                </View>
-               <Text style={styles.progressText}>Loss: 21 lb</Text>
+               <Text style={styles.progressText}>{`Loss: ${kilogramsToPounds(loss)} lb`}</Text>
             </View>
             <View style={styles.progressBar}>
                <View style={{...styles.activeBar, width: `${percent}%`}} />
             </View>
-            <View style={[commonStyles.hrz, styles.progressDesc]}>
+            <View style={[hrz, styles.progressDesc]}>
                <Animated.Text style={{
                   ...styles.progressText,
                   opacity: animateValue,
@@ -196,10 +202,6 @@ const styles = StyleSheet.create({
       paddingVertical: vS(16), 
       paddingLeft: hS(24),
       overflow: 'hidden'
-   },
-
-   main: {
-      width: '100%',
    },
 
    header: {

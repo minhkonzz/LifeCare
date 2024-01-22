@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { View, StyleSheet, Animated, Platform, StatusBar, Easing } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
 import Button from '@components/shared/button/Button'
+import useAnimValue from '@hooks/useAnimValue'
 
 const onboardingData: Array<any> = [
 	{
@@ -29,8 +30,8 @@ const onboardingData: Array<any> = [
 export default (): JSX.Element => {
 	const navigation = useNavigation<any>()
 	const [ index, setIndex ] = useState<number>(0)
-	const titleEffectValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const descriptionEffectValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const titleEffectValue = useAnimValue(0)
+	const descriptionEffectValue = useAnimValue(0)
 
 	useEffect(() => {
 		Animated.parallel([

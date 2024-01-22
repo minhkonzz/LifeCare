@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
@@ -10,12 +10,14 @@ import { AnimatedPressable } from '@components/shared/animated'
 import { CheckmarkIcon } from '@assets/icons'
 import { enqueueAction, updateMetadata } from '@store/user'
 import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import StackHeader from '@components/shared/stack-header'
 import Button from '@components/shared/button/Button'
 import useSession from '@hooks/useSession'
-import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import useAnimValue from '@hooks/useAnimValue'
 
 const goals = ['Lose weight', 'Live longer', 'Be\nenergetic', 'Improve Health']
 
@@ -23,7 +25,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
    const dispatch = useDispatch()
    const navigation = useNavigation<any>()
    const bottomBarHeight: number = useDeviceBottomBarHeight()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const { metadata } = useSelector((state: AppStore) => state.user)
    const { userId } = useSession()
    const { goal } = metadata
@@ -68,7 +70,7 @@ export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 
    return (
       <View style={{...styles.container, paddingBottom: vS(27) + bottomBarHeight }}>
-         <View style={styles.wfull}>
+         <View style={commonStyles.wfull}>
             <StackHeader title='Your goal' />
             <View style={styles.goals}>
             {
@@ -109,8 +111,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
       paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
    },
-
-   wfull: { width: '100%' },
 
    goals: {
       flexDirection: 'row', 

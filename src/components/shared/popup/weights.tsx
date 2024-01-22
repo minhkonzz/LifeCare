@@ -17,6 +17,7 @@ import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: string[] = ['kg', 'lb']
@@ -31,7 +32,7 @@ export default withPopupBehavior(
    }) => {
       const dispatch = useDispatch()
       const { userId } = useSession()
-      const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+      const focusAnimateValue = useAnimValue(0)
       let { currentWeight, goalWeight, bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
       const [ weight, setWeight ] = useState<any>(currentWeight)
       const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)

@@ -77,14 +77,6 @@ export default (): JSX.Element => {
 					title='Advance'
 					description='Keep fasting more than 20 hours'
 					items={plansData[0].items.filter(e => e.group_name === 'Advance').map(e => ({ ...e, categoryName: plansData[0].name }))} />
-
-				{/* <View style={styles.wfull}>
-					<PlanCategorySectionHeader title='Custom' />
-					<View style={styles.customPlan}>
-						<CustomIcon width={hS(18)} height={vS(18)} />
-						<Text style={styles.customPlanText}>Create your own fasting plan</Text>
-					</View>
-				</View> */}
 			</ScrollView>
 		</View>
 	)
@@ -97,8 +89,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
 	},
-
-	header: { width: '100%' },
 
 	planList: {
 		width: hS(16),

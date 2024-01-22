@@ -45,10 +45,6 @@ const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						Welcome back!
 					</Animated.Text>
 				</View>
-				{/* <Animated.Image 
-					style={{...styles.userAvatar, transform: [{ scale: animateValue }] }} 
-					source={require('../assets/images/UserAvatar.png')} 
-				/> */}
 			</View>
 		</View> || <View style={styles.header} />
 	)
@@ -122,7 +118,7 @@ const ChatBotAdvertise = withVisiblitySensor(({ isViewable, animateValue }: { is
 								outputRange: [10, 0]
 							}) }]
 						}}>
-						Powered by GPT3.5
+						Powered by Gemini
 					</Animated.Text>
 				</View>
 			</LinearGradient>

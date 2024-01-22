@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { View, Text, StyleSheet, Animated, ScrollView, Pressable } from 'react-native'
 import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -13,15 +13,25 @@ import { useNavigation } from '@react-navigation/native'
 import { AnimatedLinearGradient, AnimatedTouchableOpacity } from './shared/animated'
 import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
+const { 
+	hrz, 
+	blurOverlay, 
+	blurOverlayWrapper, 
+	noDataText,
+	headerMainText,
+	headerNotes,
+	headerNoteText,
+	headerNoteCircle
+} = commonStyles
 
 const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDetail: boolean }) => {
 	if (!hideDetail) {
 		if (typeof item === 'string') {
 			const [ month, date ] = item.split(' ')
 			return (
-				<View key={index} style={{ marginLeft: hS(18), alignItems: 'center', justifyContent: 'center' }}>
+				<View style={styles.rec}>
 					<Text style={styles.recText}>{month}</Text>
 					<View style={styles.recProg} />
 					<Text style={styles.recText}>{date}</Text>
@@ -33,7 +43,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		const [ y, m, d ] = date.split('-')
 		const monthTitle = getMonthTitle(m - 1, true)
 		const [ shown, setShown ] = useState<boolean>(false)
-		const detailAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(shown && 1 || 0)).current
+		const detailAnimateValue = useAnimValue(shown && 1 || 0)
 
 		const onPress = () => {
 			Animated.timing(detailAnimateValue, {
@@ -46,14 +56,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 		}
 
 		return (
-			<Pressable 
-				style={{ 
-					position: 'relative',
-					alignItems: 'center', 
-					marginLeft: hS(18),
-					justifyContent: 'center'
-				}}
-				{...{ onPress }}>
+			<Pressable style={styles.rec} {...{ onPress }}>
 				<Text style={styles.recText}>{monthTitle}</Text>
 				<View style={styles.recProg}>
 					<AnimatedLinearGradient
@@ -67,13 +70,7 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 				{ shown && 
 				<AnimatedLinearGradient 
 					style={{
-						position: 'absolute',
-						top: hS(20),
-						width: hS(120),
-						height: vS(65),
-						borderRadius: hS(12),
-						justifyContent: 'center', 
-						alignItems: 'center',
+						...styles.recDetail,
 						opacity: detailAnimateValue,
 						transform: [{ translateY: detailAnimateValue.interpolate({
 							inputRange: [0, 1],
@@ -83,9 +80,9 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .52, y: .5 }}>
-					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2 }}>{`Drinked: ${value}ml`}</Text>
-					<Text style={{ color: '#fff', fontFamily: 'Poppins-Medium', fontSize: hS(10), letterSpacing: .2, marginTop: vS(5) }}>{`Goal: ${goal}ml`}</Text>
-					<PolygonIcon style={{ position: 'absolute', bottom: vS(-25) }} width={16} />
+					<Text style={styles.recDetailText}>{`Drinked: ${value}ml`}</Text>
+					<Text style={styles.recDetailText}>{`Goal: ${goal}ml`}</Text>
+					<PolygonIcon style={styles.polygon} width={16} />
 				</AnimatedLinearGradient> }
 			</Pressable>
 		)
@@ -95,10 +92,21 @@ const Record = ({ item, index, hideDetail }: { item: any, index: number, hideDet
 
 export default (): JSX.Element => {
 	const navigation = useNavigation<any>()
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const waterRecords = useSelector((state: AppStore) => state.user.metadata.waterRecords)
-	const { chartData, avgIntake } = useMemo(() => handleHydrateRecords(waterRecords), [waterRecords])
-	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
+	const animateValue = useAnimValue(0)
+	const { date, drinked } = useSelector((state: AppStore) => state.water)
+	const { dailyWater, waterRecords } = useSelector((state: AppStore) => state.user.metadata)
+
+	const { chartData, avgIntake, noDataFound } = useMemo(() => {
+		const todayRecord = {
+			id: autoId('wr'),
+			date,
+			value: drinked,
+			goal: dailyWater
+		}
+		const { chartData, avgIntake } = handleHydrateRecords(waterRecords, todayRecord)
+		const noDataFound: boolean = chartData.every(e => typeof e === 'string')
+		return { chartData, avgIntake, noDataFound }
+	}, [waterRecords, drinked])
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -117,7 +125,7 @@ export default (): JSX.Element => {
 			<View style={styles.header}>
 				<View>				
 					<Animated.Text style={{
-						...styles.headerMainText,
+						...headerMainText,
 						opacity: animateValue, 
 						transform: [{ translateX: animateValue.interpolate({
 							inputRange: [0, 1],
@@ -127,8 +135,8 @@ export default (): JSX.Element => {
 						Keep hydrate
 					</Animated.Text>
 					{ !noDataFound && <View style={{ marginTop: vS(4) }}>
-						<Text style={{...styles.headerNoteText, marginLeft: 0 }}>Avg. intake</Text>
-						<Text style={styles.value}>{avgIntake.toFixed(1)} <Text style={styles.headerNoteText}>ml</Text></Text>
+						<Text style={{...headerNoteText, marginLeft: 0 }}>Avg. intake</Text>
+						<Text style={styles.value}>{avgIntake.toFixed(1)} <Text style={headerNoteText}>ml</Text></Text>
 					</View> }
 				</View>
 				<AnimatedTouchableOpacity 
@@ -138,21 +146,21 @@ export default (): JSX.Element => {
 					<BluePlusIcon width={hS(14)} height={vS(15.3)} />
 				</AnimatedTouchableOpacity>
 			</View>
-			<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records} contentContainerStyle={{ alignItems: 'center' }}>
+			<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.records} contentContainerStyle={styles.recordsContent}>
 				{ chartData.map((e, i) => <Record key={`${i}-${autoId('k')}`} {...{ item: e, index: i, hideDetail: noDataFound }} />) }
 			</ScrollView>
-			<View style={styles.headerNotes}>
-				<View style={styles.headerNotePart}>
+			<View style={headerNotes}>
+				<View style={hrz}>
 					<LinearGradient
-						style={styles.headerNoteCircle}
+						style={headerNoteCircle}
 						colors={[`rgba(${[120, 193, 243].join(', ')}, .6)`, '#78C1F3']}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }} />
-					<Text style={styles.headerNoteText}>Completed</Text>
+					<Text style={headerNoteText}>Completed</Text>
 				</View>
-				<View style={{...styles.headerNotePart, marginLeft: hS(38) }}>
-					<View style={{...styles.headerNoteCircle, backgroundColor: '#fafafa' }} />
-					<Text style={styles.headerNoteText}>Goal</Text>
+				<View style={{...hrz, marginLeft: hS(38) }}>
+					<View style={{...headerNoteCircle, backgroundColor: '#fafafa' }} />
+					<Text style={headerNoteText}>Goal</Text>
 				</View>
 			</View>
 			{ noDataFound && 
@@ -183,39 +191,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 
-	headerMainText: {
-		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(15),
-		color: darkHex,
-		letterSpacing: .2
-	},
-
-	headerNotes: {
-		width: '100%',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-
-	headerNotePart: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
-
-	headerNoteCircle: {
-		width: hS(10),
-		height: vS(10),
-		borderRadius: 200
-	},
-
-	headerNoteText: {
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(12),
-		color: `rgba(${darkRgb.join(', ')}, .6)`,
-		letterSpacing: .2,
-		marginLeft: hS(8)
-	},
-
 	hydrateRecsUpdateButton: {
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -241,8 +216,15 @@ const styles = StyleSheet.create({
 		overflow: 'visible',
 	},
 
-	rec: {
+	recordsContent: {
 		alignItems: 'center'
+	},
+
+	rec: {
+		position: 'relative',
+		alignItems: 'center', 
+		marginLeft: hS(18),
+		justifyContent: 'center'
 	},
 
 	recText: {
@@ -264,5 +246,28 @@ const styles = StyleSheet.create({
 	recProgValue: {
 		width: '100%',
 		borderRadius: 200
+	},
+
+	recDetail: {
+		position: 'absolute',
+		top: hS(20),
+		width: hS(120),
+		height: vS(65),
+		borderRadius: hS(12),
+		justifyContent: 'center', 
+		alignItems: 'center',
+	},
+
+	recDetailText: {
+		color: '#fff', 
+		fontFamily: 'Poppins-Medium', 
+		fontSize: hS(10), 
+		letterSpacing: .2,
+		marginVertical: vS(2)
+	},
+
+	polygon: {
+		position: 'absolute', 
+		bottom: vS(-25)
 	}
 })

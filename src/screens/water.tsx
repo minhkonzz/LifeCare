@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppStore } from '../store'
@@ -13,10 +13,11 @@ import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
 import WaterWave from '@components/water-wave'
+import useAnimValue from '@hooks/useAnimValue'
 
 export default (): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
+   const waveAnimateValue = useAnimValue(0)
    
    const {
       firstTimeReachGoal,

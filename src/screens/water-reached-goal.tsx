@@ -1,12 +1,13 @@
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'       
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import LottieView from 'lottie-react-native'
 import { useNavigation } from '@react-navigation/native'
+import useAnimValue from '@hooks/useAnimValue'
+import LottieView from 'lottie-react-native'
 
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    useEffect(() => {
       Animated.timing(animateValue, {

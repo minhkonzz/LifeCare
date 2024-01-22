@@ -1,4 +1,4 @@
-import { memo, SetStateAction, useRef, Dispatch } from 'react'
+import { memo, SetStateAction, Dispatch } from 'react'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useNavigation } from '@react-navigation/native'
@@ -9,11 +9,15 @@ import { updateCurrentPlan, updateNewPlan } from '@store/fasting'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
 import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
+
+const { hrz } = commonStyles
 
 export default memo(withSync(({ 
    setVisible,
@@ -26,7 +30,7 @@ export default memo(withSync(({
    const dispatch = useDispatch()
    const { newPlan } = useSelector((state: AppStore) => state.fasting)
    const { userId } = useSession()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    const onConfirm = (isAllowed: boolean) => {
       Animated.timing(animateValue, {
@@ -77,7 +81,7 @@ export default memo(withSync(({
          onSelfClose
       }}>
          <Text style={styles.content}>Do you want to start fasting now with new plan?</Text>
-         <View style={[styles.buttons, styles.horz]}>
+         <View style={[styles.buttons, hrz]}>
             <TouchableOpacity style={styles.button} 
                activeOpacity={.7} 
                onPress={() => onConfirm(true)}>
@@ -107,11 +111,6 @@ const styles = StyleSheet.create({
    buttons: {
       width: '100%', 
       justifyContent: 'space-between'
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    button: {

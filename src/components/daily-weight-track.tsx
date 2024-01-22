@@ -9,10 +9,13 @@ import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
 import { AppStore } from '../store'
 import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import UpdateWeightsPopup from '@components/shared/popup/weights'
+
+const { hrz } = commonStyles
 
 export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
    const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
@@ -29,30 +32,28 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
             colors={[`rgba(255, 211, 110, .36)`, `rgba(255, 211, 110, .8)`]}
             start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }}>
-            <View style={[styles.header, styles.horz]}>
-               <Animated.Text 
-                  style={{
-                     ...styles.title, 
-                     opacity: animateValue, 
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-50, 0]
-                     }) }]
-                  }}>
+            <View style={[styles.header, hrz]}>
+               <Animated.Text style={{
+                  ...styles.title, 
+                  opacity: animateValue, 
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [-50, 0]
+                  }) }]
+               }}>
                   Weight
                </Animated.Text>
                <BackIcon style={styles.backIc} width={hS(6.5)} height={vS(10)} />
             </View>
             <View style={styles.current}>
-					<Animated.View 
-                  style={{
-                     ...styles.current2, 
-                     opacity: animateValue, 
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-50, 0]
-                     }) }]
-                  }}>
+					<Animated.View style={{
+                  ...styles.current2, 
+                  opacity: animateValue, 
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [-50, 0]
+                  }) }]
+               }}>
 						<AnimatedText value={kilogramsToPounds(currentWeight)} style={styles.current3} />
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
@@ -124,7 +125,7 @@ export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: 
 						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: .5 }}>
-						<View style={styles.horz}>
+						<View style={hrz}>
 							<Image style={styles.bodyMeasureImg} source={require('../assets/images/body-measure.png')} />
 							<View>
 								<Text style={styles.bodyMeasureTitle}>BODY MEASUREMENT</Text>
@@ -142,11 +143,6 @@ const styles = StyleSheet.create({
    container: {
       marginTop: vS(23), 
       height: vS(268)
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    wrapper: {

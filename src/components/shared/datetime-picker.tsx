@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState, useRef, Dispatch, SetStateAction } from 'react'
+import { memo, useCallback, useMemo, useState, Dispatch, SetStateAction } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { getDatesRange, getMonthTitle, toDateTimeV2 } from '@utils/datetimes'
@@ -7,6 +7,7 @@ import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
 import WheelPicker from './wheel-picker'
+import useAnimValue from '@hooks/useAnimValue'
 
 const dateOpts = getDatesRange(8)
 const hoursOpts = Array.from({ length: 24 }).map((e, i) => i)
@@ -155,7 +156,7 @@ export default memo(({
    datetime?: { date: string, hour: number, min: number }
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }) => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    return (
       <Popup {...{

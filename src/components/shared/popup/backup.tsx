@@ -1,15 +1,10 @@
-import { Dispatch, SetStateAction, useRef, memo } from 'react'
-import {
-   View, 
-   Text,
-   Image,
-   Animated,
-   StyleSheet
-} from 'react-native'
+import { Dispatch, SetStateAction, memo } from 'react'
+import { StyleSheet } from 'react-native'
 import Popup from '@components/shared/popup'
+import useAnimValue from '@hooks/useAnimValue'
 
 export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    return (
       <Popup {...{
@@ -24,7 +19,5 @@ export default memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boole
 })
 
 const styles = StyleSheet.create({
-   container: {
-
-   }
+   container: {}
 })

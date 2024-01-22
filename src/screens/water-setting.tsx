@@ -9,6 +9,7 @@ import { updateCupsize } from '../store/water'
 import { formatNum } from '@utils/helpers'
 import { PopupContext } from '@contexts/popup'
 import { AnimatedPressable } from '@components/shared/animated'
+import { commonStyles } from '@utils/stylesheet'
 import Button from '@components/shared/button/Button'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
@@ -17,6 +18,9 @@ import WaterStartRemindPopup from '@components/shared/popup/water-setting-start-
 import WaterEndRemindPopup from '@components/shared/popup/water-setting-end-remind'
 import WaterIntervalPopup from '@components/shared/popup/water-setting-interval'
 import CustomCupsizePopup from '@components/shared/popup/custom-watercup'
+import useAnimValue from '@hooks/useAnimValue'
+
+const { wfull } = commonStyles
 
 const CupSizes = memo(() => {
 	const { setPopup } = useContext<any>(PopupContext)
@@ -59,10 +63,10 @@ const CupSizes = memo(() => {
 export default (): JSX.Element => {
 	const bottomBarHeight = useDeviceBottomBarHeight()
 	const { setPopup } = useContext<any>(PopupContext)
-	const dailyWater = useSelector((state: AppStore) => state.user.metadata?.dailyWater)
+	const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
 	const [ remindOn, setRemindOn ] = useState<boolean>(false)
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const toggleAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
+	const toggleAnimateValue = useAnimValue(0)
 
 	const {
 		startWater,
@@ -94,9 +98,9 @@ export default (): JSX.Element => {
 
 	return (
 		<View style={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
-			<View style={{ width: '100%' }}>
+			<View style={wfull}>
 				<StackHeader title='Hydration setting' />
-				<View style={styles.main}>
+				<View style={wfull}>
 					<SettingRow 
 						title='Goal' 
 						type='value' 
@@ -208,10 +212,6 @@ const styles = StyleSheet.create({
 	cupSizeIcon: {
 		width: hS(45),
 		height: vS(45)
-	},
-
-	main: {
-		width: '100%'
 	},
 
 	customValueText: {

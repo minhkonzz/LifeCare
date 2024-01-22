@@ -9,6 +9,7 @@ import { inchToCentimeter, centimeterToInch } from '@utils/fomular'
 import { autoId } from '@utils/helpers'
 import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
 import { commonStyles } from '@utils/stylesheet'
+import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 import withSync from '@hocs/withSync'
 import withPopupBehavior from '@hocs/withPopupBehavior'
 import UserService from '@services/user'
@@ -16,7 +17,6 @@ import PrimaryToggleValue from '../primary-toggle-value'
 import MeasureInput from '../measure-input'
 import LinearGradient from 'react-native-linear-gradient'
 import useSession from '@hooks/useSession'
-import { getCurrentUTCDateV2, getCurrentUTCDatetimeV1 } from '@utils/datetimes'
 
 const { popupButton, popupButtonBg, popupButtonText } = commonStyles
 const options: string[] = ['cm', 'in']

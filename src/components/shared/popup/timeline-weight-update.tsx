@@ -1,4 +1,4 @@
-import { memo, Dispatch, useState, useRef, SetStateAction } from 'react'
+import { memo, Dispatch, useState, SetStateAction } from 'react'
 import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
@@ -13,6 +13,7 @@ import Popup from '@components/shared/popup'
 import LinearGradient from 'react-native-linear-gradient'
 import UserService from '@services/user'
 import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
 
 const options: Array<string> = ["kg", "lb"]
 
@@ -25,10 +26,11 @@ const Main = ({
 }) => {
 
    const dispatch = useDispatch()
-   const focusAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const focusAnimateValue = useAnimValue(0)
    const { bodyRecords } = useSelector((state: AppStore) => state.user.metadata)
    const { userId } = useSession()
    const { id, value, day, date, month } = timelineTimeRecord
+   const [ selectedOptionIndex, setSelectedOptionIndex ] = useState<number>(0)
    const [ weight, setWeight ] = useState<any>(value)
    const [ weightError, setWeightError ] = useState<boolean>(false)
 
@@ -65,8 +67,8 @@ const Main = ({
       })
    }
 
-   const onChangeOption = (index: number) => {
-      const convertedWeight = !index && poundsToKilograms(+weight) || kilogramsToPounds(+weight)
+   const onChangeOption = () => {
+      const convertedWeight = selectedOptionIndex && kilogramsToPounds(+weight) || poundsToKilograms(+weight)
       setWeight(convertedWeight)
    }
 
@@ -80,7 +82,13 @@ const Main = ({
    return (
       <>
          <Text style={styles.datetimeText}>{`${day}, ${getMonthTitle(month, true)} ${date}`}</Text>
-         <PrimaryToggleValue {...{ options, onChangeOption, additionalStyles: styles.primaryToggleValue }} />
+         <PrimaryToggleValue {...{ 
+            options, 
+            onChangeOption,
+            selectedOptionIndex,
+            setSelectedOptionIndex, 
+            additionalStyles: styles.primaryToggleValue 
+         }} />
          {
             weightError &&
             <Animated.Text style={{
@@ -102,7 +110,7 @@ const Main = ({
          }
          <MeasureInput 
             contentCentered
-            symb='kg' 
+            symb={options[selectedOptionIndex]}
             value={weight}
             isError={weightError}
             onChangeText={t => onChangeWeight(t)} />
@@ -130,7 +138,7 @@ export default memo(({
    setVisible: Dispatch<SetStateAction<any>>,
    timelineTimeRecord: any
 }) => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    return (
       <Popup {...{

@@ -4,8 +4,11 @@ import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { Circle } from 'react-native-svg'
 import { timestampToDateTime } from '@utils/datetimes'
+import { commonStyles } from '@utils/stylesheet'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import withFastingState from '@hocs/withFastingState'
+
+const { hrz } = commonStyles
 
 export default withVisiblitySensor(withFastingState(({ 
 	isViewable, 
@@ -25,7 +28,7 @@ export default withVisiblitySensor(withFastingState(({
 			const { icon: NextStageIcon, title: nextStageTitle } = nextStage
 			return <>
 				<Text style={styles.nextStageTitle}>Next stage</Text>
-				<View style={styles.horz}>
+				<View style={hrz}>
 					<NextStageIcon width={hS(28)} height={vS(28)} />
 					<Text style={styles.nextStageName}>{nextStageTitle}</Text>
 				</View>
@@ -35,17 +38,16 @@ export default withVisiblitySensor(withFastingState(({
 		if (timeExceededValue) {
 			const timeExceededText: string = timestampToDateTime(timeExceededValue)
 			return (
-				<Animated.View
-					style={{
-						...styles.container,
-						opacity: animateValue,
-						transform: [{
-							translateX: animateValue.interpolate({
-								inputRange: [0, 1],
-								outputRange: [-50, 0]
-							})
-						}]
-					}}>
+				<Animated.View style={{
+					...styles.container,
+					opacity: animateValue,
+					transform: [{
+						translateX: animateValue.interpolate({
+							inputRange: [0, 1],
+							outputRange: [-50, 0]
+						})
+					}]
+				}}>
 					<View style={styles.main}>
 						<Text style={styles.elapsedTime}>{`Elapsed time (${elapsedTimePercent}%)`}</Text>
 						<Text style={{...styles.time, fontSize: hS(36) }}>{elapsedTimeText}</Text>
@@ -66,17 +68,16 @@ export default withVisiblitySensor(withFastingState(({
 		}
 
 		return (
-			<Animated.View
-				style={{
-					...styles.container,
-					opacity: animateValue,
-					transform: [{
-						translateX: animateValue.interpolate({
-							inputRange: [0, 1],
-							outputRange: [-50, 0]
-						})
-					}]
-				}}>
+			<Animated.View style={{
+				...styles.container,
+				opacity: animateValue,
+				transform: [{
+					translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					})
+				}]
+			}}>
 				<View style={styles.main}>
 					<Text style={styles.elapsedTime}>{elapsedTimePercent >= 0 && `Elapsed time (${elapsedTimePercent}%)` || 'Fasting period will start after'}</Text>
 					<Text style={{...styles.time, fontSize: hS(36) }}>{elapsedTimeText}</Text>
@@ -97,17 +98,16 @@ export default withVisiblitySensor(withFastingState(({
 	}
 	
 	return (
-		<Animated.View
-			style={{
-				...styles.container,
-				opacity: animateValue,
-				transform: [{
-					translateX: animateValue.interpolate({
-						inputRange: [0, 1],
-						outputRange: [-50, 0]
-					})
-				}]
-			}}>
+		<Animated.View style={{
+			...styles.container,
+			opacity: animateValue,
+			transform: [{
+				translateX: animateValue.interpolate({
+					inputRange: [0, 1],
+					outputRange: [-50, 0]
+				})
+			}]
+		}}>
 			<View style={styles.main}>
 				<Text style={{...styles.time, fontSize: hS(18) }}>Timer not started</Text>
 				<Text style={styles.nextStageTitle}>Press button below to start fasting</Text>
@@ -134,11 +134,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 10,
 		backgroundColor: '#fff'
-	},
-
-	horz: {
-		flexDirection: 'row',
-		alignItems: 'center'
 	},
 
 	timeText: {

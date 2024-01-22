@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { View, FlatList, Text, Animated, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { primaryHex, primaryRgb, darkHex, darkRgb, lightBlueHex } from '@utils/constants/colors'
@@ -10,12 +10,13 @@ import { LineChart, CurveType } from 'react-native-gifted-charts'
 import LinearGradient from 'react-native-linear-gradient'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
+import useAnimValue from '@hooks/useAnimValue'
 
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()
    const route = useRoute()
    const recommendation: any = route.params
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const { currentWeight, goalWeight } = useSelector((state: AppStore) => state.survey)
    const lose: number = goalWeight - currentWeight
 
@@ -198,8 +199,8 @@ export default (): JSX.Element => {
                      <View style={styles.k7}>
                         <WomenEatIcon width={hS(60)} height={vS(60)} />
                         <View style={styles.k8}>
-                           <Text style={styles.f13}>When its time to eat</Text>
-                           <Text style={styles.f14}>Drink plenty of water, herbal tea or other non-caloric beverages during your fasting to stay hydrated and help suppress hunger.</Text>
+                           <Text style={styles.f13}>When it's time to eat</Text>
+                           <Text style={styles.f14}>If you feel dizzy, weak, or lightheaded during your fasting period, it may be a sign to break your fast</Text>
                         </View>
                      </View>
                      <PersonalizedPlanRecommendation />

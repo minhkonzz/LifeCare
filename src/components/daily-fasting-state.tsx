@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { BackIcon, SpoonForkIcon } from '@assets/icons'
 import { getCurrentTimestamp, timestampToDateTime } from '@utils/datetimes'
 import { AnimatedPressable } from './shared/animated'
+import { formatNum } from '@utils/helpers'
 import withFastingState from '@hocs/withFastingState'
 import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
@@ -76,8 +77,8 @@ export default withVisiblitySensor(withFastingState(({
 				const currentDate: number = new Date(currentTimestamp).getDate()
 				const endDatetime: Date = new Date(endTimeStamp)
 				const endDate: number = endDatetime.getDate()
-				const endHour: number = endDatetime.getHours()
-				const endMin: number = endDatetime.getMinutes()
+				const endHour: string = formatNum(endDatetime.getHours())
+				const endMin: string = formatNum(endDatetime.getMinutes())
 				notificationString = `Period will end at ${endHour}:${endMin} ${endDate - currentDate === 0 && 'today' || 'tomorrow'}`
 			}
 			

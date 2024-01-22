@@ -1,8 +1,9 @@
-import { memo, useState, Dispatch, SetStateAction, useRef } from 'react'
+import { memo, Dispatch, SetStateAction } from 'react'
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native'
 import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedLinearGradient } from './animated'
+import useAnimValue from '@hooks/useAnimValue'
 
 const OPTION_WIDTH: number = hS(92)
 
@@ -23,7 +24,7 @@ export default memo(({
    additionalStyles, 
    toggleColor = [`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex] 
 }: PrimaryToggleValue): JSX.Element => {
-   const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const translateX = useAnimValue(0)
    // const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
    const changeOption = (index: number) => {
