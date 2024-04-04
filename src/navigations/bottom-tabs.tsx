@@ -1,10 +1,11 @@
-import { memo, useState, useEffect, useMemo, useContext } from 'react'
-import { View, StyleSheet } from 'react-native'
+import { memo, useMemo, useEffect } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import PopupProvider, { PopupContext } from '@contexts/popup'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppState } from '../store'
-import { resetDailyWater } from '../store/water'
+import { useSelector, useDispatch } from 'react-redux'
+import { getCurrentDate, getLocalDatetimeV2 } from '@utils/datetimes'
+import { AppStore } from '@store/index'
+import { resetDailyWater } from '@store/water'
+import { addRec } from '@store/user'
+import { autoId } from '@utils/helpers'
 import UserService from '@services/user'
 import BottomTabs from '@components/bottom-tabs/BottomTabs'
 import Profile from '@screens/profile'
@@ -12,12 +13,12 @@ import Timer from '@screens/timer'
 import Daily from '@screens/daily'
 import Insights from '@screens/insights'
 import Nutrition from '@screens/nutrition'
+import useSession from '@hooks/useSession'
 
 const BottomNavigator = createBottomTabNavigator()
 
 const BottomNav = memo(() => {
 	const screenOptions = useMemo(() => ({ headerShown: false, unmountOnBlur: true }), [])
-
 	return (
 		<BottomNavigator.Navigator tabBar={props => <BottomTabs {...props} />}>
 	   	<BottomNavigator.Group {...{ screenOptions }}>
@@ -51,55 +52,49 @@ const BottomNav = memo(() => {
 	)
 })
 
-const Main = () => {
-	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
-
-	return (
-		<>
-			<BottomNav />
-			{ Popup && <Popup setVisible={setPopup} /> }
-		</>
-	)
-}
-
 export default (): JSX.Element => {
-	const [ isPrepared, setIsPrepared ] = useState<boolean>(false)
-	const { drinked, changes } = useSelector((state: AppState) => state.water)
-	const dailyWater: number = useSelector((state: AppState) => state.user.metadata.dailyWater)
-	const { date: prevDate } = useSelector((state: AppState) => state.water)
-	const isOnline = useSelector((state: AppState) => state.network.isOnline)
-	const session = useSelector((state: AppState) => state.user.session)
-	const userId: string = session && session?.user.id || null
-	
 	const dispatch = useDispatch()
-	console.log('water changes:', changes)
+	const { userId } = useSession()
+   const { drinked, changes, date } = useSelector((state: AppStore) => state.water)
+   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
 
-	const resetWaterTrack = async() => {
-		const todayDate: string = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric' })
-		if (!drinked || todayDate === prevDate) return
-		await UserService.savePrevWaterRecords({
-			userId, 
+	const resetWaterTrack = async () => {
+		const todayDate: string = getCurrentDate()
+		if (!drinked || todayDate === date) return
+
+		const currentDatetime: string = getLocalDatetimeV2()
+
+		let newWaterRecords = {
 			value: drinked,
-			goal: dailyWater, 
-			changes
-		})
+			goal: dailyWater,
+			date,
+			createdAt: currentDatetime,
+			updatedAt: currentDatetime,
+			times: changes.map(e => ({
+				id: e.id,
+				value: e.liquid,
+				createdAt: e.time,
+				updatedAt: e.time
+			}))
+		}
+
+		if (userId) {
+			const { waterRecordId, error } = await UserService.savePrevWaterRecords(userId, newWaterRecords)
+			if (error || !waterRecordId) {
+				console.log('something wrong:', error)
+				return
+			}
+			newWaterRecords['id'] = waterRecordId
+		} else {
+			newWaterRecords['id'] = autoId('wr')
+		}
+		dispatch(addRec({ key: 'waterRecords', rec: newWaterRecords }))
 		dispatch(resetDailyWater(todayDate))
 	}
 
 	useEffect(() => {
-		resetWaterTrack().then(() => { setIsPrepared(true) })
+		resetWaterTrack()
 	}, [])
 
-	return (
-		isPrepared && 
-		<View style={styles.root}>
-			<PopupProvider>
-				<Main />
-			</PopupProvider>
-		</View> || <></>
-   )
+	return <BottomNav />
 }
-
-const styles = StyleSheet.create({
-	root: { flex: 1 }
-})

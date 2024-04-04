@@ -1,22 +1,22 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Text, StyleSheet, Platform, StatusBar, Animated } from 'react-native'
-import { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import Login from '@components/signin'
 import Register from '@components/signup'
 import LottieView from 'lottie-react-native'
-
-const { hex: darkHex } = Colors.darkPrimary
+import useAnimValue from '@hooks/useAnimValue'
 
 const messageIcons = {
    success: require('../assets/lottie/success-float.json'), 
    error: require('../assets/lottie/error-float.json')
 }
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+export default (): JSX.Element => {
+   const animateValue = useAnimValue(0)
+   const navigation = useNavigation<any>()
    const bottomBarHeight: number = useDeviceBottomBarHeight()
    const [ isLogin, setIsLogin ] = useState<boolean>(true)
    const AuthComponent = isLogin && Login || Register

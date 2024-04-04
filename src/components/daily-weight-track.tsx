@@ -1,34 +1,28 @@
-import { memo, useEffect, useRef, useContext } from 'react'
-import { View, Text, Pressable, Image, Animated, StyleSheet } from 'react-native'
+import { useContext } from 'react'
+import { View, Text, Image, Animated, StyleSheet } from 'react-native'
 import { EditIcon, BackIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
 import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { kilogramsToPounds } from '@utils/fomular'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
+import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
+import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
-import UpdateWeightsPopup from '@components/shared/popup-content/weights'
+import UpdateWeightsPopup from '@components/shared/popup/weights'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+const { hrz } = commonStyles
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-   const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
-   const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
-   const change: number = kilogramsToPounds(currentWeight - startWeight)
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
+   const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
    const { setPopup } = useContext<any>(PopupContext)
+   const percent: number = Math.floor((currentWeight - startWeight) / (goalWeight - startWeight) * 100)
+   const change: number = currentWeight - startWeight > 0 ? kilogramsToPounds(currentWeight - startWeight) : 0
    const navigation = useNavigation<any>()
-
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: isViewable && 1 || 0, 
-         duration: 840, 
-         useNativeDriver: true
-      }).start()
-   }, [isViewable])
 
    return (
       isViewable && 
@@ -38,36 +32,36 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
             colors={[`rgba(255, 211, 110, .36)`, `rgba(255, 211, 110, .8)`]}
             start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }}>
-            <View style={[styles.header, styles.horz]}>
-               <Animated.Text 
-                  style={{
-                     ...styles.title, 
-                     opacity: animateValue, 
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-50, 0]
-                     }) }]
-                  }}>
+            <View style={[styles.header, hrz]}>
+               <Animated.Text style={{
+                  ...styles.title, 
+                  opacity: animateValue, 
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [-50, 0]
+                  }) }]
+               }}>
                   Weight
                </Animated.Text>
                <BackIcon style={styles.backIc} width={hS(6.5)} height={vS(10)} />
             </View>
             <View style={styles.current}>
-					<Animated.View 
-                  style={{
-                     ...styles.current2, 
-                     opacity: animateValue, 
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-50, 0]
-                     }) }]
-                  }}>
-						<Text style={styles.current3}>{`${kilogramsToPounds(currentWeight)}`}</Text>
+					<Animated.View style={{
+                  ...styles.current2, 
+                  opacity: animateValue, 
+                  transform: [{ translateX: animateValue.interpolate({
+                     inputRange: [0, 1], 
+                     outputRange: [-50, 0]
+                  }) }]
+               }}>
+						<AnimatedText value={kilogramsToPounds(currentWeight)} style={styles.current3} />
 						<View style={styles.current4}>
 							<Text style={styles.current5}>lb</Text>
+                     { !!change &&  
 							<View style={styles.current6}>
 								<Text style={styles.current7}>{`${change}`}</Text>
 							</View>
+                     }
 						</View>
 					</Animated.View>
 					<AnimatedPressable 
@@ -84,9 +78,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 					</AnimatedPressable>
 				</View>
             <View style={styles.progressBar}>
-               <Text style={styles.progressText}>{`${percent}%`}</Text>
+               <Text style={styles.progressText}>{`${percent >= 0 ? percent : 0}%`}</Text>
                <LinearGradient
-						style={{...styles.activeBar, width: `${percent}%`}}
+						style={{...styles.activeBar, width: `${percent >= 0 ? percent : 0}%`}}
 						colors={['#ffb72b', `rgba(255, 183, 43, .6)`]}
 						start={{ x: 0, y: .5 }}
 						end={{ x: 1, y: .5 }}
@@ -131,7 +125,7 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: .5 }}>
-						<View style={styles.horz}>
+						<View style={hrz}>
 							<Image style={styles.bodyMeasureImg} source={require('../assets/images/body-measure.png')} />
 							<View>
 								<Text style={styles.bodyMeasureTitle}>BODY MEASUREMENT</Text>
@@ -147,13 +141,8 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      marginTop: vS(12), 
+      marginTop: vS(23), 
       height: vS(268)
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    wrapper: {
@@ -218,7 +207,7 @@ const styles = StyleSheet.create({
    current7: {
       fontFamily: 'Poppins-SemiBold',
       fontSize: hS(14),
-      color: Colors.primary.hex,
+      color: primaryHex,
       letterSpacing: .2
    },
 

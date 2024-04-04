@@ -1,18 +1,16 @@
-import { useEffect, useRef } from 'react'
-import { View, Text, Animated, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { useEffect } from 'react'
+import { View, Animated, StyleSheet } from 'react-native'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import Button from '@components/shared/button/Button'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+import useAnimValue from '@hooks/useAnimValue'
 
 export default (): JSX.Element => {
-	const navigation = useNavigation()
+	const navigation = useNavigation<any>()
 	const bottomBarHeight = useDeviceBottomBarHeight()
-	const animatedValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animatedValue = useAnimValue(0)
 
 	useEffect(() => {
 		Animated.timing(animatedValue, {

@@ -4,17 +4,15 @@ import { View, Text, StyleSheet, Pressable, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { updateNewPlan } from '../store/fasting'
 import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
-import { AppState } from '../store'
+import { darkHex, darkRgb } from '@utils/constants/colors'
+import { AppStore } from '../store'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { ElectroIcon, RestaurantIcon } from '@assets/icons'
-import RequireEndFastingPopup from '@components/shared/popup-content/require-end-fasting'
-import ConfirmPopup from '@components/shared/popup-content/ask-start-fasting'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+import RequireEndFastingPopup from '@components/shared/popup/require-end-fasting'
+import ConfirmPopup from '@components/shared/popup/ask-start-fasting'
 
 export default ({ item }): JSX.Element => {
-	const { startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
+	const { startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
 	const { setPopup } = useContext<any>(PopupContext)
 	const dispatch = useDispatch()
 
@@ -37,13 +35,13 @@ export default ({ item }): JSX.Element => {
 			<View>
 				<Text style={styles.planCategory}>1 day plan</Text>
 				<Text style={styles.planName}>{`${item.hrs_fast}-${item.hrs_eat}`}</Text>
-				<View style={{ marginTop: vS(16) }}>
+				<View style={styles.descs}>
 					<View style={styles.hrsDescWrapper}>
-						<ElectroIcon width={hS(8)} height={vS(10)} />
+						<ElectroIcon width={hS(12)} height={vS(14)} />
 						<Text style={styles.hrsDesc}>{`${item.hrs_fast} hours for fasting`}</Text>
 					</View>
 					<View style={{...styles.hrsDescWrapper, marginTop: vS(5) }}>
-						<RestaurantIcon width={hS(9)} height={vS(9)} />
+						<RestaurantIcon width={hS(14)} height={vS(14)} />
 						<Text style={styles.hrsDesc}>{`${item.hrs_eat} hours for eating`}</Text>
 					</View>
 				</View>
@@ -57,39 +55,43 @@ const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		width: hS(257),
-		height: vS(148),
-		elevation: 10,
+		width: hS(328),
+		height: vS(210),
+		elevation: 12,
 		shadowColor: `rgba(${darkRgb.join(', ')}, .5)`,
 		backgroundColor: '#fff',
 		borderRadius: hS(32),
 		paddingTop: vS(16),
 		paddingLeft: hS(18),
-		paddingRight: hS(11),
-		paddingBottom: vS(10),
-		marginLeft: hS(24),
+		paddingRight: hS(14),
+		paddingBottom: vS(14),
+		marginLeft: hS(20),
 		marginTop: vS(4)
+	},
+
+	descs: {
+		marginTop: vS(16)
 	},
 
 	planCategory: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: hS(8),
+		fontSize: hS(13),
 		color: `rgba(${darkRgb.join(', ')}, .6)`,
 		letterSpacing: .2
 	},
 
 	planName: {
 		fontFamily: 'Poppins-Medium',
-		fontSize: hS(24),
+		fontSize: hS(36),
 		color: darkHex,
 		letterSpacing: .2,
 		marginTop: vS(4)
 	},
 
 	hrsDesc: {
-		marginLeft: hS(6),
+		marginLeft: hS(10),
 		fontFamily: 'Poppins-Regular',
-		fontSize: hS(9),
+		fontSize: hS(12),
 		color: darkHex,
 		letterSpacing: .2
 	},
@@ -100,8 +102,8 @@ const styles = StyleSheet.create({
 	},
 
    planDaysDecor: {
-		width: hS(80),
-		height: vS(80),
+		width: hS(105),
+		height: vS(105),
 		alignSelf: 'flex-end'
 	}
 })

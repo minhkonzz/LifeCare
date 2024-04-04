@@ -1,27 +1,33 @@
-import { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, Animated, Pressable, Platform, StatusBar } from 'react-native'
+import { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useSelector } from 'react-redux'
-import { AppState } from '../store' 
+import { useDispatch, useSelector } from 'react-redux'
+import { AppStore } from '../store' 
+import { AnimatedPressable } from '@components/shared/animated'
+import { CheckmarkIcon } from '@assets/icons'
+import { enqueueAction, updateMetadata } from '@store/user'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import StackHeader from '@components/shared/stack-header'
 import Button from '@components/shared/button/Button'
-import CheckmarkIcon from '@assets/icons/checkmark.svg'
+import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const goals = ['Lose weight', 'Live longer', 'Be\nenergetic', 'Improve Health']
 
-export default (): JSX.Element => {
+export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
+   const dispatch = useDispatch()
    const navigation = useNavigation<any>()
    const bottomBarHeight: number = useDeviceBottomBarHeight()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { session, metadata } = useSelector((state: AppState) => state.user)
-   const userId: string | null = session && session?.user.id || null
+   const animateValue = useAnimValue(0)
+   const { metadata } = useSelector((state: AppStore) => state.user)
+   const { userId } = useSession()
    const { goal } = metadata
    const [ selectedGoal, setSelectedGoal ] = useState<string[]>(goal)
 
@@ -38,13 +44,33 @@ export default (): JSX.Element => {
    }
 
    const onSave = async () => {
-      await UserService.updatePersonalData(userId, { goal })
+      const payload = { goal }
+
+      const cache = () => {
+         dispatch(updateMetadata(payload))
+         if (userId && !isOnline) {
+            dispatch(enqueueAction({
+               userId,
+               actionId: autoId('qaid'),
+               invoker: 'updatePersonalData',
+               name: 'UPDATE_GOAL',
+               params: [userId, payload]
+            }))
+         }
+      }
+
+      if (userId) {
+         const errorMessage: string = await UserService.updatePersonalData(userId, { goal })
+         if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+         return
+      }
+      else cache()
       navigation.goBack()
    }
 
    return (
       <View style={{...styles.container, paddingBottom: vS(27) + bottomBarHeight }}>
-         <View style={styles.wfull}>
+         <View style={commonStyles.wfull}>
             <StackHeader title='Your goal' />
             <View style={styles.goals}>
             {
@@ -74,7 +100,7 @@ export default (): JSX.Element => {
             onPress={onSave}/>
       </View>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {
@@ -85,8 +111,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
       paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
    },
-
-   wfull: { width: '100%' },
 
    goals: {
       flexDirection: 'row', 

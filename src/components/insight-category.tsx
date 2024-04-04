@@ -1,26 +1,60 @@
-import { useEffect, useRef } from 'react'
-import { View, Text, FlatList, Animated, StyleSheet } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { useEffect, useMemo } from 'react'
+import { View, FlatList, Animated, StyleSheet } from 'react-native'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BackIcon from '@assets/icons/goback.svg'
-import InsightItem from './insight-item'
+import InsightHorizontalItem from './insight-horizontal-item'
+import InsightListItem from './insight-list-item'
+import InsightGridItem from './insight-grid-item'
+import useAnimValue from '@hooks/useAnimValue'
 
-const darkPrimary: string = Colors.darkPrimary.hex
+const insightTypes = {
+	"grid": InsightGridItem,
+	"list": InsightListItem,
+	"horizontal-scroll": InsightHorizontalItem
+}
 
 export default ({ item, index }: { item: any, index: number }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const category = item.title
+	const animateValue = useAnimValue(0)
+	const { title: category, viewType } = item
+
+	const InsightItem = insightTypes[viewType]
+
+	const flatListProps = useMemo(() => {
+		switch (viewType) {
+			case "grid": return {
+				numColumns: 2,
+				showsVerticalScrollIndicator: false
+			}
+			case "list": return {
+				showsVerticalScrollIndicator: false
+			}
+			default: return {
+				horizontal: true,
+				showsHorizontalScrollIndicator: false,
+				contentContainerStyle: { paddingRight: hS(24) }
+			}
+		}
+	}, [])
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1,
-			duration: 920, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [])
 
 	return (
-		<View style={{...styles.container, marginTop: index > 0 ? vS(28) : 0}}>
+		<Animated.View 
+			style={{
+				...styles.container, 
+				marginTop: index > 0 ? vS(28) : 0,
+				opacity: animateValue,
+				transform: [{ translateY: animateValue.interpolate({
+					inputRange: [0, 1],
+					outputRange: [50, 0]
+				}) }]
+			}}>
 			<View style={styles.header}>
 				<Animated.Text 
 					style={{
@@ -33,26 +67,21 @@ export default ({ item, index }: { item: any, index: number }): JSX.Element => {
 					}}>
 					{ category }
 				</Animated.Text>
-				<View style={styles.viewall}>
-					<Text style={styles.viewallText}>See all</Text>
-					<BackIcon style={styles.viewallIcon} width={hS(5)} height={vS(8)} />
-				</View>
 			</View>
 			<FlatList 
-				horizontal
-				contentContainerStyle={{ paddingRight: hS(24) }}
-				showsHorizontalScrollIndicator={false} 
+				{...flatListProps} 
 				data={item.items} 
 				keyExtractor={item => item.id} 
-				renderItem={({ item: insight, index }) => <InsightItem {...{ item: {...insight, category }, index }}/>}
+				renderItem={({ item: insight, index }) => <InsightItem {...{ item: {...insight, category }, index }} />}
 			/>
-		</View>
+		</Animated.View>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: {
-		width: '100%'
+		width: '100%',
+		alignItems: 'center'
 	},
 
 	header: {
@@ -64,26 +93,9 @@ const styles = StyleSheet.create({
 	},
 
 	title: {
-		color: darkPrimary,
+		color: darkHex,
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(18),
 		letterSpacing: .2
-	},
-
-	viewall: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
-
-	viewallText: {
-		marginRight: hS(10),
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(12),
-		color: darkPrimary
-	},
-
-	viewallIcon: {
-		transform: [{ rotate: '180deg' }],
-		marginBottom: vS(3)
 	}
 })

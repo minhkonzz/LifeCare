@@ -1,6 +1,6 @@
-import { memo, ReactNode, useState, useRef, useCallback } from 'react'
+import { memo, useState, useRef, useCallback } from 'react'
 import { View, FlatList } from 'react-native'
-import { SCREEN_WIDTH, verticalScale as vS } from '@utils/responsive'
+import { SCREEN_WIDTH } from '@utils/responsive'
 
 interface CarouselProps {
    data: any[],

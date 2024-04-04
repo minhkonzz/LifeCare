@@ -1,47 +1,61 @@
-import { memo, FC, useState, useRef, useEffect, useContext } from 'react'
+import { memo, useCallback, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, darkHex, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { PopupContext } from '@contexts/popup'
-import { useSelector } from 'react-redux'
-import { AppState } from '../store'
-import { toDateTimeV1, hoursToTimestamp, timestampToDateTime } from '@utils/datetimes'
-import { getCurrentTimestamp } from '@utils/datetimes'
-import { FireColorIcon, BloodSugarDecreaseIcon, BloodSugarIncreaseIcon, BloodSugarNormalIcon, PrimaryEditIcon } from '@assets/icons'
-import StartFastingPopup from '@components/shared/popup-content/start-fasting'
-import fastingStagesData from '@assets/data/fasting-stages.json'
+import { useSelector, useDispatch } from 'react-redux'
+import { AppStore } from '../store'
+import { toDateTimeV1, hoursToTimestamp, timestampToDateTime, getCurrentTimestamp } from '@utils/datetimes'
+import { PrimaryEditIcon } from '@assets/icons'
+import { enqueueAction } from '@store/user'
+import { updateTimes } from '@store/fasting'
+import { autoId } from '@utils/helpers'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { AnimatedTouchableOpacity } from './shared/animated'
+import useSession from '@hooks/useSession'
+import UserService from '@services/user'
+import withSync from '@hocs/withSync'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
+import withFastingStage from '@hocs/withFastingState'
+import StartFastingPopup from '@components/shared/popup/start-fasting'
 import LinearGradient from 'react-native-linear-gradient'
-import ConfirmStopFastingPopup from '@components/shared/popup-content/confirm-stop-fasting'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-const stageIcons = [
-	BloodSugarIncreaseIcon,
-	BloodSugarDecreaseIcon,
-	BloodSugarNormalIcon,
-	FireColorIcon
-]
-
-const stages = fastingStagesData.map((e, i) => ({...e, icon: stageIcons[i]}))
+import ConfirmStopFastingPopup from '@components/shared/popup/confirm-stop-fasting'
 
 interface ActivateTimeProps {
-	activate?: boolean
+	title: string
+	borderColor?: string
+	editable?: boolean
 	current?: boolean
 	value?: string
 }
 
-const FastingActivateTime: FC<ActivateTimeProps> = ({ activate, current, value = '' }) => {
+const FastingActivateTime = memo(({ 
+	title, 
+	editable,
+	borderColor, 
+	current, 
+	value = '' 
+}: ActivateTimeProps): JSX.Element => {
+	
+	const EditButton = useCallback(() => {
+		const { setPopup } = useContext<any>(PopupContext)
+
+		return (
+			<Pressable onPress={() => setPopup(StartFastingPopup)}>
+				<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+			</Pressable>
+		)
+	}, [])
+
 	return (
 		<View style={styles.fastingActivateTime}>
 			<View style={styles.fastingActivateTimeMain}>
-				<View style={{...styles.boundaryC, borderColor: activate && primaryHex || '#ff9b85' }}>
+				<View style={{...styles.boundaryC, borderColor }}>
 					<View style={styles.coreC} />
 				</View>
-				<Text style={styles.text}>{activate && 'Start:' || 'Stop:'}</Text>
+				<Text style={styles.text}>{title}</Text>
 				<Text style={{
 					...styles.text,
 					marginTop: 2,
@@ -51,51 +65,22 @@ const FastingActivateTime: FC<ActivateTimeProps> = ({ activate, current, value =
 					{value}
 				</Text>
 			</View>
-			{
-				current &&
-				<Pressable>
-					<PrimaryEditIcon width={hS(20)} height={vS(20)} />
-				</Pressable>
-			}
+			{ editable && <EditButton /> }
 		</View>
 	)
-}
+})
 
-const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: Animated.Value, navigation: any }) => {
-	const startTimestamp: number = useSelector((state: AppState) => state.fasting.startTimeStamp)
-	const [ data, setData ] = useState<{ timeElapsed: number, stageElapsedPercent: number, stage: any } | null>(null)
-
-	useEffect(() => {
-		let interval = setInterval(() => {
-			const currentTimeStamp = getCurrentTimestamp()
-			const timeElapsed = currentTimeStamp - startTimestamp
-			const elapsedHours = Math.floor((timeElapsed / 1000 / 60 / 60) % 24)
-			let currentStage: any
-
-			if (data && data.stage) {
-				const { to } = data.stage
-				currentStage = elapsedHours >= to && stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || data.stage
-			} else {
-				currentStage = stages.find(e => elapsedHours >= e.from && elapsedHours <= e.to) || stages.at(-1)
-			}
-
-			const { from, to } = currentStage
-			const stageElapsedPercent: number = (elapsedHours - from) / (to - from) * 100
-			setData({ timeElapsed, stageElapsedPercent, stage: currentStage })
-		}, 999)
-
-		return () => { clearInterval(interval) }
-	}, [startTimestamp])
-
+const CurrentFastingStage = memo(withFastingStage(({ stageData: data }: { stageData: any }) => {
+	const navigation = useNavigation<any>()
 	if (data) {
-		const { stageElapsedPercent, timeElapsed, stage } = data
+		const { stageElapsedPercent, elapsedTime, stage } = data
 		const { title, icon, to } = stage
+		const totalMsLeftToNextStage: number = hoursToTimestamp(to) - elapsedTime
 		const StageIcon = icon
 
 		return (
-			<AnimatedPressable 
-				onPress={() => navigation.navigate('fasting-stages')}
-				style={{ opacity: animateValue }}>
+			<Pressable 
+				onPress={() => navigation.navigate('fasting-stages')}>
 				<LinearGradient
 					style={styles.stage}
 					colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
@@ -116,92 +101,178 @@ const CurrentFastingStage = memo(({ animateValue, navigation }: { animateValue: 
 							/>
 							<StageIcon width={hS(36)} height={vS(36)} />
 						</View>
-						<Animated.View 
-							style={{ 
-								marginLeft: hS(15), 
-								opacity: animateValue, 
-								transform: [{ translateX: animateValue.interpolate({
-									inputRange: [0, 1], 
-									outputRange: [-50, 0]
-								}) }] 
-							}}>
+						<View style={{ marginLeft: hS(15) }}>
 							<Text style={styles.stageSmText}>CURRENT STAGE</Text>
 							<Text style={{...styles.stageLgText, marginBottom: vS(4) }}>{title}</Text>
+							{ totalMsLeftToNextStage > 0 && 
 							<Text style={styles.stageSmText}>
-								{`${timestampToDateTime(hoursToTimestamp(to) - timeElapsed)} left to next stage`}
-							</Text>
-						</Animated.View>
+								{`${timestampToDateTime(totalMsLeftToNextStage)} left to next stage`}
+							</Text> }
+						</View>
 					</View>
 				</LinearGradient>
-			</AnimatedPressable>
+			</Pressable>
 		)
 	}
-
 	return <></>
-})
+}, true))
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
+export default withSync(withVisiblitySensor(withFastingStage(({ 
+	isViewable, 
+	animateValue,
+	stageData,
+	isOnline
+}: { 
+	isViewable: boolean, 
+	animateValue: Animated.Value,
+	stageData: any,
+	isOnline: boolean
+}): JSX.Element => {
+	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const { startTimeStamp, endTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
 	const { setPopup } = useContext<any>(PopupContext)
-	const isFasting = !!(startTimeStamp && endTimeStamp)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
+	const { currentPlan } = useSelector((state: AppStore) => state.fasting)
+	const { userId } = useSession()
 
 	const handleFastingButton = () => {
 		if (!currentPlan) {
 			navigation.navigate('plans')
 			return
 		}
-		if (isFasting) {
+		if (stageData) {
 			setPopup(ConfirmStopFastingPopup)
 			return 
 		}
 		setPopup(StartFastingPopup)
 	}
 
-	return (
-		isFasting && 
-		<View style={styles.container}>
-			<Animated.View style={{
-				...styles.header, 
-				opacity: animateValue, 
-				transform: [{ translateX: animateValue.interpolate({
-					inputRange: [0, 1], 
-					outputRange: [-50, 0]
-				}) }]
-			}}>
-				<FastingActivateTime activate current value={toDateTimeV1(startTimeStamp)} />
-				<View style={styles.line} />
-				<FastingActivateTime value={toDateTimeV1(endTimeStamp)} />
-			</Animated.View> 
-			<AnimatedTouchableOpacity 
-				activeOpacity={.7} 
-				onPress={handleFastingButton}
-				style={{ 
+	if (stageData) {
+		const currentTimeStamp: number = getCurrentTimestamp()
+		const { startTimeStamp, endTimeStamp } = stageData
+		const isOnFastingTime: boolean = startTimeStamp < currentTimeStamp
+		
+		if (!isOnFastingTime) {
+			const onEndPlan = async () => {
+				const payload = { startTimeStamp: 0, endTimeStamp: 0 }
+				const cache = () => {
+					dispatch(updateTimes(payload))
+					if (userId && !isOnline) {
+						dispatch(enqueueAction({
+							userId,
+							actionId: autoId('qaid'),
+							invoker: 'updatePersonalData',
+							name: 'UPDATE_FASTING_TIMES',
+							params: [userId, payload]
+						}))
+					}
+				}
+
+				if (userId) {
+					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+					return
+				}
+				cache()
+			}
+
+			const onStartFastingNow = async () => {
+				const _ct = getCurrentTimestamp()
+				const { hrsFast } = currentPlan
+				const payload = { startTimeStamp: _ct, endTimeStamp: _ct + hrsFast * 60 * 60 * 1000 }
+				const cache = () => {
+					dispatch(updateTimes(payload))
+					if (userId && !isOnline) {
+						dispatch(enqueueAction({
+							userId,
+							actionId: autoId('qaid'),
+							invoker: 'updatePersonalData',
+							name: 'UPDATE_FASTING_TIMES',
+							params: [userId, payload]
+						}))
+					}
+				}
+
+				if (userId) {
+					const errorMessage: string = await UserService.updatePersonalData(userId, payload)
+					if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+					return
+				}
+				cache()
+			}
+
+			return (
+				isViewable && 
+				<Animated.View style={{ opacity: animateValue, flexDirection: 'row', alignItems: 'center', marginTop: vS(48), justifyContent: 'space-between', width: hS(366) }}>
+					<TouchableOpacity 
+						activeOpacity={.7} 
+						onPress={onStartFastingNow}>
+						<LinearGradient
+							style={{...styles.startStopButton, width: hS(172), height: vS(65) }}
+							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.startStopButtonText}>Start now</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+					<TouchableOpacity 
+						activeOpacity={.7} 
+						onPress={onEndPlan}>
+						<LinearGradient
+							style={{...styles.startStopButton, width: hS(172), height: vS(65) }}
+							colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.startStopButtonText}>End plan</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+				</Animated.View> || <View style={styles.startStopButton} /> 
+			)
+		}
+
+		const currentDate: number = new Date().getDate()
+		const isOnStartDate: boolean = new Date(startTimeStamp).getDate() === currentDate
+		const isOnEndDate: boolean = new Date(endTimeStamp).getDate() === currentDate
+
+		return (
+			isViewable && 
+			<View style={styles.container}>
+				<Animated.View style={{
+					...styles.header, 
 					opacity: animateValue, 
-					transform: [{ translateY: animateValue.interpolate({
+					transform: [{ translateX: animateValue.interpolate({
 						inputRange: [0, 1], 
-						outputRange: [-30, 0]
-					}) }]	
+						outputRange: [-50, 0]
+					}) }]
 				}}>
-				<LinearGradient
-					style={styles.startStopButton}
-					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }}>
-					<Text style={styles.startStopButtonText}>Stop fasting</Text>
-				</LinearGradient>
-			</AnimatedTouchableOpacity>
-			<CurrentFastingStage {...{ animateValue, navigation }} />
-		</View> || 
+					<FastingActivateTime title='Start' editable current={isOnStartDate} value={toDateTimeV1(startTimeStamp)} borderColor={primaryHex} />
+					<View style={styles.line} />
+					<FastingActivateTime title='End' current={isOnEndDate} value={toDateTimeV1(endTimeStamp)} borderColor='#ff9b85' />
+				</Animated.View> 
+				<AnimatedTouchableOpacity 
+					activeOpacity={.7} 
+					onPress={handleFastingButton}
+					style={{ 
+						opacity: animateValue, 
+						transform: [{ translateY: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-30, 0]
+						}) }]	
+					}}>
+					<LinearGradient
+						style={styles.startStopButton}
+						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }}>
+						<Text style={styles.startStopButtonText}>Finish fasting</Text>
+					</LinearGradient>
+				</AnimatedTouchableOpacity>
+				<CurrentFastingStage />
+			</View> || <View style={styles.container} /> 
+		)
+	}
+
+	return (
+		isViewable && 
 		<AnimatedTouchableOpacity 
 			activeOpacity={.7} 
 			onPress={handleFastingButton}
@@ -219,9 +290,9 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				end={{ x: .5, y: 1 }}>
 				<Text style={styles.startStopButtonText}>Start Fasting</Text>
 			</LinearGradient>
-		</AnimatedTouchableOpacity>
+		</AnimatedTouchableOpacity> || <View style={styles.startStopButton} /> 
 	)
-})
+}, true)))
 
 const styles = StyleSheet.create({
 	container: {

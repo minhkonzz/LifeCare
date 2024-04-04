@@ -1,20 +1,20 @@
 import { View, StyleSheet } from 'react-native'
-import WheelPicker from './wheel-picker'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { verticalScale as vS } from '@utils/responsive'
 import { WheelPickerProps } from '@utils/interfaces'
+import WheelPicker from './wheel-picker'
 
-// interface ValueWheelPickerProps {
-//    items: string[] | number[]
-//    itemHeight: number, 
-//    onIndexChange?: (index: number) => void
-// }
-
-export default ({ items, itemHeight, onIndexChange }: WheelPickerProps): JSX.Element => {
+export default ({ 
+   items, 
+   itemHeight, 
+   onIndexChange, 
+   fs,
+   initialScrollIndex
+}: WheelPickerProps): JSX.Element => {
    return (
-      <View style={[styles.container, { height: itemHeight * 5 }]}>
+      <View style={{...styles.container, height: itemHeight * 5 }}>
          <View style={styles.indicator} />
-         <WheelPicker {...{ items, itemHeight, onIndexChange }} />
+         <WheelPicker {...{ items, itemHeight, onIndexChange, fs, initialScrollIndex }} />
       </View>
    )
 }
@@ -25,16 +25,10 @@ const styles = StyleSheet.create({
       justifyContent: 'center'
    }, 
 
-   wheelPicker: {
-      position: 'absolute',
-      width: '100%',
-      height: '100%'
-   },
-
    indicator: {
       width: '100%', 
       height: '18%', 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .1)`, 
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .1)`, 
       borderRadius: 100,
       marginBottom: vS(4)
    }

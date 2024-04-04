@@ -11,20 +11,14 @@ import {
 } from 'react-native'
 
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { BASE_WIDTH } from '@utils/constants/screen'
+import { PolygonIcon, WhiteBackIcon, WhiteFireIcon, WhiteEditIcon } from '@assets/icons'
 import foodNutritionData from '@assets/data/food-nutrition.json'
 import Screen from '@components/shared/screen'
 import Button from '@components/shared/button/Button'
 import LinearGradient from 'react-native-linear-gradient'
-import PolygonIcon from '@assets/icons/polygon.svg'
-import WhiteBackIcon from '@assets/icons/goback-white.svg'
-import WhiteFireIcon from '@assets/icons/fire-white.svg'
-import WhiteEditIcon from '@assets/icons/edit-white.svg'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface NutritionPartProgressProps {
     title: string, 

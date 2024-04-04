@@ -1,20 +1,11 @@
 import { Platform } from 'react-native'
-import PushNotification from 'react-native-push-notification'
 import { NOTIFICATION_CHANNEL_ID } from '@utils/constants/notification'
 import { calculateAmountBetweenTimes } from '@utils/datetimes'
-
-import {  
-   WATER_REMIND,
-   START_FAST_REMIND,
-   END_FAST_REMIND,
-   WEIGHT_REMIND
-} from '@utils/constants/notification'
+import { WATER_REMIND, START_FAST_REMIND, END_FAST_REMIND, WEIGHT_REMIND } from '@utils/constants/notification'
+import PushNotification from 'react-native-push-notification'
 
 export const configPushStartFastNotification = (bundledConfig: any) => {
-   const {
-      startFast, 
-      beforeStartFast
-   } = bundledConfig
+   const { startFast, beforeStartFast } = bundledConfig
 
    const startFastDate = new Date(startFast)
    const hourStartFast = startFastDate.getHours()
@@ -39,17 +30,12 @@ export const configPushStartFastNotification = (bundledConfig: any) => {
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: START_FAST_REMIND
-      }
+      userInfo: { type: START_FAST_REMIND }
    })
 }
 
 export const configPushEndFastNotification = (bundledConfig: any) => {
-   const {
-      endFast, 
-      beforeEndFast
-   } = bundledConfig
+   const { endFast, beforeEndFast } = bundledConfig
 
    const endFastDate = new Date(endFast)
    const hourEndFast = endFastDate.getHours()
@@ -82,9 +68,7 @@ export const configPushEndFastNotification = (bundledConfig: any) => {
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: END_FAST_REMIND
-      }
+      userInfo: { type: END_FAST_REMIND }
    })
 }
 
@@ -120,50 +104,45 @@ export const configPushWaterDrinkNotification = (bundledConfig: any) => {
       endTime: `${startHour}:${startMin}`
    })
 
+   const date: Date = new Date(Date.now() + totalMsUntilPush)
+
    PushNotification.localNotificationSchedule({
       channelId: NOTIFICATION_CHANNEL_ID,
-      id: `WATER${WATER_REMIND}`,
-      date: new Date(Date.now() + totalMsUntilPush),
+      date,
       title: 'Remember to keep track your water',
       message: `Time to drink more water. You drinked ${drinked} ml today`,
       allowWhileIdle: true, 
       playSound: true, 
       soundName: 'default',
-      userInfo: {
-         type: WATER_REMIND
-      }
+      userInfo: { type: WATER_REMIND }
    })
 }
 
 export const configPushNotification = (bundledConfig: any) => {
-   
-   const { 
-      startWater,
-      endWater, 
-      waterInterval, 
-      drinked
-   } = bundledConfig
-
    PushNotification.configure({
       onRegister: function (token) {},
 
+      onAction: function(notification) {
+         console.log('pushed notification 1', notification)
+      },
+
       onNotification: function (notification) {
-         const { data } = notification
-         const notificationType = data.type
-         switch (notificationType) {
-            case START_FAST_REMIND: {
+         // console.log('pushed notification')
+         // const { data } = notification
+         // const notificationType = data.type
+         // switch (notificationType) {
+         //    case START_FAST_REMIND: {
                
-               return
-            }
-            case END_FAST_REMIND: {  
-               return
-            }
-            case WATER_REMIND: {
-               PushNotification.cancelLocalNotification(`WATER${WATER_REMIND}`)
-               configPushWaterDrinkNotification(bundledConfig)
-               return
-            }
-         }
+         //       return
+         //    }
+         //    case END_FAST_REMIND: {  
+         //       return
+         //    }
+         //    case WATER_REMIND: {
+         //       // configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
+         //       return
+         //    }
+         // }
       },
 
       onRegistrationError: function (err) {
@@ -187,6 +166,4 @@ export const configPushNotification = (bundledConfig: any) => {
       soundName: 'default',
       vibrate: true
    }, created => console.log(`created channel ${created}`))
-
-   configPushWaterDrinkNotification({ startWater, endWater, waterInterval, drinked })
 }

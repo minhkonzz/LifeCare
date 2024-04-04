@@ -9,15 +9,12 @@ import {
    StyleSheet
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import { SearchIcon, WhiteScanIcon, WhiteBackIcon, WhitePlusIcon } from '@assets/icons'
 import NutritionAddTotal from '@components/nutrition-add-total'
 import addFoodList from '@assets/data/add-food-list.json'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 export default (): JSX.Element => {
    return (

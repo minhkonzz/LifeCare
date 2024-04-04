@@ -1,16 +1,13 @@
 import { FC } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, darkHex, darkRgb, lightHex, lightRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { EditIcon, BodyIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
+import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
-
-const primaryHex: string = Colors.primary.hex
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex, rgb: lightRgb } = Colors.lightPrimary
 
 interface BodyPartProps {
    title: string,
@@ -30,9 +27,11 @@ const BodyPart: FC<BodyPartProps> = ({ title, indicatorColor, value }) => {
    )
 }
 
+const { hrz } = commonStyles
+
 export default (): JSX.Element => {
    const navigation = useNavigation<any>()
-   const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppState) => state.user.metadata)
+   const { chestMeasure, thighMeasure, waistMeasure, hipsMeasure } = useSelector((state: AppStore) => state.user.metadata)
 
    return (
       <LinearGradient
@@ -40,8 +39,8 @@ export default (): JSX.Element => {
          colors={[`rgba(${lightRgb.join(', ')}, .6)`, lightHex]}
          start={{ x: .5, y: 0 }}
          end={{ x: .52, y: .5 }}>
-         <View style={[styles.horz, styles.header]}>
-            <Text style={styles.title}>Body measurement</Text>
+         <View style={[hrz, styles.header]}>
+            <Animated.Text style={styles.title}>Body measurement</Animated.Text>
             <TouchableOpacity 
                style={styles.editButton} 
                activeOpacity={.8} 
@@ -49,7 +48,7 @@ export default (): JSX.Element => {
                <EditIcon width={hS(16)} height={vS(16)} />
             </TouchableOpacity>
          </View>
-         <View style={styles.horz}>
+         <View style={hrz}>
             <View>
                <BodyIcon width={hS(105)} height={vS(105)} />
                <View style={[styles.bodyIndicator, styles.chestIndicator]} />
@@ -57,7 +56,7 @@ export default (): JSX.Element => {
                <View style={[styles.bodyIndicator, styles.hipsIndicator]} />
                <View style={[styles.bodyIndicator, styles.thighIndicator]} />
             </View>
-            <View style={[styles.detail, styles.horz]}>
+            <View style={{...styles.detail, ...hrz}}>
                <View style={styles.detailPart}>
                   <BodyPart title='Chest' indicatorColor={primaryHex} value={chestMeasure} />
                   <BodyPart title='Hips' indicatorColor='#7B3DFF' value={hipsMeasure} />
@@ -75,7 +74,7 @@ export default (): JSX.Element => {
 
 const styles = StyleSheet.create({
    container: {
-      marginTop: vS(32), 
+      marginTop: vS(24), 
       width: hS(370),
       height: vS(193),
       borderRadius: hS(24), 
@@ -83,11 +82,6 @@ const styles = StyleSheet.create({
       paddingTop: vS(12), 
       paddingRight: hS(12),
       paddingBottom: vS(18)
-   }, 
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    }, 
    
    header: {

@@ -1,33 +1,39 @@
-import { FC, useState, useContext } from 'react'
+import { FC } from 'react'
 import {
 	View,
 	Text,
 	FlatList,
 	StyleSheet,
-	Animated,
-	Pressable,
 	Platform,
 	StatusBar,
-	ScrollView,
-	Image
+	ScrollView
 } from 'react-native'
-import { PopupContext } from '../contexts/popup'
-import PopupProvider from '../contexts/popup'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import StackHeader from '@components/shared/stack-header'
 import DayPlanItem from '@components/day-plan-item'
 import LinearGradient from 'react-native-linear-gradient'
 import plansData from '../assets/data/plans.json'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-
 type PlanCategorySectionProps = {
 	title: string,
 	description: string,
 	items?: Array<any>
+}
+
+const PlanCategorySectionHeader = ({ title }: { title: string }): JSX.Element => {
+	return (
+		<View style={styles.planCategorySectionHeader}>
+			<LinearGradient
+				style={styles.planCategorySectionDecor}
+				colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+				start={{ x: .5, y: 0 }}
+				end={{ x: .5, y: 1 }}
+			/>
+			<Text style={styles.planCategorySectionTitle}>{title}</Text>
+		</View>
+	)
 }
 
 const PlanCategorySection: FC<PlanCategorySectionProps> = ({
@@ -37,18 +43,10 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 }) => {
 	return (
 		<View style={styles.planCategorySection}>
-			<View style={styles.planCategorySectionHeader}>
-				<LinearGradient
-					style={styles.planCategorySectionDecor}
-					colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-					start={{ x: .5, y: 0 }}
-					end={{ x: .5, y: 1 }}
-				/>
-				<Text style={styles.planCategorySectionTitle}>{title}</Text>
-			</View>
+			<PlanCategorySectionHeader {...{ title }} />
 			<Text style={styles.planCategorySectionDesc}>{description}</Text>
 			<FlatList
-				style={{ marginTop: vS(16), height: vS(170) }}
+				style={{ marginTop: vS(16), height: vS(250) }}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={item => item.id}
@@ -58,38 +56,15 @@ const PlanCategorySection: FC<PlanCategorySectionProps> = ({
 	)
 }
 
-const Plans = () => {
+export default (): JSX.Element => {
 	const bottomBarHeight: number = useDeviceBottomBarHeight()
-	const [ tabIndexSelected, setTabIndexSelected ] = useState<number>(0)
-	const { popup: Popup, setPopup } = useContext<any>(PopupContext)
 
 	return (
 		<View style={{...styles.container, paddingBottom: bottomBarHeight }}>
-			{/* <View style={styles.header}>
-				<View style={{ width: '100%', paddingHorizontal: hS(24) }}>
-					
-				</View>
-				<FlatList
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					data={plansData}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item, index }) =>
-						<View style={{
-							...styles.planCategory,
-							borderBottomWidth: vS(4),
-							borderBottomColor: primaryHex
-						}}>
-							<Text style={[
-								styles.planCategoryTitle,
-								{ color: index === tabIndexSelected ? darkHex : `rgba(${darkRgb.join(', ')}, .8)` }]}>
-								{item.name}
-							</Text>
-						</View>
-					} />
-			</View> */}
-			<StackHeader title='Plans' />
-			<ScrollView style={styles.main}>
+			<View style={{ width: '100%', paddingHorizontal: hS(22) }}>
+				<StackHeader title='Plans' />
+			</View>
+			<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
 				<PlanCategorySection
 					title='Beginner'
 					description='Skip one meal each day'
@@ -103,16 +78,7 @@ const Plans = () => {
 					description='Keep fasting more than 20 hours'
 					items={plansData[0].items.filter(e => e.group_name === 'Advance').map(e => ({ ...e, categoryName: plansData[0].name }))} />
 			</ScrollView>
-			{ Popup && <Popup setVisible={setPopup} /> }
 		</View>
-	)
-}
-
-export default (): JSX.Element => {
-	return (
-		<PopupProvider>
-			<Plans />
-		</PopupProvider>
 	)
 }
 
@@ -124,7 +90,11 @@ const styles = StyleSheet.create({
 		paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0
 	},
 
-	header: { width: '100%' },
+	planList: {
+		width: hS(16),
+		height: vS(250),
+		borderWidth: 1
+	},
 
 	planCategory: {
 		width: hS(140),

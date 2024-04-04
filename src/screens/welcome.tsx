@@ -1,25 +1,61 @@
-import {
-	View,
-	Text,
-	Image,
-	StyleSheet
-} from 'react-native'
-
-import Button from '@components/shared/button/Button'
-import { Colors } from '@utils/constants/colors'
+import { useEffect } from 'react'
+import { View, StyleSheet, Animated } from 'react-native'
+import { primaryHex, primaryRgb, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
+import Button from '@components/shared/button/Button'
+import useAnimValue from '@hooks/useAnimValue'
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
+export default (): JSX.Element => {
+	const animateValue = useAnimValue(0)
+
+	useEffect(() => {
+		Animated.timing(animateValue, {
+			toValue: 1,
+			duration: 700,
+			useNativeDriver: true
+		}).start()
+	}, [])
+
+	const navigation = useNavigation<any>()
 	return (
 		<View style={styles.container}>
-			<Image style={styles.storyset} source={require('../assets/images/storyset/welcome.gif')} />
-			<Text style={styles.title}>{`Welcome to\nLifeCare`}</Text>
+			<Animated.Image 
+				style={{...styles.storyset, opacity: animateValue}} 
+				source={require('../assets/images/storyset/welcome.gif')} 
+			/>
+			<View style={styles.texts}>
+				<Animated.Text style={{
+					...styles.title,
+					opacity: animateValue,
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					}) }]
+				}}>
+					Fastiny
+				</Animated.Text>
+				<Animated.Text style={{
+					...styles.title, 
+					fontSize: hS(15), 
+					color: `rgba(${darkRgb.join(', ')}, .7)`, 
+					fontFamily: 'Poppins-Regular',
+					marginTop: vS(16),
+					lineHeight: vS(28),
+					opacity: animateValue,
+					transform: [{ translateY: animateValue.interpolate({
+						inputRange: [0, 1],
+						outputRange: [-50, 0]
+					}) }]
+				}}>
+					Intermittent fasting for people staying in shape
+				</Animated.Text>
+			</View>
 			<Button
 				title='Get started'
 				size='large'
-				bgColor={[`rgba(${Colors.primary.rgb.join(', ')}, .6)`, Colors.primary.hex]}
-				onPress={() => navigation.navigate('auth')}
+				bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+				onPress={() => navigation.navigate('onboarding')}
 			/>
 		</View>
 	)
@@ -38,10 +74,14 @@ const styles = StyleSheet.create({
 
 	title: {
 		fontSize: hS(36),
-		fontFamily: 'Poppins-Bold',
+		fontFamily: 'Poppins-SemiBold',
 		textAlign: 'center',
-		lineHeight: hS(52),
-		color: Colors.darkPrimary.hex
+		color: primaryHex
+	},
+	
+	texts: {
+		justifyContent: 'center',
+		width: '100%'
 	},
 
 	storyset: {

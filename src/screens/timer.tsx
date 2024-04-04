@@ -1,34 +1,33 @@
-import { memo, useEffect, useRef } from 'react'
+import { memo, useContext } from 'react'
 import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { BackIcon } from '@assets/icons'
+import { BackIcon, PrimaryBookIcon } from '@assets/icons'
+import { PopupContext } from '@contexts/popup'
+import { AnimatedPressable } from '@components/shared/animated'
+import { commonStyles } from '@utils/stylesheet'
+import SyncDetector from '@components/sensors/sync-detect'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import FastingClock from '@components/fasting-clock'
 import FastingActivator from '@components/fasting-activator'
 import FastingRecords from '@components/timer-fasting-records'
 import Screen from '@components/shared/screen'
+import SuggestionPopup from '@components/shared/popup/suggestion'
+import withFastingState from '@hocs/withFastingState'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hrz } = commonStyles
 
-const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppState) => state.fasting)
+const MainTop = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
+	const { currentPlan, startTimeStamp, endTimeStamp } = useSelector((state: AppStore) => state.fasting)
 	const navigation = useNavigation<any>()
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	return (
 		isViewable && 
 		<View style={styles.mainTop}>
+			<SyncDetector />
 			<Animated.Text style={{
 				...styles.mainTopTitle, 
 				opacity: animateValue, 
@@ -49,11 +48,7 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 			}}>
 				<Pressable style={styles.plansBox} onPress={() => navigation.navigate('plans')}>
 					<Text style={styles.plansBoxText}>{currentPlan && `${currentPlan.name} Intermittent Fasting plan` || 'Choose fasting plan'}</Text>
-					<BackIcon
-						style={styles.backIc}
-						width={hS(5)}
-						height={vS(10)}
-					/>
+					<BackIcon style={styles.backIc} width={hS(5)} height={vS(10)} />
 				</Pressable>
 				<Pressable style={styles.planRef}>
 					<Text style={styles.planRefText}>?</Text>
@@ -63,18 +58,87 @@ const MainTop = memo(({ isViewable }: { isViewable: boolean }) => {
 	)
 })
 
+const Tips = withVisiblitySensor(
+	withFastingState(({
+		isFasting, 
+		isViewable, 
+		animateValue
+	}: { 
+		isFasting: boolean,
+		isViewable: boolean, 
+		animateValue: Animated.Value 
+	}): JSX.Element => {
+
+	const { setPopup } = useContext<any>(PopupContext)
+	return (
+		isViewable && (
+		isFasting && 
+		<View style={styles.tips}>
+			<AnimatedPressable onPress={() => setPopup(SuggestionPopup)} style={{
+				...styles.tip,
+				opacity: animateValue,
+				transform: [{ translateX: animateValue.interpolate({
+					inputRange: [0, 1],
+					outputRange: [-50, 0]
+				}) }]
+			}}>
+				<View style={{...hrz, marginBottom: vS(-7) }}>
+					<PrimaryBookIcon style={styles.Ic} width={hS(28)} height={vS(28)} />
+					<Text style={styles.tipText}>Tips during fasting period</Text>
+				</View>
+				<BackIcon style={styles.redirectIcon} width={10} height={10} />
+			</AnimatedPressable>
+		</View> || <></>) || <View style={styles.tips} />
+	)
+}))
+
 export default memo((): JSX.Element => {
 	return (
 		<Screen header='tab' title='Timer' paddingHorzContent content={[
 			MainTop,
 			FastingClock,
 			FastingActivator,
-			FastingRecords
+			FastingRecords,
+			Tips
 		]} />
 	)
 })
 
 const styles = StyleSheet.create({
+	Ic: { marginBottom: vS(5) },
+
+	tips: {
+		width: hS(370),
+		marginTop: vS(16),
+		height: vS(200)
+	},
+
+	tip: {
+		width: '100%',
+		paddingVertical: vS(30),
+		paddingHorizontal: hS(24),
+		elevation: 5,
+		shadowColor: `rgba(${darkRgb.join(', ')}, .3)`,
+		borderRadius: hS(24),
+		marginTop: vS(8),
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		flexDirection: 'row'
+	},
+
+	tipText: {
+		fontFamily: 'Poppins-SemiBold', 
+		fontSize: hS(12),
+		color: darkHex,
+		letterSpacing: .2,
+		marginLeft: hS(12)
+	},	
+
+	redirectIcon: {
+		transform: [{ rotate: '180deg' }],
+		marginBottom: vS(-4)
+	},
+
 	mainTop: {
 		height: vS(120),
 		alignItems: 'center',

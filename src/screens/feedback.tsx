@@ -1,20 +1,11 @@
-import feedbackNotSatisfiedOptions from '@assets/data/feedback-not-satisfied-options.json'
-import FeedbackTextBox from '@components/feedback-textbox'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import Button from '@components/shared/button/Button'
 import StackHeader from '@components/shared/stack-header'
 import LinearGradient from 'react-native-linear-gradient'
-import {
-	View,
-	Text,
-	StyleSheet,
-	Animated,
-	Pressable
-} from 'react-native'
-
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+import feedbackNotSatisfiedOptions from '@assets/data/feedback-not-satisfied-options.json'
+import FeedbackTextBox from '@components/feedback-textbox'
 
 export default (): JSX.Element => {
 	const optionIndexesSelected = [1, 2, 4]

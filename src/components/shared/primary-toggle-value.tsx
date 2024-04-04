@@ -1,26 +1,31 @@
-import { useState, useRef } from 'react'
+import { memo, Dispatch, SetStateAction } from 'react'
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import LinearGradient from 'react-native-linear-gradient'
+import { AnimatedLinearGradient } from './animated'
+import useAnimValue from '@hooks/useAnimValue'
 
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-
-// const options: Array<string> = ["cm/ft", "kg/lb"]
-const OPTION_WIDTH: number = hS(98)
-
-const { rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const OPTION_WIDTH: number = hS(92)
 
 interface PrimaryToggleValue {
    options: string[],
-   onChangeOption?: (selectedIndex: number) => void
+   selectedOptionIndex: number, 
+   setSelectedOptionIndex: Dispatch<SetStateAction<number>>
+   toggleColor?: string[],
+   onChangeOption?: () => void
    additionalStyles?: any
 }
 
-export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValue): JSX.Element => {
-   const translateX: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
+export default memo(({ 
+   options, 
+   selectedOptionIndex, 
+   setSelectedOptionIndex,
+   onChangeOption, 
+   additionalStyles, 
+   toggleColor = [`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex] 
+}: PrimaryToggleValue): JSX.Element => {
+   const translateX = useAnimValue(0)
+   // const [ selectedIndex, setSelectedIndex ] = useState<number>(0)
 
    const changeOption = (index: number) => {
       Animated.timing(translateX, {
@@ -28,8 +33,8 @@ export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValu
          duration: 300, 
          useNativeDriver: true
       }).start(() => {
-         if (onChangeOption) onChangeOption(index)
-         setSelectedIndex(index)
+         if (onChangeOption) onChangeOption()
+         setSelectedOptionIndex(index)
       })
    }
 
@@ -37,7 +42,7 @@ export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValu
       <View style={additionalStyles && {...styles.container, ...additionalStyles} || styles.container}>
          <AnimatedLinearGradient
             style={{...styles.toggleButton, transform: [{ translateX }] }}
-            colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+            colors={toggleColor}
             start={{ x: .5, y: 0 }}
             end={{ x: .52, y: 1 }} />
          {
@@ -48,8 +53,8 @@ export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValu
                   onPress={() => changeOption(i)}>
                   <Text style={{
                      ...styles.optionText, 
-                     fontFamily: `Poppins-${i === selectedIndex && 'Bold' || 'Regular'}`,
-                     color: i === selectedIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
+                     fontFamily: `Poppins-${i === selectedOptionIndex && 'Bold' || 'Regular'}`,
+                     color: i === selectedOptionIndex && '#fff' || `rgba(${darkRgb.join(', ')}, .8)`
                   }}>
                      {e}
                   </Text>
@@ -58,7 +63,7 @@ export default ({ options, onChangeOption, additionalStyles }: PrimaryToggleValu
          }
       </View>
    )
-}
+})
 
 const styles = StyleSheet.create({
    container: {

@@ -1,49 +1,81 @@
-import { memo, Dispatch, SetStateAction, useState, useRef, useEffect } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { memo, Dispatch, SetStateAction, useRef, useEffect, useCallback, useContext, useState } from 'react'
+import { View, Text, StyleSheet, Animated, Platform, StatusBar, TouchableOpacity, ScrollView, Pressable } from 'react-native'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDeviceBottomBarHeight } from '@hooks/useDeviceBottomBarHeight'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
-import { resetTimes } from '../store/fasting'
-import { toDateTimeV1 } from '@utils/datetimes'
+import { AppStore } from '../store'
+import { resetTimes } from '@store/fasting'
+import { addRec, enqueueAction } from '@store/user'
+import { getLocalDatetimeV2, milisecondsToHoursMins, toDateTimeV1, toDateTimeV2 } from '@utils/datetimes'
+import { PopupContext } from '@contexts/popup'
+import { WhiteBackIcon, WhiteEditIcon, PrimaryEditIcon } from '@assets/icons'
+import { autoId } from '@utils/helpers'
+import { AnimatedLinearGradient } from '@components/shared/animated'
+import { NETWORK_REQUEST_FAILED } from '@utils/constants/error-message'
+import { commonStyles } from '@utils/stylesheet'
+import UpdateStartFastPopup from '@components/shared/popup/update-startfast'
+import UpdateEndFastPopup from '@components/shared/popup/update-endfast'
+import Button from '@components/shared/button/Button'
+import withSync from '@hocs/withSync'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
-import BackIcon from '@assets/icons/goback-white.svg'
-import EditWhite from '@assets/icons/edit-white.svg'
-import CurrentWeightPopup from '@components/shared/popup-content/current-weight'
+import CurrentWeightPopup from '@components/shared/popup/current-weight'
 import AnimatedNumber from '@components/shared/animated-text'
-import {
-	View,
-	Text,
-	StyleSheet,
-	Animated,
-	Platform,
-	StatusBar,
-	TouchableOpacity,
-	ScrollView
-} from 'react-native'
+import useSession from '@hooks/useSession'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
+const { wfull, hrz } = commonStyles
 
-const TimeSetting = memo(() => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
-	const { name: planName } = currentPlan
-	const endTimeStamp = Date.now()
+const TimeSetting = memo(({ 
+	fastingRecId,
+	startTimeStamp,
+	setSavedStartTimeStamp, 
+	endTimeStamp, 
+	setSavedEndTimeStamp,
+	planName 
+}: {
+	fastingRecId?: string,
+	startTimeStamp: number,
+	setSavedStartTimeStamp: Dispatch<SetStateAction<number>>,
+	endTimeStamp: number,
+	setSavedEndTimeStamp: Dispatch<SetStateAction<number>>,
+	planName: string
+}) => {
+	const animateValue = useAnimValue(0)
+	const { setPopup } = useContext<any>(PopupContext)
+
+	const UpdateStartFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+		return <UpdateStartFastPopup {...{ 
+			setVisible, 
+			datetime: toDateTimeV2(startTimeStamp), 
+			fastingRecId,
+			endTimeStamp,
+			setSavedStartTimeStamp
+		}} />
+	}), [])
+
+	const UpdateEndFastTimePopup = useCallback(memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<any>> }) => {
+		return <UpdateEndFastPopup {...{ 
+			setVisible, 
+			datetime: toDateTimeV2(endTimeStamp), 
+			fastingRecId,
+			startTimeStamp,
+			setSavedEndTimeStamp
+		}} />
+	}), [])
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1, 
-			duration: 1200, 
+			duration: 840, 
 			useNativeDriver: true
 		}).start()
 	}, [])
 
 	return (
-		<Animated.View style={{...styles.fastingTimes, opacity: animateValue}}>
+		<Animated.View style={{...styles.fastingTimes, opacity: animateValue }}>
 			<Animated.View style={{
 				...styles.planName,
 				opacity: animateValue,
@@ -54,41 +86,52 @@ const TimeSetting = memo(() => {
 			}}>
 				<Text style={styles.planNameText}>{planName}</Text>
 			</Animated.View>
-			<View style={styles.wfull}>
+			<View style={wfull}>
 				<View style={styles.timeSetting}>
 					<View style={styles.timeSettingTitle}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: primaryHex }} />
 						<Text style={styles.timeSettingTitleText}>Start</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
+					<View style={hrz}>
+						<Text style={styles.timeSettingValueText}>{toDateTimeV1(startTimeStamp)}</Text>
+						<Pressable onPress={() => setPopup(UpdateStartFastTimePopup)}>
+							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						</Pressable>
+					</View>
 				</View>
 				<View style={{...styles.timeSetting, marginTop: vS(28) }}>
 					<View style={styles.timeSettingTitle}>
 						<View style={{...styles.timeSettingDecor, backgroundColor: 'rgb(255, 155, 133)' }} />
 						<Text style={styles.timeSettingTitleText}>End</Text>
 					</View>
-					<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
+					<View style={hrz}>
+						<Text style={styles.timeSettingValueText}>{toDateTimeV1(endTimeStamp)}</Text>
+						<Pressable onPress={() => setPopup(UpdateEndFastTimePopup)}>
+							<PrimaryEditIcon width={hS(20)} height={vS(20)} />
+						</Pressable>
+					</View>
 				</View>
 			</View>
 		</Animated.View>
 	)
 })
 
-const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const progressAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppState) => state.user.metadata)
+const TrackWeight = memo((): JSX.Element => {
+	const animateValue = useAnimValue(0)
+	const progressAnimateValue = useAnimValue(0)
+	const { setPopup } = useContext<any>(PopupContext)
+	const { startWeight, goalWeight, currentWeight } = useSelector((state: AppStore) => state.user.metadata)
 
 	useEffect(() => {
 		Animated.parallel([
 			Animated.timing(animateValue, {
 				toValue: 1, 
-				duration: 920, 
+				duration: 840, 
 				useNativeDriver: true
 			}),
 			Animated.timing(progressAnimateValue, {
 				toValue: 1, 
-				duration: 920, 
+				duration: 840, 
 				useNativeDriver: false
 			})
 		]).start()
@@ -98,25 +141,23 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 		<Animated.View style={{...styles.trackWeight, opacity: animateValue }}>
 			<View style={styles.trackWeightHeader}>
 				<View>
-					<Animated.Text 
-						style={{
-							...styles.trackWeightTitle,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-30, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.trackWeightTitle,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-30, 0]
+						}) }]
+					}}>
 						Track your weight
 					</Animated.Text>
 					<View style={styles.trackWeightValue}>
-						<Animated.Text 
-							style={{
-								...styles.trackWeightValueText,
-								transform: [{ translateY: animateValue.interpolate({
-									inputRange: [0, 1], 
-									outputRange: [10, 0]
-								}) }]
-							}}>
+						<Animated.Text style={{
+							...styles.trackWeightValueText,
+							transform: [{ translateY: animateValue.interpolate({
+								inputRange: [0, 1], 
+								outputRange: [10, 0]
+							}) }]
+						}}>
 							{`${currentWeight} kg`}
 						</Animated.Text>
 						<Animated.Text style={{
@@ -133,13 +174,13 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 				</View>
 				<TouchableOpacity
 					activeOpacity={.7}
-					onPress={() => setVisible(true)}>
+					onPress={() => setPopup(CurrentWeightPopup)}>
 					<LinearGradient
 						style={styles.trackWeightButton}
 						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }}>
-						<EditWhite width={hS(20)} height={vS(20)} />
+						<WhiteEditIcon width={hS(20)} height={vS(20)} />
 					</LinearGradient>
 				</TouchableOpacity>
 			</View>
@@ -158,26 +199,24 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 						end={{ x: .5, y: 1 }} />
 				</Animated.View>
 				<View style={styles.weightProcessTexts}>
-					<Animated.Text 
-						style={{
-							...styles.weightProcessText,
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-10, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.weightProcessText,
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [-10, 0]
+						}) }]
+					}}>
 						{`Start: ${startWeight} kg`}
 					</Animated.Text>
-					<Animated.Text 
-						style={{
-							...styles.weightProcessText,
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [10, 0]
-							}) }]
-						}}>
+					<Animated.Text style={{
+						...styles.weightProcessText,
+						opacity: animateValue,
+						transform: [{ translateX: animateValue.interpolate({
+							inputRange: [0, 1], 
+							outputRange: [10, 0]
+						}) }]
+					}}>
 						{`Goal: ${goalWeight} kg`}
 					</Animated.Text>
 				</View>
@@ -186,41 +225,135 @@ const TrackWeight = memo(({ setVisible }: { setVisible: Dispatch<SetStateAction<
 	)
 })
 
-export default (): JSX.Element => {
-	const dispatch = useDispatch()
-	const navigation = useNavigation<any>()
+export default withSync(({ isOnline }: { isOnline: boolean }): JSX.Element => {
 	const bottomBarHeight = useDeviceBottomBarHeight()
-	const [ visible, setVisible ] = useState<boolean>(false)
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const { startTimeStamp, currentPlan } = useSelector((state: AppState) => state.fasting)
-	const session = useSelector((state: AppState) => state.user.session) 
-   const userId: string | null = session && session.user.id || null
-	const { name: planName } = currentPlan
-	const endTimeStamp: number = Date.now()
-	const totalMins: number = Math.floor((endTimeStamp - startTimeStamp) / (1000 * 60))
-	const hours: number = Math.floor(totalMins / 60)
-	const mins: number = totalMins % 60
+	const navigation = useNavigation<any>()
+	const dispatch = useDispatch()
+	const route = useRoute()
+	const screenParams: any = route.params
+	const animateValue = useAnimValue(0)
+	const { startTimeStamp: _startTimeStamp, currentPlan } = useSelector((state: AppStore) => state.fasting)
 
-	console.log('mins:', mins)
+	let fastingRecId: string = '', startTimeStamp: number, endTimeStamp: number, planName: string
+		 
+	if (screenParams) {
+		const { item } = screenParams
+		const { id, plan, startTimeStamp: _start, endTimeStamp: _end } = item
+		fastingRecId = id
+		startTimeStamp = _start
+		endTimeStamp = _end
+		planName = plan
+	} else {
+		startTimeStamp = _startTimeStamp
+		endTimeStamp = Date.now()
+		planName = currentPlan.name
+	}
+	
+	const { userId } = useSession()
+	const [ savedStartTimeStamp, setSavedStartTimeStamp ] = useState<number>(startTimeStamp)
+	const [ savedEndTimeStamp, setSavedEndTimeStamp ] = useState<number>(endTimeStamp)
+	const { hours, mins } = milisecondsToHoursMins(savedEndTimeStamp - savedStartTimeStamp)
 
    useEffect(() => {
       Animated.timing(animateValue, {
          toValue: 1,
-         duration: 920, 
+         duration: 840, 
          useNativeDriver: true
       }).start()
    }, [])
 
-	const onSave = async () => {
-		await UserService.saveFastingRecord({ userId, startTimeStamp, endTimeStamp, planName })
-		dispatch(resetTimes())
-		navigation.goBack()
-	}
+	const BottomButtons = useCallback(memo(() => {
 
-	const onDelete = () => {
-		dispatch(resetTimes())
-		navigation.goBack()
-	}
+		const resetFastingTimes = async () => {
+			const resetPayload = { startTimeStamp: 0, endTimeStamp: 0 }
+			const cache = () => {
+				dispatch(resetTimes())
+				if (userId && !isOnline) {
+					dispatch(enqueueAction({
+						userId, 
+						actionId: autoId('qaid'),
+						invoker: 'updatePersonalData',
+						name: 'UPDATE_FASTING_TIMES',
+						params: [userId, resetPayload]
+					}))
+				}
+			}
+
+			if (userId) {
+				const errorMessage: string = await UserService.updatePersonalData(userId, resetPayload)
+				if (errorMessage === NETWORK_REQUEST_FAILED) cache()
+				return
+			}
+			cache()
+		}
+
+		const onSave = async () => {
+			let payload: any = { startTimeStamp: savedStartTimeStamp, endTimeStamp: savedEndTimeStamp, planName, notes: '' }
+	
+			const cache = () => {
+				const createdAt: string = getLocalDatetimeV2()
+				payload = {
+					...payload, 
+					id: autoId('frec'),
+					createdAt,
+					updatedAt: createdAt
+				}
+				dispatch(addRec({ key: 'fastingRecords', rec: payload }))
+				if (userId && !isOnline) {
+					dispatch(enqueueAction({
+						userId,
+						actionId: autoId('qaid'),
+						invoker: 'saveFastingRecord',
+						name: 'ADD_FASTING_REC',
+						params: [userId, payload]
+					}))
+				}
+			}
+	
+			if (userId) {
+				const addFastingRecErrorMessage: string = await UserService.saveFastingRecord(userId, payload)
+				if (addFastingRecErrorMessage === NETWORK_REQUEST_FAILED) cache()
+			}
+			else cache()
+			await resetFastingTimes()
+			navigation.goBack()
+		}
+
+		const onDelete = async () => {
+			await resetFastingTimes()
+			navigation.goBack()
+		}
+
+		return (
+			<View style={styles.bottom}>
+				{ !screenParams && 
+				<>
+					<TouchableOpacity
+						activeOpacity={.7}
+						onPress={onDelete}>
+						<LinearGradient
+							style={styles.bottomButton}
+							colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.bottomButtonText}>Delete</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+					<TouchableOpacity
+						activeOpacity={.7}
+						onPress={onSave}>
+						<LinearGradient
+							style={styles.bottomButton}
+							colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
+							start={{ x: .5, y: 0 }}
+							end={{ x: .5, y: 1 }}>
+							<Text style={styles.bottomButtonText}>Save</Text>
+						</LinearGradient>
+					</TouchableOpacity>
+				</> || <Button title='Confirm' size='large' bgColor={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]} /> }
+			</View>
+		)
+	}), [])
 
 	return (
 		<ScrollView contentContainerStyle={{...styles.container, paddingBottom: vS(27) + bottomBarHeight}}>
@@ -234,7 +367,7 @@ export default (): JSX.Element => {
 				start={{ x: .5, y: 0 }}
 				end={{ x: .52, y: .5 }} />
 			<View style={styles.header}>
-				<BackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
+				<WhiteBackIcon style={styles.backIcon} width={hS(9.2)} height={vS(16)} />
 				<Animated.Text 
 					style={{
 						...styles.headerTitle,
@@ -260,40 +393,21 @@ export default (): JSX.Element => {
 					<Text style={styles.symbolTitle}>m</Text>
 				</Animated.View>
 			</View>
-			<TimeSetting />
-			<TrackWeight {...{ setVisible }} />
-			<View style={styles.bottom}>
-				<TouchableOpacity
-					activeOpacity={.7}
-					onPress={onDelete}>
-					<LinearGradient
-						style={styles.bottomButton}
-						colors={[`rgba(${darkRgb.join(', ')}, .6)`, darkHex]}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }}>
-						<Text style={styles.bottomButtonText}>Delete</Text>
-					</LinearGradient>
-				</TouchableOpacity>
-				<TouchableOpacity
-					activeOpacity={.7}
-					onPress={onSave}>
-					<LinearGradient
-						style={styles.bottomButton}
-						colors={[`rgba(${primaryRgb.join(', ')}, .6)`, primaryHex]}
-						start={{ x: .5, y: 0 }}
-						end={{ x: .5, y: 1 }}>
-						<Text style={styles.bottomButtonText}>Save</Text>
-					</LinearGradient>
-				</TouchableOpacity>
-			</View>
-			{ visible && <CurrentWeightPopup {...{ setVisible }} /> }
+			<TimeSetting {...{ 
+				fastingRecId,
+				startTimeStamp: savedStartTimeStamp, 
+				setSavedStartTimeStamp,
+				endTimeStamp: savedEndTimeStamp,
+				setSavedEndTimeStamp, 
+				planName 
+			}} />
+			<TrackWeight />
+			<BottomButtons />
 		</ScrollView>
 	)
-}
+})
 
 const styles = StyleSheet.create({
-	wfull: { width: '100%' },
-
 	container: {
 		backgroundColor: '#fff',
 		flex: 1,
@@ -365,7 +479,7 @@ const styles = StyleSheet.create({
 
 	bottomButton: {
 		width: hS(172),
-		height: vS(72),
+		height: vS(64),
 		borderRadius: 100,
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -441,7 +555,8 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		fontSize: hS(12),
 		letterSpacing: .2,
-		color: darkHex
+		color: darkHex,
+		marginRight: hS(12)
 	},
 
 	trackWeight: {
@@ -523,8 +638,8 @@ const styles = StyleSheet.create({
 
 	weightProcessText: {
 		fontFamily: 'Poppins-Regular',
-		fontSize: hS(10),
-		color: darkHex,
+		fontSize: hS(12),
+		color: `rgba(${darkRgb.join(', ')}, .6)`,
 		letterSpacing: .2
 	}
 })

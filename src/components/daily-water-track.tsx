@@ -1,34 +1,24 @@
-import { memo, useEffect, useRef } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { lightRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'  
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { BluePlusIcon, WatercupIcon } from '@assets/icons'
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
+import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
+import AnimatedText from '@components/shared/animated-text'
 import LinearGradient from 'react-native-linear-gradient'
 import WaterWave from '@components/water-wave'
 
-const { rgb: lightRgb } = Colors.lightPrimary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hrz } = commonStyles
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
-export default memo((): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const drinked = useSelector((state: AppState) => state.water.drinked)
-   const dailyWater = useSelector((state: AppState) => state.user.metadata?.dailyWater)
+export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
+   const drinked = useSelector((state: AppStore) => state.water.drinked)
+   const { dailyWater, firstTimeTrackWater } = useSelector((state: AppStore) => state.user.metadata)
    const navigation = useNavigation<any>()
 
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1, 
-         duration: 840, 
-         useNativeDriver: true
-      }).start()
-   }, [])
-
-   const onPress = () => { navigation.navigate('water') }
+   const onPress = () => { navigation.navigate(firstTimeTrackWater && 'water-overview' || 'water') }
 
    return (
       <AnimatedPressable style={{ opacity: animateValue }} {...{ onPress }}>
@@ -45,11 +35,11 @@ export default memo((): JSX.Element => {
                   outputRange: [-50, 0]
                }) }]
             }}>
-               <WaterWave />
+               <WaterWave w={hS(127)} />
             </Animated.View>
             <View style={styles.main}>
                <Animated.View style={{
-                  ...styles.horz, 
+                  ...hrz, 
                   ...styles.header, 
                   transform: [{ translateX: animateValue.interpolate({
                      inputRange: [0, 1], 
@@ -67,8 +57,8 @@ export default memo((): JSX.Element => {
                   }) }]
                }}>
                   <Text style={styles.currentValueText}>{`${drinked} / `}</Text>
-                  <View style={styles.horz}>
-                     <Text style={styles.currentValue}>{dailyWater}</Text>
+                  <View style={hrz}>
+                     <AnimatedText value={dailyWater} style={styles.currentValue} /> 
                      <Text style={styles.symbolText}>ml</Text>
                   </View>
                </Animated.View>
@@ -82,7 +72,7 @@ export default memo((): JSX.Element => {
          </LinearGradient>
       </AnimatedPressable>
    )
-})
+}
 
 const styles = StyleSheet.create({
    container: {
@@ -127,11 +117,6 @@ const styles = StyleSheet.create({
    main: {
       height: vS(127),
 		justifyContent: 'space-between'
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    header: {

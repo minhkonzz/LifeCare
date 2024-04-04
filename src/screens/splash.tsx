@@ -1,18 +1,20 @@
 import { useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
-import { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import LottieView from 'lottie-react-native'
 
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const metadata = useSelector((state: AppState) => state.user.metadata)
+export default (): JSX.Element => {
+   const navigation = useNavigation<any>()
+   const { isLoading, metadata } = useSelector((state: AppStore) => state.user)
 
    useEffect(() => {
-      const routeName = !metadata && 'welcome' || 'main'
-      const timeOutId = setTimeout(() => { navigation.navigate(routeName) }, 2800)
-      return () => clearTimeout(timeOutId)
-   }, [])
+      if (!isLoading) {
+         const routeName = !metadata && 'welcome' || 'main'
+         navigation.navigate(routeName)
+      }
+   }, [isLoading])
 
    return (
       <View style={styles.container}>

@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 
 interface ButtonProps {
@@ -16,10 +16,10 @@ export default ({
     style,
     onPress,
     size = 'medium',
-    bgColor = Colors.primary.hex
+    bgColor = primaryHex
 }: ButtonProps): JSX.Element => {
-    const buttonStyles = [styles.button]
-    const titleStyles = [styles.title]
+    const buttonStyles: any[] = [styles.button]
+    const titleStyles: any[] = [styles.title]
 
     if (size === 'small') {
         buttonStyles.push(styles.smallButton)

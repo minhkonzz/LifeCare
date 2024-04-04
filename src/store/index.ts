@@ -7,6 +7,7 @@ import fastingReducer from './fasting'
 import waterReducer from './water'
 import settingReducer from './setting'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import { 
    persistReducer,
    FLUSH,
@@ -20,6 +21,7 @@ import {
 const persistConfig = {
    key: 'root', 
    storage: AsyncStorage,
+   // transforms: [aesEncryptDecryptTransformer],
    whitelist: ['user', 'fasting', 'setting', 'water'], 
    blacklist: ['auth', 'network', 'survey']
 }
@@ -44,7 +46,7 @@ const store = configureStore({
    })
 })
 
-export type AppState = ReturnType<typeof store.getState>
+export type AppStore = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
 export default store

@@ -3,28 +3,77 @@
       "id": "ft1", 
       "title": "Blood sugar rise", 
       "from": 0, 
-      "to": 4,
+      "to": 2,
       "content": "You’ll feel pretty normal during the first hours of fasting because your body is going through the regular process of breaking down glycogen \n\nYour blood sugar rises. Your pancreas releases insulin to break down glucose for energy and store the extra glucose for later"
    },
    {
       "id": "ft2", 
       "title": "Blood sugar falls", 
-      "from": 4, 
-      "to": 8,
+      "from": 2, 
+      "to": 5,
       "content": "As a result of the effects of insulin, your blood sugar decreases to near normal after spiking\n\nAnd it typically doesn’t continue climbing because insulin is immediately delivered into your circulatory system after eating"
    },
    {
       "id": "ft3", 
-      "title": "Blood sugar normal", 
-      "from": 8, 
-      "to": 12,
+      "title": "Blood sugar returns normal", 
+      "from": 5, 
+      "to": 8,
       "content": "Feel hungry? Your stomach is reminding you that it’s been a while since your last meal. However, you’re not actually feel hungry. Your body will continue to digest your last food intake. It starts to use stored glucose for energy, and continues to function as if you’ll eat again soon"
    }, 
    {
       "id": "ft4", 
-      "title": "Burning stored fat", 
+      "title": "Switch into fasting mode", 
+      "from": 8, 
+      "to": 10,
+      "content": "8 hours after your last meal, your liver will use up the last of its glucose reserves. Now your body goes into a state called gluconeogenesis, which indicates that your body has switched into the fasting mode.\n\nStudies show that gluconeogenesis, a metabolic pathway, results in the generation of glucose from body fat instead of carbohydrates. It increases your calorie burning"
+   },
+   {
+      "id": "ft5", 
+      "title": "Turning into Fat burning", 
+      "from": 10, 
+      "to": 12,
+      "content": "Your glycogen reserves are running out! As a result, you may become irritable or hangry. Just relax, it's a sign that your body is burning fat!\n\nWith little glycogen left, fat cells (adipocyte) will release fat into your bloodstream. They also go straight into your liver and are converted into energy for your body. Actually, you are cheating your body into burning fat in order to survive"
+   },
+   {
+      "id": "ft6", 
+      "title": "Get in Ketosis state", 
       "from": 12, 
+      "to": 18,
+      "content": "Now it's the turn of fat to fuel your body. You're in the metabolic state called ketosis. The glycogen is almost used up and your liver converts fat into ketone bodies - an alternative energy source for your body.\n\nFat reserves are readily released and consumed. For this reason, ketosis is sometimes referred to as the body's \"fat-burning\" mode. Ketosis produces fewer inflammatory by-products, so it provides health benefits to your heart, metabolism and brain"
+   },
+   {
+      "id": "ft7", 
+      "title": "Fat burning starts", 
+      "from": 18, 
       "to": 24,
-      "content": "Now, it’s the turn of fat to fuel your body. You’re in the metabolic state called ketosis\n\nThe glycogen is almost used up and your liver converts fat into ketone bodies, an alternative energy source for your body. Ketosis produces fewer inflammatory by-products. So it provides health benefits to your heart, metabolism and brain"
+      "content": "The longer you fast, the deeper into ketosis you'll go. By 18 hours, your body has switched into fat-burning mode. Research shows that after fasting for 12 to 24 hours, the energy supply from fat will increase by 60%, and it has a significant increase after 18 hours. Now:\n\n1.The level of ketone bodies rises.\n2.Ketones act as signaling molecules to tell your body how to better regulate its metabolism in a stressful environment.\n3.Your body's anti-inflammatory and rejuvenation processes are ready to work"
+   },
+   {
+      "id": "ft8", 
+      "title": "Autophagy starts", 
+      "from": 24, 
+      "to": 48,
+      "content": "At this point, your body triggers autophagy (literally means \"self-devouring\". Cells start to clean up their house. They remove unnecessary or dysfunctional components. It's a good thing because it allows the orderly degradation and recycling of cellular components.\n\nDuring autophagy, cells break down viruses, bacteria and damaged components. In this process, you get the energy to make new cell parts. It's significants for cell's health, renewal, and survival. The main benefit of autophagy is best know as the body turning the clock back and creating younger cells"
+   },
+   {
+      "id": "ft9", 
+      "title": "Growth hormone goes up", 
+      "from": 48, 
+      "to": 56,
+      "content": "Your growth hormone level is much higher than the level at which it was before starting. This benefits from the ketone bodies production and hunger hormone secretion during fasting. Growth hormone helps increase lean muscle mass and improve your cardiovascular health"
+   },
+   {
+      "id": "ft10", 
+      "title": "Sensitive to insulin", 
+      "from": 56, 
+      "to": 72,
+      "content": "Your insulin is at its lowest level since fasting. It makes you more insulin sensitive, which is an especially good thing if you have a high risk of developing diabetes.\n\nLowering your insulin levels has a range of health benefits both short term and long term, such as activating autophagy and reducing inflammation"
+   },
+   {
+      "id": "ft11", 
+      "title": "Immune cells regenerate", 
+      "from": 72, 
+      "to": 2000,
+      "content": "\"Survival of the fittest\". Your body turns down cellular survival pathways and recycles immune cells that are damaged when fighting viruses, bacteria, and germs.\n\nIn order to fill \"the vacancy of the guardians\", your body regenerates new immune cells at a rapid pace. It starts the immune system regeneration and shifts cells to a state of self-renewal. Your immune system becomes stronger and stronger.\n\nScientists are still studying on COVID 19, any medicines and treatments should be taken under the guidance of the doctor.\n\nIf you feel uncomfortable, you should immediately stop fasting and consult your doctor"
    }
 ]

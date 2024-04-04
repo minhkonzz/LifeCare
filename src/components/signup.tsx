@@ -1,32 +1,20 @@
-import { 
-   memo, 
-   Dispatch, 
-   SetStateAction, 
-   useEffect, 
-   useRef 
-} from 'react'
-import {
-   View,
-   Text,
-   Pressable,   
-   StyleSheet, 
-   Animated
-} from 'react-native'
-import Button from '@components/shared/button/Button'
+import { memo, Dispatch, SetStateAction, useEffect } from 'react'
+import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { UserFieldIcon, LockIcon, AtIcon, BackIcon } from '@assets/icons'
-import AuthInput from './auth-input'
 import { useSelector } from 'react-redux'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive' 
-import { AppState } from '../store'
+import { AppStore } from '../store'
+import { commonStyles } from '@utils/stylesheet'
+import Button from '@components/shared/button/Button'
+import AuthInput from './auth-input'
 import AuthService from '@services/user'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hrz } = commonStyles
 
 export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boolean>> }): JSX.Element => {
-   console.log('render SignUp component')
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -41,13 +29,11 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
          toValue: 0,
          duration: 640,
          useNativeDriver: true
-      }).start(({ finished }) => {
-         setIsLogin(true)
-      })
+      }).start(() => { setIsLogin(true) })
    }
 
    const SignupButton = (): JSX.Element => {
-      const { email, password } = useSelector((state: AppState) => state.auth)
+      const { email, password } = useSelector((state: AppStore) => state.auth)
       const onSignup = async() => {
          try {
             const data = await AuthService.signUpWithEmail(email, password)
@@ -66,7 +52,7 @@ export default memo(({ setIsLogin }: { setIsLogin: Dispatch<SetStateAction<boole
          <Animated.Image style={{...styles.storyset, transform: [{ scale: animateValue }] }} source={require('../assets/images/storyset/signup.gif')} />
          <Animated.View style={{
             ...styles.titleWrapper,
-            ...styles.horz, 
+            ...hrz, 
             opacity: animateValue,
             transform: [{ translateX: animateValue.interpolate({
                inputRange: [0, 1],
@@ -120,11 +106,6 @@ const styles = StyleSheet.create({
    storyset: {
       width: hS(292), 
       height: vS(292)
-   },
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    },
 
    titleWrapper: {

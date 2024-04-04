@@ -50,8 +50,31 @@ import EyeIcon from './eye.svg'
 import EyeHidedIcon from './eye-hided.svg'
 import CornerArrowUpRightIcon from './corner-arrow-up-right.svg'
 import SpoonForkIcon from './spoon-fork.svg'
+import CustomIcon from './custom.svg'
+import SymptomsIcon from './symptoms.svg'
+import PrimaryBookIcon from './primary-book.svg'
+import PrimaryWeightIcon from './primary-weight.svg'
+import DontEatTimeIcon from './dont-eat-time.svg'
+import EatTimeIcon from './eat-time.svg'
+import WomenEatIcon from './women-eat.svg'
+import StayHydratedIcon from './stay-hydrated.svg'
+import MedicalCheckupIcon from './medical-checkup.svg'
+import IntoFatBurnIcon from './into-fat-burn.svg'
+import FatBurnStartIcon from './fat-burn-start.svg'
+import GrowthHormoneIcon from './growth-hormone.svg'
+import CleaningIcon from './cleaning.svg'
+import InsulinIcon from './insulin.svg'
+import BloodCellsIcon from './red-blood-cells.svg'
+import SwitchToFastIcon from './switch-to-fast.svg'
 
 export {
+   SwitchToFastIcon,
+   IntoFatBurnIcon,
+   FatBurnStartIcon,
+   GrowthHormoneIcon,
+   CleaningIcon,
+   InsulinIcon,
+   BloodCellsIcon,
    AtIcon,
    BloodSugarDecreaseIcon,
    BloodSugarIncreaseIcon,
@@ -103,6 +126,16 @@ export {
    EyeIcon,
    EyeHidedIcon,
    CornerArrowUpRightIcon,
-   SpoonForkIcon
+   SpoonForkIcon, 
+   CustomIcon, 
+   PrimaryBookIcon,
+   PrimaryWeightIcon,
+   SymptomsIcon,
+   WomenEatIcon,
+   StayHydratedIcon,
+   DontEatTimeIcon,
+   EatTimeIcon,
+   MedicalCheckupIcon,
+   
 }
 

@@ -1,72 +1,48 @@
-import { useState, useEffect, useRef } from 'react'
+import { useContext } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
-import { Colors } from '@utils/constants/colors'
+import { AppStore } from '../store'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { updateNotififcation, updateSyncGoogleFit, updateDarkMode } from '../store/setting'
+import { updateNotififcation, updateDarkMode } from '@store/setting'
+import { PopupContext } from '@contexts/popup'
 import StackHeader from '@components/shared/stack-header'
 import SettingRow from '@components/setting-row'
 import settingLayoutData from '@assets/data/setting-layout.json'
-import RewipeDataWarnPopup from '@components/shared/popup-content/rewipe-data-warn'
-import LanguagePopup from '@components/shared/popup-content/gender'
-import withSync from '@hocs/withSync'
+import RewipeDataWarnPopup from '@components/shared/popup/rewipe-data-warn'
+import LanguagePopup from '@components/shared/popup/languages'
 
-import {
-	View,
-	Text,
-	StyleSheet,
-	FlatList,
-	TouchableOpacity,
-	Animated
-} from 'react-native'
-
-const { hex: darkHex } = Colors.darkPrimary
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
 const settingRowCallbacks = {}
 const settingRowValues = {}
 
-export default withSync((): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-	const [ rewipeDataPopupVisible, setRewipeDataPopupVisible ] = useState<boolean>(false)
-	const [ langPopupVisible, setLangPopupVisible ] = useState<boolean>(false)
-	console.log('render Setting')
+export default (): JSX.Element => {
+	const { setPopup } = useContext<any>(PopupContext)
 
 	const { 
 		notification,  
 		darkmode,
-		syncGoogleFit,
+		// syncGoogleFit,
 		lang
-	} = useSelector((state: AppState) => state.setting)
+	} = useSelector((state: AppStore) => state.setting)
 	
 	const dispatch = useDispatch()
 	const navigation = useNavigation<any>()
 
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: 1, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [])
-
 	if (Object.keys(settingRowCallbacks).length === 0) {
 		settingRowCallbacks['personal-data'] = () => { navigation.navigate('personal-data') }
-		settingRowCallbacks['meal-time'] = () => {}
 		settingRowCallbacks['notification'] = () => { dispatch(updateNotififcation()) }
 		settingRowCallbacks['reminder'] = () => { navigation.navigate('reminder') }
 		settingRowCallbacks['widgets'] = () => {}
-		settingRowCallbacks['language'] = () => { setLangPopupVisible(true) }
+		settingRowCallbacks['language'] = () => { setPopup(LanguagePopup) }
 		settingRowCallbacks['dark-mode'] = () => { dispatch(updateDarkMode()) }
-		settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
-		settingRowCallbacks['privacy-policy'] = () => {}
-		settingRowCallbacks['rate-us'] = () => {}
+		// settingRowCallbacks['sync-google-fit'] = () => { dispatch(updateSyncGoogleFit()) }
 		settingRowCallbacks['feedback'] = () => { navigation.navigate('feedback') }
 	}
 
 	settingRowValues['notification'] = notification
 	settingRowValues['dark-mode'] = darkmode
-	settingRowValues['sync-google-fit'] = syncGoogleFit
+	// settingRowValues['sync-google-fit'] = syncGoogleFit
 	settingRowValues['language'] = lang
 
 	return (
@@ -75,19 +51,7 @@ export default withSync((): JSX.Element => {
 			{
 				['About me', 'General', 'Contact us'].map((e, i) => (
 					<View key={i} style={{ marginTop: vS(i > 0 ? 24 : 0) }}>
-						<Animated.Text 
-							style={[
-								styles.settingSectionTitle, 
-								{
-									opacity: animateValue,
-									transform: [{ translateX: animateValue.interpolate({
-										inputRange: [0, 1], 
-										outputRange: [-150, 0]
-									}) }]
-								}
-							]}>
-							{e}
-						</Animated.Text>
+						<Text style={styles.settingSectionTitle}>{e}</Text>
 						<FlatList
 							style={{ flexGrow: 0 }}
 							showsVerticalScrollIndicator={false}
@@ -105,38 +69,17 @@ export default withSync((): JSX.Element => {
 				))
 			}
 			<View style={styles.bottom}>
-				<Animated.Text 
-					style={[
-						styles.versionText, 
-						{
-							opacity: animateValue,
-							transform: [{ translateX: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: [-150, 0]
-							}) }]
-						}
-					]}>
-					Version 1.0.0
-				</Animated.Text>
-				<AnimatedTouchableOpacity 
-					onPress={() => setRewipeDataPopupVisible(true)}
+				<Text style={styles.versionText}>Version 1.0.0</Text>
+				<TouchableOpacity 
+					onPress={() => setPopup(RewipeDataWarnPopup)}
 					activeOpacity={.7}
-					style={{
-						...styles.rewipeDataButton, 
-						opacity: animateValue,
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-100, 0]
-						}) }]
-					}}>
+					style={styles.rewipeDataButton}>
 					<Text style={styles.rewipeDataButtonText}>Rewipe all data</Text>
-				</AnimatedTouchableOpacity>
+				</TouchableOpacity>
 			</View>
-			{ rewipeDataPopupVisible && <RewipeDataWarnPopup setVisible={setRewipeDataPopupVisible} /> }
-			{ langPopupVisible && <LanguagePopup setVisible={setLangPopupVisible} options={['English', 'Vietnamese', 'Germany']} /> }
 		</View>
 	)
-})
+}
 
 const styles = StyleSheet.create({
 	container: {

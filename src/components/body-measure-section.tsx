@@ -1,37 +1,63 @@
-import { memo, Dispatch, SetStateAction } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { memo, Dispatch, SetStateAction, useCallback } from 'react'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import WhiteEditIcon from '@assets/icons/edit-white.svg'
+import { WhiteEditIcon } from '@assets/icons'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { LineChart } from 'react-native-gifted-charts'
+import { getDatesRange, getMonthTitle } from '@utils/datetimes'
+import { BlurView } from '@react-native-community/blur'
+import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
-import {
-   View,
-   Text, 
-   StyleSheet,
-   TouchableOpacity,
-   FlatList, 
-   Animated
-} from 'react-native'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 
 interface Props {
    title: string, 
    value: number,
+   hd: any[]
    onPressEdit: Dispatch<SetStateAction<boolean>>
 }
 
-export default memo(({ title, value, onPressEdit }: Props): JSX.Element => {
-   const maxValueMeasure = 130
-   const days = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+const { hrz, blurOverlay, blurOverlayWrapper, noDataText } = commonStyles
+
+let visitedMonth: string = ''
+let visitedValue: number = 0
+let startIndex: number = 0
+let endIndex: number = 0
+
+export default memo(({ title, value, onPressEdit, hd }: Props): JSX.Element => {
+   
+   const standardRecords = hd.reduce((acc: any, cur: any) => {
+      const { id, createdAt, value } = cur
+      const d = new Date(createdAt)
+      acc[`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`] = { id, value }
+      return acc
+   }, {})
+
+   const chartData = getDatesRange(122).map((e: any, i) => {
+      const r = standardRecords[e.value]
+      const { month, date } = e
+      const monthTitle: string = getMonthTitle(month, true)
+      const isNextMonth: boolean = monthTitle !== visitedMonth
+      if (isNextMonth) visitedMonth = monthTitle
+      const currentPointTitle = `${isNextMonth ? monthTitle + ' ' : '' }${date}`
+      if (r) {
+         const { value } = r
+         if (!startIndex) startIndex = i
+         visitedValue = value
+         endIndex = i
+         return { value, label: currentPointTitle }
+      }
+      return { value: visitedValue, label: currentPointTitle, hideDataPoint: true }
+   })
+
+   const CustomDataPoint = useCallback(() => <View style={styles.customPoint} />, [])
 
    return (
       <View style={styles.container}>
-         <View style={{...styles.hrz, width: '100%', justifyContent: 'space-between' }}>
+         <View style={{...hrz, width: '100%', justifyContent: 'space-between' }}>
             <View>
                <Text style={styles.title}>{title}</Text>
-               <View style={styles.hrz}>
-                  <Text style={styles.currentValue}>{value}</Text>
+               <View style={hrz}>
+                  <Text style={styles.currentValue}>{value || '--'}</Text>
                   <Text style={styles.symb}>cm</Text>
                </View>
             </View>
@@ -45,25 +71,26 @@ export default memo(({ title, value, onPressEdit }: Props): JSX.Element => {
                </LinearGradient>
             </TouchableOpacity>
          </View>
-         <View style={styles.chart}>
-            <View style={styles.leftColumn}>
-            {
-               Array.from({ length: 6 }, (_, i) => maxValueMeasure - 10 * i).map((e, i) => 
-                  <Text key={i} style={{...styles.chartValue, marginTop: i > 0 ? vS(22) : 0}}>{e}</Text>
-               )
-            }
+         { value && 
+         <LineChart 
+            {...{ data: chartData, customDataPoint: CustomDataPoint, startIndex, endIndex }} 
+            yAxisTextStyle={styles.axisText}
+            xAxisLabelTextStyle={styles.axisText}
+            curved 
+            showVerticalLines 
+            startOpacity={.8}
+            startFillColor={primaryHex}
+            noOfSections={4}
+            color={`rgba(${primaryRgb.join(', ')}, .6)`} 
+            thickness={5}
+            xAxisColor='#e4e4e4'
+            yAxisColor='#e4e4e4' 
+            spacing={hS(42)} /> ||
+            <View style={blurOverlayWrapper}>
+               <BlurView style={blurOverlay} blurType='light' blurAmount={3} />
+               <Text style={noDataText}>No data found</Text>
             </View>
-            <FlatList 
-               horizontal
-               showsHorizontalScrollIndicator={false}
-               data={days} 
-               renderItem={({ item, index }) => 
-                  <View key={index} style={{ alignItems: 'center', marginLeft: index > 0 ? hS(28) : 0 }}>
-                     <View style={styles.dayDecor} />
-                     <Text style={{...styles.chartValue, marginTop: vS(8)}}>{item}</Text>
-                  </View>
-               } />
-         </View>
+         }
       </View>
    )
 })
@@ -80,10 +107,22 @@ const styles = StyleSheet.create({
       marginVertical: vS(24)
    },
 
-   hrz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
-   }, 
+   customPoint: {
+      width: hS(13), 
+      height: hS(13), 
+      borderRadius: 100, 
+      backgroundColor: primaryHex, 
+      borderWidth: 2, 
+      borderColor: '#fff', 
+      marginBottom: vS(7)
+   },
+
+   axisText: {
+      fontSize: hS(11),
+      fontFamily: 'Poppins_Regular',
+      color: darkHex,
+      letterSpacing: .2
+   },
 
    title: {
       fontFamily: 'Poppins-SemiBold', 
@@ -117,28 +156,5 @@ const styles = StyleSheet.create({
       marginBottom: vS(22),
       elevation: 12, 
       shadowColor: darkHex
-   },
-
-   chart: {
-      flexDirection: 'row',
-      marginTop: vS(20)
-   },
-
-   leftColumn: {
-      marginRight: hS(14),
-      alignItems: 'flex-end'
-   },
-
-   chartValue: {
-      fontFamily: 'Poppins-Regular',
-      fontSize: hS(10),
-      color: darkHex,
-      letterSpacing: .2
-   },
-
-   dayDecor: {
-      width: 1,
-      height: vS(220),
-      backgroundColor: 'rgba(0, 0, 0, .1)'
    }
 })

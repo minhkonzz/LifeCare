@@ -3,8 +3,9 @@ import { TextInput, StyleSheet, Animated, Pressable } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { updateEmail, updatePassword, updatePasswordConfirm, updateName } from '../store/auth'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkRgb } from '@utils/constants/colors'
 import { EyeIcon, EyeHidedIcon } from '@assets/icons'
+import useAnimValue from '@hooks/useAnimValue'
 
 const onChangeTextActions = {
    'email': updateEmail,
@@ -34,7 +35,7 @@ export default ({
    hide = false,
    onFocus
 }: AuthInputProps): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
    const dispatch = useDispatch()
    const [ hided, setHided ] = useState<boolean>(hide)
    const onChangeTextAction = onChangeTextActions[type]
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
       paddingRight: hS(80),
       fontFamily: 'Poppins-Regular',
       fontSize: hS(13),
-      color: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .6)`
+      color: `rgba(${darkRgb.join(', ')}, .6)`
    },
 
    eyeIc: {

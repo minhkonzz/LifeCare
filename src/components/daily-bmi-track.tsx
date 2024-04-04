@@ -1,32 +1,22 @@
-import { memo, useEffect, useRef, useContext } from 'react'
+import { useContext } from 'react'
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native'
 import { PopupContext } from '@contexts/popup'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { getBMI } from '@utils/fomular'
 import { getBMIStatus } from '@utils/helpers'
+import { AnimatedLinearGradient } from './shared/animated'
 import LinearGradient from 'react-native-linear-gradient'
 import bmiRangesData from '@assets/data/bmi-range-data.json'
-import UpdateBMIPopup from '@components/shared/popup-content/bmi-update'
+import UpdateBMIPopup from '@components/shared/popup/bmi-update'
+import AnimatedText from '@components/shared/animated-text'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-
-export default memo((): JSX.Element => {
-	const { currentWeight, currentHeight } = useSelector((state: AppState) => state.user.metadata)
+export default ({ animateValue }: { animateValue: Animated.Value }): JSX.Element => {
+	const { currentWeight, currentHeight } = useSelector((state: AppStore) => state.user.metadata)
 	const bmiValue: number = getBMI(currentWeight, currentHeight / 100)
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
 	const { setPopup } = useContext<any>(PopupContext)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: 1, 
-			duration: 840, 
-			useNativeDriver: false
-		}).start()
-	}, [])
 
    return (
 		<Pressable onPress={() => setPopup(UpdateBMIPopup)}>
@@ -46,17 +36,18 @@ export default memo((): JSX.Element => {
 				</Animated.Text>
 				<Animated.View style={{ opacity: animateValue }}>
 					<View style={styles.value}>
-						<Text style={styles.valueNumber}>{bmiValue}</Text>
+						<AnimatedText value={bmiValue} style={styles.valueNumber} />
 						<Text style={styles.valueSymbol}>kg/m2</Text>
 					</View>
 					<Text style={styles.status}>{getBMIStatus(bmiValue)}</Text>
 				</Animated.View>
 				<Animated.View style={{
 					...styles.rangeColors, 
-					height: animateValue.interpolate({
+					opacity: animateValue,
+					transform: [{ translateY: animateValue.interpolate({
 						inputRange: [0, 1] ,
-						outputRange: [0, vS(48)]
-					})	
+						outputRange: [30, 0]
+					})	}]
 				}}>
 				{
 					bmiRangesData.map((e, i) => {
@@ -79,7 +70,7 @@ export default memo((): JSX.Element => {
 			</AnimatedLinearGradient>
 		</Pressable>
    )
-})
+}
 
 const styles = StyleSheet.create({
    container: {
@@ -110,7 +101,7 @@ const styles = StyleSheet.create({
 
    status: {
       fontFamily: 'Poppins-Medium',
-		fontSize: hS(8),
+		fontSize: hS(10),
 		color: darkHex,
 		letterSpacing: .4
    },

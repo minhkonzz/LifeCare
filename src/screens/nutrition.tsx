@@ -1,5 +1,5 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native' 
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import Screen from '@components/shared/screen'
 import Calendar from '@components/shared/calendar'
@@ -10,8 +10,6 @@ import NutritionPersonalMeal from '@components/nutrition-personal-meal'
 import nutritionPersonalActivityData from '@assets/data/nutrition-personal-activity.json'
 import LinearGradient from 'react-native-linear-gradient'
 import MealWarnSvg from '@assets/images/meal-warn.svg'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
 
 const Meals = () => {
    return (

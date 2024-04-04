@@ -1,57 +1,82 @@
-import { memo, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { Colors } from '@utils/constants/colors'
+import { memo, useMemo } from 'react'
+import { View, Text, StyleSheet, Animated } from 'react-native'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
-import { getDatesRange } from '@utils/datetimes'
-import { handleFastingRecords } from '@utils/helpers'
+import { AppStore } from '../store'
+import { getMonthTitle } from '@utils/datetimes'
+import { formatNum, handleFastingRecords } from '@utils/helpers'
 import { BlurView } from '@react-native-community/blur'
+import { AnimatedPressable } from './shared/animated'
+import { commonStyles } from '@utils/stylesheet'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import LinearGradient from 'react-native-linear-gradient'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const { 
+	wfull,
+	hrz, 
+	blurOverlayWrapper, 
+	blurOverlay, 
+	noDataText,
+	headerMainText,
+	headerNoteCircle 
+} = commonStyles
 
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient)
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
-const Record = ({ 
+const Record = memo(({ 
 	item, 
 	index, 
-	hideDetail, 
-	animateValue 
+	hideDetail
 }: { 
 	item: any, 
 	index: number, 
-	hideDetail: boolean, 
-	animateValue: Animated.Value 
+	hideDetail: boolean
 }): JSX.Element => {
 
 	if (!hideDetail) {
-		const [ month, day ] = item.date.split(' ')
+		if (typeof item === 'string') {
+			const [ month, day ] = item.split(' ')
+			return (
+				<View style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0)}}>
+					<Text></Text>
+					<LinearGradient
+						style={styles.recProg}
+						colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
+						start={{ x: .5, y: 0 }}
+						end={{ x: .5, y: 1 }} />
+					<View style={{ alignItems: 'center', marginTop: vS(7) }}>
+						<Text style={styles.recText}>{day}</Text>
+						<Text style={{...styles.recText, marginTop: vS(-2) }}>{month}</Text>
+					</View>
+				</View>
+			)
+		}
+
+		const { date, records } = item 
+		const [ y, m, d ] = date.split('-')
+		const monthTitle = getMonthTitle(m - 1, true)
+		const totalHours = useMemo(() => records.reduce((acc: any, cur: any) => acc + cur.totalHours, 0), []) 
+
 		return (
 			<View key={index} style={{...styles.rec, marginLeft: (index > 0 ? hS(15) : 0) }}>
-				<Text style={{...styles.recText, height: vS(22) }}>{item.totalHours > 0 ? `${item.totalHours}h` : ''}</Text>
+				<Text style={{...styles.recText, height: vS(22) }}>{totalHours > 0 ? `${totalHours}h` : ''}</Text>
 				<LinearGradient
 					style={styles.recProg}
 					colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 					start={{ x: .5, y: 0 }}
 					end={{ x: .5, y: 1 }}>
-					<AnimatedLinearGradient
+					<LinearGradient
 						style={{
-							...styles.recProgValue, 
-							height: animateValue.interpolate({
-								inputRange: [0, 1], 
-								outputRange: ['0%', `${item.totalHours / 24 * 100}%`]
-							}) 
+							...styles.recProgValue,
+							height: '100%',
+							top: `${100 - totalHours / 24 * 100}%`
 						}}
 						colors={[`rgba(${primaryRgb.join(', ')}, .2)`, primaryHex]}
 						start={{ x: .5, y: 0 }}
 						end={{ x: .5, y: 1 }} />
 				</LinearGradient>
 				<View style={{ alignItems: 'center', marginTop: vS(7) }}>
-					<Text style={styles.recText}>{day}</Text>
-					<Text style={{...styles.recText, marginTop: vS(-2) }}>{month}</Text>
+					<Text style={styles.recText}>{formatNum(d)}</Text>
+					<Text style={{...styles.recText, marginTop: vS(-2) }}>{monthTitle}</Text>
 				</View>
 			</View>
 		)
@@ -66,53 +91,30 @@ const Record = ({
 				end={{ x: .5, y: 1 }} />
 		</View>
 	)
-}
+})
 
-export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const fastingRecords = useSelector((state: AppState) => state.user.metadata.fastingRecords)
-	const standardFastingRecords = fastingRecords.reduce((acc: any, cur: any) => {
-		const { startTimeStamp, endTimeStamp } = cur
-		return {...acc, ...handleFastingRecords(startTimeStamp, endTimeStamp)}
-	}, {})
-
-	const chartData = getDatesRange(122).map(e => {
-		const r = standardFastingRecords[e.value]
-		if (r) return {
-			date: e.value,
-			totalHours: r.totalHours
-		}
-		return null
-	})
-
-	const noDataFound: boolean = chartData.every(e => !e)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 840, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
+export default withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }): JSX.Element => {
+	const fastingRecords = useSelector((state: AppStore) => state.user.metadata.fastingRecords)
+	const { chartData } = useMemo(() => handleFastingRecords(fastingRecords), [fastingRecords])
+	const noDataFound: boolean = chartData.every(e => typeof e === 'string')
 
 	if (!isViewable) return <View style={styles.container} />
 
 	return (
 		<Animated.View style={{...styles.container, opacity: animateValue }}>
-			<View style={styles.header}>
-				<Animated.Text 
-					style={{
-						...styles.title, 
-						opacity: animateValue, 
-						transform: [{ translateX: animateValue.interpolate({
-							inputRange: [0, 1], 
-							outputRange: [-50, 0]
-						}) }]
-					}}>
+			<View style={wfull}>
+				<Animated.Text style={{
+					...headerMainText, 
+					opacity: animateValue, 
+					transform: [{ translateX: animateValue.interpolate({
+						inputRange: [0, 1], 
+						outputRange: [-50, 0]
+					}) }]
+				}}>
 					Fasting records
 				</Animated.Text>
 				<Animated.View style={{
-					...styles.hrz, 
+					...hrz, 
 					marginTop: vS(8), 
 					opacity: animateValue, 
 					transform: [{ translateY: animateValue.interpolate({
@@ -120,18 +122,18 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 						outputRange: [-30, 0]
 					}) }]
 				}}>
-					<View style={styles.hrz}>
+					<View style={hrz}>
 						<LinearGradient
-							style={styles.noteColor}
+							style={headerNoteCircle}
 							colors={[`rgba(${primaryRgb.join(', ')}, .3)`, primaryHex]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
 						/>
 						<Text style={styles.noteTitle}>Completed</Text>
 					</View>
-					<View style={{...styles.hrz, marginLeft: hS(38) }}>
+					<View style={{...hrz, marginLeft: hS(38) }}>
 						<LinearGradient
-							style={styles.noteColor}
+							style={headerNoteCircle}
 							colors={[`rgba(${darkRgb.join(', ')}, .05)`, `rgba(${darkRgb.join(', ')}, .2)`]}
 							start={{ x: .5, y: 0 }}
 							end={{ x: .5, y: 1 }}
@@ -145,15 +147,15 @@ export default memo(({ isViewable }: { isViewable: boolean }): JSX.Element => {
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				data={chartData}
-				renderItem={({ item, index }) => <Record {...{ item, index, hideDetail: noDataFound, animateValue }} />}
+				renderItem={({ item, index }) => <Record {...{ item, index, hideDetail: noDataFound }} />}
 			/>
 			<AnimatedPressable style={{...styles.timelineRef, opacity: animateValue }}>
 				<Text style={styles.timelineText}>Timeline</Text>
 			</AnimatedPressable>
 			{ noDataFound && 
-			<View style={styles.blurOverlayWrapper}>
-				<BlurView style={styles.blurOverlay} blurType='light' blurAmount={12} />
-				<Text style={styles.noDataText}>No data found</Text>
+			<View style={blurOverlayWrapper}>
+				<BlurView style={blurOverlay} blurType='light' blurAmount={6} />
+				<Text style={noDataText}>No data found</Text>
 			</View> }
 		</Animated.View>
 	)
@@ -171,50 +173,6 @@ const styles = StyleSheet.create({
 		paddingTop: vS(18),
 		paddingBottom: vS(8),
 		marginTop: vS(27)
-	},
-
-	blurOverlayWrapper: {		
-		position: 'absolute',
-		top: 0,
-		left: 0, 
-		right: 0,
-		bottom: 0,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-
-	blurOverlay: {
-		position: 'absolute',
-		width: '100%',
-		height: '100%'
-	},
-
-	noDataText: {
-		fontFamily: 'Poppins-Regular',
-		fontSize: hS(14),
-		color: darkHex,
-		letterSpacing: .2
-	},
-
-	header: {
-		width: '100%'
-	},
-
-	title: {
-		fontFamily: 'Poppins-SemiBold',
-		fontSize: hS(15),
-		color: darkHex
-	},
-
-	hrz: {
-		flexDirection: 'row',
-		alignItems: 'center'
-	},
-
-	noteColor: {
-		width: hS(10),
-		height: vS(10),
-		borderRadius: 25
 	},
 
 	noteTitle: {
@@ -244,13 +202,15 @@ const styles = StyleSheet.create({
 	recProg: {
 		width: hS(54),
 		height: vS(121),
-		borderRadius: 200,
-		justifyContent: 'flex-end'
+		borderRadius: 100,
+		justifyContent: 'flex-end',
+		overflow: 'hidden'
 	},
 
 	recProgValue: {
 		width: '100%',
-		borderRadius: 200
+		borderRadius: 100,
+		position: 'absolute'
 	},
 
 	timelineRef: {

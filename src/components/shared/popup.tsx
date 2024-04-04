@@ -1,10 +1,8 @@
 import { memo, ReactNode, Dispatch, SetStateAction, useEffect } from 'react'
 import { View, Text, Animated, Pressable, StyleSheet } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { CloseIcon } from '@assets/icons'
-
-const darkPrimary: string = Colors.darkPrimary.hex
 
 interface PopupProps {
 	type: 'bottomsheet' | 'centered'
@@ -49,7 +47,6 @@ export default memo(({
 		return (
 			<>
 				<View style={styles.header}>
-					<View style={styles._blank} />
 					<Text style={styles.headerTitle}>{title}</Text>
 					<Pressable style={styles.closeButton} onPress={closePopup}>
 						<CloseIcon width={hS(12)} height={vS(12)} />
@@ -103,9 +100,6 @@ export default memo(({
 })
 
 const styles = StyleSheet.create({
-	_blank: {
-		width: hS(24)
-	},
 
 	touchCloseArea: {
 		position: 'absolute', 
@@ -138,25 +132,21 @@ const styles = StyleSheet.create({
 
 	header: {
 		width: '100%',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
 		paddingBottom: vS(16)
 	},
 
 	headerTitle: {
+		alignSelf: 'center',
 		fontFamily: 'Poppins-SemiBold',
 		fontSize: hS(16),
-		color: darkPrimary
+		color: darkHex
 	},
 
 	closeButton: {
 		width: hS(24), 
 		height: vS(12),
-		position: 'absolute',
-		top: 8,
-		right: 8,
-		padding: 8
+		alignSelf: 'flex-end',
+		marginTop: vS(-16)
 	},
 
 	overlay: {

@@ -1,19 +1,21 @@
-import { FC, useState, useRef } from 'react'
+import { FC, useState, useContext } from 'react'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { useSelector } from 'react-redux'
 import { formatNum } from '@utils/helpers'
+import { PopupContext } from '@contexts/popup'
+import { commonStyles } from '@utils/stylesheet'
 import SettingRow from '@components/setting-row'
 import StackHeader from '@components/shared/stack-header'
 import reminderData from '@assets/data/reminder.json'
-import WeightRepeatPopup from '@components/shared/popup-content/weight-remind'
-import RemindStartFastPopup from '@components/shared/popup-content/start-fast-remind'
-import RemindEndFastPopup from '@components/shared/popup-content/end-fast-remind'
-import WaterStartRemindPopup from '@components/shared/popup-content/water-start-remind'
-import WaterEndRemindPopup from '@components/shared/popup-content/water-end-remind'
-import WaterRemindIntervalPopup from '@components/shared/popup-content/water-interval-remind'
-import withSync from '@hocs/withSync'
+import WeightRepeatPopup from '@components/shared/popup/weight-remind'
+import RemindStartFastPopup from '@components/shared/popup/start-fast-remind'
+import RemindEndFastPopup from '@components/shared/popup/end-fast-remind'
+import WaterStartRemindPopup from '@components/shared/popup/water-start-remind'
+import WaterEndRemindPopup from '@components/shared/popup/water-end-remind'
+import WaterRemindIntervalPopup from '@components/shared/popup/water-interval-remind'
+import useAnimValue from '@hooks/useAnimValue'
 
 interface ReminderSectionProps {
 	title: string,
@@ -24,7 +26,7 @@ const reminderCallbacks = {}
 const reminderValues = {}
 
 const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
 	const [ isEnabled, setIsEnabled ] = useState<boolean>(false)
 
 	const onPress = () => {
@@ -33,7 +35,7 @@ const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) 
 			duration: 320,
 			easing: Easing.ease,
 			useNativeDriver: false
-		}).start(({ finished }) => {
+		}).start(() => {
 			setIsEnabled(!isEnabled)
 		})
 	}
@@ -67,14 +69,8 @@ const ReminderSection: FC<ReminderSectionProps> = ({ title, settingList = [] }) 
 	)
 }
 
-export default withSync((): JSX.Element => {
-	const [ repeatWeightPopupVisible, setRepeatWeightPopupVisible ] = useState<boolean>(false)
-	const [ remindStartFastPopupVisible, setRemindStartFastPopupVisible ] = useState<boolean>(false)
-	const [ remindEndFastPopupVisible, setRemindEndFastPopupVisible ] = useState<boolean>(false)
-	const [ waterStartRemindPopupVisible, setWaterStartRemindPopupVisible ] = useState<boolean>(false)
-	const [ waterEndRemindPopupVisible, setWaterEndRemindPopupVisible ] = useState<boolean>(false)
-	const [ waterRemindIntervalPopupVisible, setWaterRemindIntervalPopupVisible ] = useState<boolean>(false)
-	console.log('render Reminder')
+export default (): JSX.Element => {
+	const { setPopup } = useContext<any>(PopupContext)
 	
 	const {
 		beforeStartFast,
@@ -83,15 +79,15 @@ export default withSync((): JSX.Element => {
 		startWater,
 		endWater,
 		waterInterval
-	} = useSelector((state: AppState) => state.setting.reminders)
+	} = useSelector((state: AppStore) => state.setting.reminders)
 	
 	if (Object.keys(reminderCallbacks).length === 0) {
-		reminderCallbacks['start-fast-remind'] = () => { setRemindStartFastPopupVisible(true) }
-		reminderCallbacks['end-fast-remind'] = () => { setRemindEndFastPopupVisible(true) }
-		reminderCallbacks['repeat-weight'] = () => { setRepeatWeightPopupVisible(true) }
-		reminderCallbacks['water-start-remind'] = () => { setWaterStartRemindPopupVisible(true) }
-		reminderCallbacks['water-end-remind'] = () => { setWaterEndRemindPopupVisible(true) }
-		reminderCallbacks['water-interval-remind'] = () => { setWaterRemindIntervalPopupVisible(true) }
+		reminderCallbacks['start-fast-remind'] = () => { setPopup(RemindStartFastPopup) }
+		reminderCallbacks['end-fast-remind'] = () => { setPopup(RemindEndFastPopup) }
+		reminderCallbacks['repeat-weight'] = () => { setPopup(WeightRepeatPopup) }
+		reminderCallbacks['water-start-remind'] = () => { setPopup(WaterStartRemindPopup) }
+		reminderCallbacks['water-end-remind'] = () => { setPopup(WaterEndRemindPopup) }
+		reminderCallbacks['water-interval-remind'] = () => { setPopup(WaterRemindIntervalPopup) }
 	}
 
 	reminderValues['start-fast-remind'] = `${beforeStartFast} mins` 
@@ -113,7 +109,7 @@ export default withSync((): JSX.Element => {
 	return (
 		<View style={styles.container}>
 			<StackHeader title='Reminder' />
-			<View style={{ width: '100%' }}>
+			<View style={commonStyles.wfull}>
 			{
 				[
 					'Start fasting',
@@ -123,15 +119,9 @@ export default withSync((): JSX.Element => {
 				].map((e, i) => <ReminderSection key={`r${i}`} title={e} settingList={reminderData[e]} />)
 			}
 			</View>
-			{ repeatWeightPopupVisible && <WeightRepeatPopup setVisible={setRepeatWeightPopupVisible} /> }
-			{ remindStartFastPopupVisible && <RemindStartFastPopup setVisible={setRemindStartFastPopupVisible} /> }
-			{ remindEndFastPopupVisible && <RemindEndFastPopup setVisible={setRemindEndFastPopupVisible} /> }
-			{ waterStartRemindPopupVisible && <WaterStartRemindPopup setVisible={setWaterStartRemindPopupVisible} /> }
-			{ waterEndRemindPopupVisible && <WaterEndRemindPopup setVisible={setWaterEndRemindPopupVisible} /> }
-			{ waterRemindIntervalPopupVisible && <WaterRemindIntervalPopup setVisible={setWaterRemindIntervalPopupVisible} /> }
 		</View>
 	)
-})
+}
 
 const styles = StyleSheet.create({
 	container: {

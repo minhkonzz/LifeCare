@@ -1,13 +1,11 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale  as vS } from '@utils/responsive'
 import { WatercupIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
-
-const { hex: darkHex } = Colors.darkPrimary
+import { AppStore } from '../store'
 
 interface TabHeaderProps {
 	title?: string
@@ -15,8 +13,8 @@ interface TabHeaderProps {
 
 export default ({ title }: TabHeaderProps): JSX.Element => {
 	const navigation = useNavigation<any>()
-	const drinked: number = useSelector((state: AppState) => state.water.drinked)
-	const dailyWater: number = useSelector((state: AppState) => state.user.metadata.dailyWater)
+	const drinked: number = useSelector((state: AppStore) => state.water.drinked)
+	const { dailyWater, firstTimeTrackWater } = useSelector((state: AppStore) => state.user.metadata)
 
 	return (
 		<View style={styles.container}>
@@ -32,7 +30,7 @@ export default ({ title }: TabHeaderProps): JSX.Element => {
 					tintColor='#91C8E4'
 					backgroundColor='#E3E3E3' />
 				<View style={styles.watercupInside}>
-					<Pressable onPress={() => navigation.navigate('water')}>
+					<Pressable onPress={() => navigation.navigate(firstTimeTrackWater && 'water-overview' || 'water')}>
 						<WatercupIcon width={hS(14)} height={vS(19)} />
 					</Pressable>
 				</View>

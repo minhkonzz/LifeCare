@@ -1,14 +1,14 @@
-import { memo, useCallback, useState, useRef, Dispatch, SetStateAction } from 'react'
+import { memo, useCallback, useMemo, useState, Dispatch, SetStateAction } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { getDatesRange } from '@utils/datetimes'
-import { Colors } from '@utils/constants/colors'
+import { getDatesRange, getMonthTitle, toDateTimeV2 } from '@utils/datetimes'
+import { darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
+import { commonStyles } from '@utils/stylesheet'
 import LinearGradient from 'react-native-linear-gradient'
 import Popup from './popup'
 import WheelPicker from './wheel-picker'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
 const dateOpts = getDatesRange(8)
 const hoursOpts = Array.from({ length: 24 }).map((e, i) => i)
 const minsOpts = Array.from({ length: 60 }).map((e, i) => i)
@@ -39,17 +39,28 @@ const Picker = memo(({
 
 const Main = ({ 
    setVisible,
-   animateValue, 
+   animateValue,
+   datetime,
+   error,
    onSave 
 }: {
    animateValue: Animated.Value,
    setVisible: Dispatch<SetStateAction<any>>,
+   datetime?: { date: string, hour: number, min: number },
+   error?: string,
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }): JSX.Element => {
 
-   const [ date, setDate ] = useState<string>('')
-   const [ hours, setHours ] = useState<number>(0)
-   const [ mins, setMins ] = useState<number>(0)
+   const memorizedDatetime = useMemo(() => {
+      const { date, hour, min } = datetime ?? toDateTimeV2()
+      return { currentDate: date, currentHour: hour, currentMin: min }
+   }, [])
+
+   const { currentDate, currentHour, currentMin } = memorizedDatetime
+
+   const [ date, setDate ] = useState<string>(currentDate)
+   const [ hours, setHours ] = useState<number>(currentHour)
+   const [ mins, setMins ] = useState<number>(currentMin)
 
    const onConfirm = () => {
       Animated.timing(animateValue, {
@@ -63,7 +74,8 @@ const Main = ({
    }
 
    const setNewDate = useCallback((i: number) => {
-      setDate(dateOpts[i]['value'])
+      const { month, date: dateOpt } = dateOpts[i]
+      setDate(`${getMonthTitle(month, true)} ${dateOpt}`)
    }, [])
 
    const setNewHours = useCallback((i: number) => {
@@ -75,14 +87,13 @@ const Main = ({
    }, [])
 
    const WheelPickers = useCallback(memo(() => {
-      const d: Date = new Date()
-      const hour: number = d.getHours()
-      const min: number = d.getMinutes()
-      const date: number = d.getDate()
-      const formattedDate: string = `${d.toLocaleString('en-US', { month: 'short' })} ${date}`
-      const currentDateIndex: number = dateOpts.findIndex(e => e.value === formattedDate)
-      const currentHourIndex: number = hoursOpts.findIndex(e => e === hour)
-      const currentMinIndex: number = minsOpts.findIndex(e => e === min)
+      const currentDateIndex: number = dateOpts.findIndex(e => {
+         const { month, date: dateOpt } = e
+         return `${getMonthTitle(month, true)} ${dateOpt}` === date
+      })
+
+      const currentHourIndex: number = hoursOpts.findIndex(e => e === hours)
+      const currentMinIndex: number = minsOpts.findIndex(e => e === mins)
 
       return (
          <>
@@ -109,6 +120,7 @@ const Main = ({
 
    return (
       <>
+         { error && <Text style={commonStyles.errorText}>{error}</Text> }
          <View style={styles.main}>
             <View style={styles.indicator} />
             <View style={styles.wheelpickers}>
@@ -131,16 +143,20 @@ const Main = ({
    )  
 }
 
-export default ({
+export default memo(({
    setVisible,
    title,
+   error,
+   datetime,
    onSave
 }: {
    setVisible: Dispatch<SetStateAction<any>>,
    title: string,
+   error?: string,
+   datetime?: { date: string, hour: number, min: number }
    onSave?: (date: string, hours: number, mins: number) => Promise<void>
 }) => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const animateValue = useAnimValue(0)
 
    return (
       <Popup {...{
@@ -150,10 +166,10 @@ export default ({
          animateValue,
          setVisible
       }}>
-         <Main {...{ animateValue, setVisible, onSave }} />
+         <Main {...{ animateValue, setVisible, datetime, onSave, error }} />
       </Popup>
    )
-}
+})
 
 const styles = StyleSheet.create({
    main: {

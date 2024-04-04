@@ -1,14 +1,11 @@
 import { ReactNode } from 'react'
-import {
-   View, 
-   Text,
-   Pressable,
-   StyleSheet
-} from 'react-native'
-
-import { Colors } from '@utils/constants/colors'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import BackIcon from '@assets/icons/goback.svg'
+import { BackIcon } from '@assets/icons'
+import { commonStyles } from '@utils/stylesheet'
+
+const { hrz } = commonStyles
 
 interface ProfileRedirectProps {
    title: string, 
@@ -18,8 +15,8 @@ interface ProfileRedirectProps {
 
 export default ({ title, onPress, children }: ProfileRedirectProps): JSX.Element => {
    return (
-      <Pressable style={[styles.horz, styles.container]} {...{ onPress }}>
-         <View style={styles.horz}>
+      <Pressable style={{...hrz, ...styles.container }} {...{ onPress }}>
+         <View style={hrz}>
             { children }
             <Text style={styles.title}>{title}</Text>
          </View>
@@ -35,20 +32,15 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       paddingHorizontal: hS(24), 
       borderRadius: hS(24), 
-      backgroundColor: `rgba(${Colors.darkPrimary.rgb.join(', ')}, .12)`, 
+      backgroundColor: `rgba(${darkRgb.join(', ')}, .12)`, 
       marginTop: vS(16)
-   }, 
-
-   horz: {
-      flexDirection: 'row', 
-      alignItems: 'center'
    }, 
 
    title: {
       fontFamily: 'Poppins-Medium', 
       fontSize: hS(14), 
       letterSpacing: .2,
-      color: Colors.darkPrimary.hex,
+      color: darkHex,
       marginLeft: hS(17),
       marginTop: vS(2)
    }, 

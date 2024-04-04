@@ -1,10 +1,11 @@
-import { memo, useEffect, useRef } from 'react'
-import { View, Text, Image, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Animated } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { lightHex, darkRgb, darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector } from 'react-redux'
-import { AppState } from '../store'
+import { AppStore } from '../store'
+import { AnimatedPressable, AnimatedTouchableOpacity } from '@components/shared/animated'
+import withVisiblitySensor from '@hocs/withVisiblitySensor'
 import Screen from '@components/shared/screen'
 import LinearGradient from 'react-native-linear-gradient'
 import DailyFastingState from '@components/daily-fasting-state'
@@ -13,23 +14,8 @@ import BMITrack from '@components/daily-bmi-track'
 import WaterTrack from '@components/daily-water-track'
 import NutritionTrack from '@components/daily-nutrition-track'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: lightHex } = Colors.lightPrimary
-
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity)
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
-const Header = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
-	const { name } = useSelector((state: AppState) => state.user.metadata)
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 800, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
+const Header = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
+	const { name } = useSelector((state: AppStore) => state.user.metadata)
 
 	return (
 		isViewable && 
@@ -53,32 +39,19 @@ const Header = memo(({ isViewable }: { isViewable: boolean }) => {
 						...styles.titleGreet, 
 						transform: [{ translateX: animateValue.interpolate({
 							inputRange: [0, 1], 
-							outputRange: [-150, 0]
+							outputRange: [-50, 0]
 						}) }]
 					}}>
 						Welcome back!
 					</Animated.Text>
 				</View>
-				{/* <Animated.Image 
-					style={{...styles.userAvatar, transform: [{ scale: animateValue }] }} 
-					source={require('../assets/images/UserAvatar.png')} 
-				/> */}
 			</View>
 		</View> || <View style={styles.header} />
 	)
 })
 
-const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(isViewable && 0 || 1)).current
+const ChatBotAdvertise = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	const navigation = useNavigation<any>()
-
-	useEffect(() => {
-		Animated.timing(animateValue, {
-			toValue: isViewable && 1 || 0, 
-			duration: 920, 
-			useNativeDriver: true
-		}).start()
-	}, [isViewable])
 
 	return (
 		isViewable && 
@@ -125,23 +98,43 @@ const ChatBotAdvertise = memo(({ isViewable }: { isViewable: boolean }) => {
 					</AnimatedTouchableOpacity>
 				</View>
 				<View style={styles.chatbotAdvertiseBottom}>
-					<Image source={require('../assets/lottie/FastAIBotInterface.gif')} style={styles.animatedChatbotInterface} />
-					<Text style={styles.gptRef}>Powered by GPT3.5</Text>
+					<Animated.Image 
+						source={require('../assets/lottie/FastAIBotInterface.gif')} 
+						style={{
+							...styles.animatedChatbotInterface,
+							opacity: animateValue,
+							transform: [{ translateX: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [30, 0],
+							}) }]
+						}} 
+					/>
+					<Animated.Text 
+						style={{
+							...styles.gptRef,
+							opacity: animateValue,
+							transform: [{ translateY: animateValue.interpolate({
+								inputRange: [0, 1],
+								outputRange: [10, 0]
+							}) }]
+						}}>
+						Powered by Gemini
+					</Animated.Text>
 				</View>
 			</LinearGradient>
 		</AnimatedPressable> || <View style={styles.chatbotAdvertise} />
 	)
 })
 
-const RowMetrics = ({ isViewable }: { isViewable: boolean }) => {
+const RowMetrics = withVisiblitySensor(({ isViewable, animateValue }: { isViewable: boolean, animateValue: Animated.Value }) => {
 	return (
 		isViewable && 
 		<View style={styles.metricRow}>
-			<BMITrack />
-			<WaterTrack />
+			<BMITrack {...{ animateValue }} />
+			<WaterTrack {...{ animateValue }} />
 		</View> || <View style={styles.metricRow} />
 	)
-}
+})
 
 export default (): JSX.Element => (
 	<Screen paddingHorzContent content={[
@@ -229,7 +222,7 @@ const styles = StyleSheet.create({
 	chatbotAdvertise: {
       width: '100%', 
       height: vS(161),
-      marginTop: vS(18),
+      marginTop: vS(23),
       borderRadius: vS(24)
    },
 

@@ -1,32 +1,22 @@
 import { StyleSheet, View, Dimensions } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import Animated, {
-   SharedValue,
-   runOnJS,
-   useAnimatedProps,
-   useSharedValue,
-   withTiming,
-} from 'react-native-reanimated'
-import { Colors } from '@utils/constants/colors'
+import Animated, { SharedValue, runOnJS, useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated'
+import { darkHex } from '@utils/constants/colors'
 import { interpolatePath } from 'react-native-redash'
-import usePath from '@hooks/usePath'
 import { getPathXCenter } from '@utils/path'
+import { WhiteHomeIcon, WhiteTimerIcon, WhiteCalendarIcon, WhiteExploreIcon, WhiteUserIcon } from '@assets/icons'
+import usePath from '@hooks/usePath'
 import TabItem from './BottomTabItem'
 import AnimatedCircle from './AnimatedCircle'
-import HomeWhiteIcon from '@assets/icons/home-white.svg'
-import TimerWhiteIcon from '@assets/icons/timer-white.svg'
-import CalendarWhiteIcon from '@assets/icons/calendar-white.svg'
-import ExploreWhiteIcon from '@assets/icons/explore-white.svg'
-import UserWhiteIcon from '@assets/icons/user-white.svg'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const AnimatedPath = Animated.createAnimatedComponent(Path)
 const tabIcons = {
-   'daily': HomeWhiteIcon,
-   'timer': TimerWhiteIcon,
-   'nutrition': CalendarWhiteIcon,
-   'insights': ExploreWhiteIcon,
-   'profile': UserWhiteIcon
+   'daily': WhiteHomeIcon,
+   'timer': WhiteTimerIcon,
+   'nutrition': WhiteCalendarIcon,
+   'insights': WhiteExploreIcon,
+   'profile': WhiteUserIcon
 }
 
 export default ({ state, descriptors, navigation }) => {
@@ -58,10 +48,10 @@ export default ({ state, descriptors, navigation }) => {
    return (
       <View style={styles.tabBarContainer}>
          <Svg width={SCREEN_WIDTH} height={tHeight} style={styles.shadowMd}>
-            <AnimatedPath fill={Colors.darkPrimary.hex} {...{ animatedProps }} />
+            <AnimatedPath fill={darkHex} {...{ animatedProps }} />
          </Svg>
          <AnimatedCircle circleX={circleXCoordinate} />
-         <View style={[styles.tabItemsContainer, { height: tHeight }]}>
+         <View style={{...styles.tabItemsContainer, height: tHeight }}>
             {
                state.routes.map((route, index) => {
                   const { options } = descriptors[route.key];

@@ -1,22 +1,17 @@
-import { useRef, useEffect } from 'react'
-import { Colors } from '@utils/constants/colors'
+import { useEffect } from 'react'
+import { View, Text, ScrollView, Image, Animated, StyleSheet } from 'react-native'
+import { darkHex, darkRgb } from '@utils/constants/colors'
 import { useRoute } from '@react-navigation/native'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import ClockIcon from '@assets/icons/clock.svg'
-import {
-   View, 
-   Text,
-   ScrollView, 
-   Image, 
-   Animated, 
-   StyleSheet
-} from 'react-native'
+import { ClockIcon } from '@assets/icons'
+import { commonStyles } from '@utils/stylesheet'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
+const { hrz } = commonStyles
 
 export default (): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const route = useRoute()
+   const animateValue = useAnimValue(0)
+   const route = useRoute<any>()
    const {
       banner, 
       title, 
@@ -40,15 +35,29 @@ export default (): JSX.Element => {
             showsVerticalScrollIndicator={false}
             style={styles.main}
             contentContainerStyle={styles.mainContent}>
-            <View style={{...styles.hrz, ...styles.header}}>
+            <View style={{...hrz, ...styles.header}}>
                <Text style={styles.category}>{ category }</Text>
-               <View style={styles.hrz}>
+               <View style={hrz}>
                   <ClockIcon width={hS(12)} height={vS(12)} />
                   <Text style={styles.minsRead}>{`${mins_read} mins read`}</Text>
                </View>
             </View>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.content}>{content}</Text>
+            <View>
+               { content.map((e: any) => {
+                  switch (e.k) {
+                     case "desc": return (
+                        <Text style={styles.content}>{e.v}</Text>
+                     )
+                     case "section_title": return (
+                        <Text style={styles.sectionTitle}>{e.v}</Text>
+                     )
+                     case "image": return (
+                        <Image source={e.v} style={styles.imageContent} />
+                     )
+                  }
+               }) }
+            </View>
          </ScrollView>
       </View>
    )
@@ -59,11 +68,6 @@ const styles = StyleSheet.create({
       flex: 1, 
       alignItems: 'center'
    }, 
-
-   hrz: {
-      flexDirection: 'row',
-      alignItems: 'center'
-   },
 
    header: {
       width: '100%',
@@ -124,5 +128,18 @@ const styles = StyleSheet.create({
       letterSpacing: .2, 
       lineHeight: vS(25), 
       marginTop: vS(15)
-   }
+   },
+
+   sectionTitle: {
+      fontFamily: 'Poppins-SemiBold',
+      fontSize: hS(14), 
+      color: darkHex,
+      letterSpacing: .2, 
+      lineHeight: vS(25), 
+      marginTop: vS(12)
+   },
+   
+   imageContent: {
+      width: '100%'
+   },
 })

@@ -5,12 +5,6 @@
 			"title": "Personal data",
 			"type": "redirect",
 			"cbkey": "personal-data"
-		},
-		{
-			"id": 2,
-			"title": "Meal time",
-			"type": "redirect",
-			"cbkey": "meal-time"
 		}
 	],
 	"General": [
@@ -43,27 +37,9 @@
 			"title": "Dark mode",
 			"type": "toggle",
 			"cbkey": "dark-mode"
-		},
-		{
-			"id": 6,
-			"title": "Sync to Google Fit",
-			"type": "toggle",
-			"cbkey": "sync-google-fit"
 		}
 	],
 	"Contact us": [
-		{
-			"id": 1,
-			"title": "Privacy policy",
-			"type": "redirect",
-			"cbkey": "privacy-policy"
-		},
-		{
-			"id": 2,
-			"title": "Rate us",
-			"type": "redirect",
-			"cbkey": "rate-us"
-		},
 		{
 			"id": 3,
 			"title": "Feedback",

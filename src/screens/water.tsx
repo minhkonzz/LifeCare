@@ -1,71 +1,65 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Pressable, Easing } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppState } from '../store'
-import { NavigationProp } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
-import { horizontalScale as hS, SCREEN_HEIGHT, verticalScale as vS } from '@utils/responsive'
+import { AppStore } from '../store'
+import { useNavigation } from '@react-navigation/native'
+import { darkHex, strongBlueHex, lightBlueHex, strongBlueRgb } from '@utils/constants/colors'
+import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { INCREASE, DECREASE } from '@utils/constants/indent'
-import { updateLiquid, resetSpecs } from '../store/water'
+import { updateLiquid, resetSpecs, updateFirstTimeReachGoal } from '@store/water'
 import { BackIcon, SettingIcon, WhitePlusIcon, StrongBlueMinusIcon } from '@assets/icons'
-import { WaveSvg } from '@assets/images'
+import useSession from '@hooks/useSession'
 import UserService from '@services/user'
 import LinearGradient from 'react-native-linear-gradient'
 import AnimatedNumber from '@components/shared/animated-text'
+import WaterWave from '@components/water-wave'
+import useAnimValue from '@hooks/useAnimValue'
 
-import {
-   View,
-   Text,
-   StyleSheet,
-   Animated,
-   TouchableOpacity, 
-   Pressable, 
-   Easing
-} from 'react-native'
+export default (): JSX.Element => {
+   const animateValue = useAnimValue(0)
+   const waveAnimateValue = useAnimValue(0)
+   
+   const {
+      firstTimeReachGoal,
+      drinked: liquidDrinked, 
+      cupsize, 
+      needSync, 
+      specs, 
+      date, 
+      changes 
+   } = useSelector((state: AppStore) => state.water)
 
-const darkPrimary: string = Colors.darkPrimary.hex
-const lightBlue: string = Colors.lightBlue.hex
-const strongBlue: string = Colors.strongBlue.hex
-
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waveAnimateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const waterTranslateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
-   const { drinked: liquidDrinked, cupsize, needSync, specs, date, changes } = useSelector((state: AppState) => state.water)
-   const { dailyWater } = useSelector((state: AppState) => state.user.metadata)
-   const { session } = useSelector((state: AppState) => state.user)
-   const userId: string = session?.user?.id
+   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
+   const navigation = useNavigation<any>()
+   const { userId } = useSession()
    const dispatch = useDispatch()
-
-   console.log('changes:', changes)
-   console.log('specs:', specs)
 
    useEffect(() => {
       Animated.timing(animateValue, {
          toValue: 1, 
-         duration: 920, 
+         duration: 840, 
          useNativeDriver: true
       }).start()
 
       Animated.loop(
          Animated.timing(waveAnimateValue, {
             toValue: 1, 
-            duration: 1010, 
+            duration: 840, 
             useNativeDriver: true,
             easing: Easing.linear
          })
       ).start()
    }, [])
 
-   useEffect(() => {
-      Animated.timing(waterTranslateY, {
-         toValue: vS(SCREEN_HEIGHT - SCREEN_HEIGHT * liquidDrinked / dailyWater - 20),
-         duration: 1500,
-         useNativeDriver: true
-      }).start()
-   }, [liquidDrinked])
-
    const increaseLiquid = () => {
       dispatch(updateLiquid(INCREASE))
+      if (!firstTimeReachGoal && (liquidDrinked + cupsize >= dailyWater)) {
+         dispatch(updateFirstTimeReachGoal())
+         const timeout = setTimeout(() => {
+            clearTimeout(timeout)
+            navigation.navigate('water-reached-goal')
+         }, 2000)  
+      }
    }
 
    const decreaseLiquid = () => {
@@ -74,29 +68,14 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
    }
 
    const onSync = async () => {
-      await UserService.syncDailyWater({
-         userId,
-         date,
-         drinked: liquidDrinked,
-         goal: dailyWater,
-         specs
-      })
-      console.log('daily water sync success')
+      if (userId) 
+         await UserService.syncDailyWater({ userId, date, drinked: liquidDrinked, goal: dailyWater, specs })
       dispatch(resetSpecs())
    }
 
    return (
       <View style={styles.container}>
-         <Animated.View style={{
-            ...styles.waveContainer,
-            opacity: animateValue,
-            transform: [
-               { translateX: waveAnimateValue.interpolate({ inputRange: [0, 1], outputRange: [0, hS(-378)] }) },
-               { translateY: waterTranslateY }
-            ]
-         }}>
-            <WaveSvg width={hS(792)} height='100%' />
-         </Animated.View>
+         <WaterWave w={hS(792)} full />
          <View style={styles.interacts}>
             <View style={styles.header}>
                <BackIcon width={hS(14)} height={vS(14)} />
@@ -143,7 +122,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
                <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseLiquid}>
                   <LinearGradient
                      style={styles.increaseMilButton}
-                     colors={[lightBlue, `rgba(${Colors.strongBlue.rgb.join(', ')}, .6)`]}
+                     colors={[lightBlueHex, `rgba(${strongBlueRgb.join(', ')}, .6)`]}
                      start={{ x: .2, y: 0 }}
                      end={{ x: .5, y: 1 }}>
                      <WhitePlusIcon width={hS(20)} height={vS(20)} />
@@ -192,7 +171,7 @@ const styles = StyleSheet.create({
    headerTitle: {
       fontSize: hS(15),
       fontFamily: 'Poppins-SemiBold',
-      color: darkPrimary
+      color: darkHex
    },
 
    interacts: {
@@ -218,7 +197,7 @@ const styles = StyleSheet.create({
    totalMilText: {
       fontSize: hS(36),
       fontFamily: 'Poppins-SemiBold',
-      color: strongBlue
+      color: strongBlueHex
    },
 
    totalMilSymbText: {
@@ -228,7 +207,7 @@ const styles = StyleSheet.create({
    goalMilText: {
       fontFamily: 'Poppins-Medium',
       fontSize: hS(14),
-      color: darkPrimary
+      color: darkHex
    },
 
    updates: {
@@ -254,7 +233,7 @@ const styles = StyleSheet.create({
    sideUpdateButton: {
       width: hS(70),
       height: vS(70),
-      backgroundColor: `rgba(${Colors.strongBlue.rgb.join(', ')}, .2)`,
+      backgroundColor: `rgba(${strongBlueRgb.join(', ')}, .2)`,
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 500, 

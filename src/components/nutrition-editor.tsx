@@ -1,14 +1,11 @@
 import AnimatedNumber from '@components/shared/animated-text'
 import { WhitePlusIcon, FireIcon } from '@assets/icons'
 import { useNavigation } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { primaryHex, primaryRgb, darkHex, darkRgb } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import { NutritionEditorProps } from '@utils/interfaces'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary 
 
 export default ({ title, totalCalories, caloriesMethod, children }: NutritionEditorProps): JSX.Element => {
    const navigation = useNavigation<any>()

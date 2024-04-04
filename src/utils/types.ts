@@ -32,16 +32,18 @@ export type FastingState = {
 
 export type DailyWaterState = {
    date: string, 
+   firstTimeReachGoal: boolean,
    drinked: number, 
    needSync: boolean,
    initCupsize: number,
+   customCupsize: number,
    cupsize: number,
-   specs: Array<{ id: string, liquid: number, time: string, type: boolean }>
+   specs: any[]
    changes: Array<{ id: string, liquid: number, time: string }>
 }
 
 export type Message = {
-   id: number, 
+   id: string, 
    sender: string,
    text: string
 }
@@ -77,13 +79,16 @@ export type SettingState = {
 export type UserState = {
    session: any,
    metadata: any,
-   changes: any
+   isLoading: boolean,
+   queuedActions: any
 }
 
 export type WaterRecordsPayload = {
-   userId: string,
    goal: number, 
    value: number,
-   changes: Array<{ liquid: number, time: string }>
+   createdAt: string,
+   updatedAt: string,
+   times: Array<{ id: string, value: number, createdAt: string, updatedAt: string }>,
+   date: string
 }
 

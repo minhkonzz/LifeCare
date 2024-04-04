@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react'
+import { memo } from 'react'
 import {
 	Animated,
 	ListRenderItemInfo,
@@ -8,13 +8,14 @@ import {
 	Text
 } from 'react-native'
 
-import { Colors } from '@utils/constants/colors'
+import { darkHex } from '@utils/constants/colors'
 import { WheelPickerProps } from '@utils/interfaces'
+import useAnimValue from '@hooks/useAnimValue'
 
-let valueScrolledTo: string | number = -1
+let valueScrolledTo: string | number = 0
 
 export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex }: WheelPickerProps): JSX.Element => {
-	const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current
+	const scrollY = useAnimValue(0)
 
 	const momentumScrollEnd = (
 		event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -70,7 +71,7 @@ export default memo(({ items, itemHeight, fs, onIndexChange, initialScrollIndex 
 	return (
 		<Animated.FlatList
 			{...{ initialScrollIndex }}
-			style={{...styles.container, height: itemHeight * 5 }}
+			style={{...styles.container, height: itemHeight * 5}}
 			data={['', '', ...items, '', '']}
 			renderItem={({ item, index }) => <WheelPickerItem {...{ item, index }} />}
 			showsVerticalScrollIndicator={false}
@@ -105,6 +106,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Medium',
 		textAlign: 'center',
 		textAlignVertical: 'center',
-		color: Colors.darkPrimary.hex
+		color: darkHex
 	}
 })

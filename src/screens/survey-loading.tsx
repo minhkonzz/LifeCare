@@ -1,47 +1,109 @@
 import { useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { NavigationProp } from '@react-navigation/native'
-import { Colors } from '@utils/constants/colors'
+import { useNavigation } from '@react-navigation/native'
+import { darkHex } from '@utils/constants/colors'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
 import { useSelector, useDispatch } from 'react-redux'
-import { updateMetadata } from '../store/user'
-import { AppState } from '../store'
+import { updateMetadata } from '@store/user'
+import { AppStore } from '../store'
 import { InitialPersonalData, PersonalData } from '@utils/interfaces'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GOOGLE_AI_KEY } from '@env'
+import useSession from '@hooks/useSession'
 import UserService from '@services/user'
 import LottieView from 'lottie-react-native'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-
-export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Element => {
+export default (): JSX.Element => {
    const dispatch = useDispatch()
-   const survey = useSelector((state: AppState) => state.survey)
-   const session = useSelector((state: AppState) => state.user.session)
+   const navigation = useNavigation<any>()
+   const { isOnline } = useSelector((state: AppStore) => state.network)
+   const { userId } = useSession()
+   const survey = useSelector((state: AppStore) => state.survey)
+
+   const {
+      age, 
+      gender,
+      currentHeight,
+      currentWeight, 
+      goalWeight, 
+      exercisePerformance,
+      fastingFamiliar,
+      goal, 
+      firstMealTime,
+      lastMealTime,
+      healthConcerns
+   } = survey
+
+   const getPrompt = () => {
+      return `
+         I'm ${fastingFamiliar} with Fasting diet, 
+         I want to know what fasting plan is right for me if my height is ${currentHeight} centimeter, 
+         my current weight is ${currentWeight} kg, 
+         my goal weight is ${goalWeight} kg, 
+         my goal are ${goal.join(', ')}.
+         My gender is ${gender}, 
+         I'm ${age} years old, 
+         I sleep about 9 hours every night, 
+         I have ${exercisePerformance} with exercise,
+         My first meal time is at ${firstMealTime},
+         My last meal time is at ${lastMealTime},
+         I'm having ${healthConcerns.join(', ')}.
+         I want the response includes: fasting_plan_name (string), daily_water (number and value in ml), daily_calories (number), other_tips (array), advise (string), plan_explain (string). Response text must be a valid JSON string
+      `
+   }
 
    const initPersonalData = async () => {
+      let recommendation = null
+      let dailyWater = 2500
+
+      if (isOnline) {
+         try {
+            const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY)
+            const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+            const prompt = getPrompt()
+            const ans = await model.generateContent(prompt)
+            const res = ans.response.text()
+            const startIndex = res.indexOf('{')
+            const endIndex = res.lastIndexOf('}')
+            const subRes = res.substring(startIndex, endIndex + 1)
+            const recommendResult = JSON.parse(subRes)
+            if (recommendResult) {
+               recommendation = recommendResult
+               const { daily_water } = recommendResult
+               if (daily_water) dailyWater = daily_water
+            }
+         } catch (error) {
+            console.log('Cannot get recommendation')
+         }
+      }
+
       let isOk: boolean = false
       let initPersonalData: InitialPersonalData = {
-         gender: survey.gender,
-         age: survey.age, 
-         currentHeight: survey.currentHeight,
-         currentWeight: survey.currentWeight, 
-         startWeight: survey.currentWeight,
-         goalWeight: survey.goalWeight,
-         exercisePerformance: survey.exercisePerformance,
-         fastingFamiliar: survey.fastingFamiliar,
-         goal: survey.goal,
-         firstTimeTrackWater: false, 
+         gender,
+         age,
+         currentHeight,
+         currentWeight,
+         startWeight: currentWeight,
+         goalWeight,
+         exercisePerformance,
+         fastingFamiliar,
+         goal,
+         firstMealTime,
+         lastMealTime,
+         healthConcerns,
          isSurveyed: true
       }   
 
-      if (!session) {
+      if (!userId) {
          // user logged in as guest
          const personalData: PersonalData = {
             ...initPersonalData,
+            firstTimeTrackWater: true, 
             chestMeasure: 0,
             thighMeasure: 0,
             waistMeasure: 0,
             hipsMeasure: 0, 
-            dailyWater: 2500,
+            dailyWater,
             dailyCarbs: 0,
             dailyFat: 0,
             dailyProtein: 0,
@@ -57,17 +119,16 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
          dispatch(updateMetadata(personalData))
          isOk = true
       } else {
-         const userId = session?.user?.id
          const { status } = await UserService.initPersonalData(userId, initPersonalData)
          dispatch(updateMetadata({
             waterRecords: [],
             fastingRecords: [],
             bodyRecords: []
          }))
-         initPersonalData['waterRecords']
+
          if (status === 204) isOk = true
       }
-      if (isOk) navigation.navigate('main')
+      if (isOk) navigation.navigate('fasting-definitions', recommendation)
    }
 
    useEffect(() => {
@@ -81,11 +142,7 @@ export default ({ navigation }: { navigation: NavigationProp<any> }): JSX.Elemen
             source={require('../assets/lottie/lottie-loading.json')}
             autoPlay 
             loop />
-         <View style={styles.texts}>
-            <Text style={styles.lgText}>We're setting</Text>
-            <Text style={styles.lgText}>Everything up for you</Text>
-         </View>
-         <Text style={styles.smText}>Calculating...</Text>
+         <Text style={styles.lgText}>We're setting up for you</Text>
       </View>
    )
 }
@@ -113,13 +170,5 @@ const styles = StyleSheet.create({
       fontSize: hS(24), 
       color: darkHex, 
       lineHeight: vS(36)
-   }, 
-
-   smText: {
-      fontFamily: 'Poppins-Medium',
-      fontSize: hS(14), 
-      color: `rgba(${darkRgb.join(', ')}, .6)`,
-      letterSpacing: .2, 
-      marginTop: vS(22)
    }
 })

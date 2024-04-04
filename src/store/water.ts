@@ -1,13 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { autoId } from '@utils/helpers'
 import { DailyWaterState } from '@utils/types'
-import { getCurrentDate } from '@utils/datetimes'
+import { getCurrentDate, getLocalDatetimeV2 } from '@utils/datetimes'
 
 const initialState: DailyWaterState = {
    date: getCurrentDate(),
+   firstTimeReachGoal: false,
    drinked: 0,
    needSync: false,
    initCupsize: 200,
+   customCupsize: 0,
    cupsize: 250,
    specs: [],
    changes: []
@@ -26,14 +28,7 @@ const WaterSlice = createSlice({
             const newChange = { 
                id: newId,
                liquid: state.cupsize, 
-               time: new Intl.DateTimeFormat('en', {
-                  year: '2-digit',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-               }).format(new Date())
+               time: getLocalDatetimeV2()
             }
             state.changes = [...state.changes, newChange]
             state.specs = [...state.specs, { ...newChange, type }]
@@ -53,6 +48,16 @@ const WaterSlice = createSlice({
          state.cupsize = action.payload
       },
 
+      updateCustomCupsize: (state, action) => {
+         const cupsize = action.payload
+         state.cupsize = cupsize
+         state.customCupsize = cupsize 
+      },
+
+      updateFirstTimeReachGoal: (state) => {
+         state.firstTimeReachGoal = true 
+      },
+
       resetSpecs: (state) => {
          state.specs = []
          state.needSync = false
@@ -69,10 +74,12 @@ const WaterSlice = createSlice({
 })
 
 export const {
+   updateFirstTimeReachGoal,
    updateLiquid,
    updateCupsize,
    resetSpecs,
-   resetDailyWater
+   resetDailyWater,
+   updateCustomCupsize
 } = WaterSlice.actions
 
 export default WaterSlice.reducer

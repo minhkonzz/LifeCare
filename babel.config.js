@@ -9,6 +9,7 @@ module.exports = {
 					'@components': './src/components',
 					'@contexts': './src/contexts',
 					'@screens': './src/screens',
+					'@popup': './src/components/shared/popup-content',
 					'@navigations': './src/navigations',
 					'@utils': './src/utils',
 					'@hooks': './src/hooks',
@@ -17,7 +18,8 @@ module.exports = {
 					'@controllers': './src/controllers',
 					'@configs': './src/configs', 
 					'@services': './src/services', 
-					'@hocs': './src/hocs'
+					'@hocs': './src/hocs',
+					'@store': './src/store'
 				}
 			}
 		],

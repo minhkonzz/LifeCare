@@ -21,10 +21,10 @@ export interface WheelPickerProps {
 }
 
 export interface OptionProps {
-   item: string, 
-   index: number, 
-   stateKey: string, 
-   action: any
+   item: string 
+   index: number
+   stateKey: string,
+   setError: Dispatch<SetStateAction<string>>
 }
 
 export interface AnimatedNumberProps {
@@ -37,10 +37,6 @@ export interface NutritionEditorProps {
    totalCalories: number,
    caloriesMethod: string,
    children?: ReactNode
-}
-
-export interface RadioOptionsPopupProps {
-   setVisible: Dispatch<SetStateAction<boolean>>
 }
 
 export interface NetworkState {
@@ -56,7 +52,10 @@ export interface SurveyState {
    age: number
    currentHeight: number
    currentWeight: number
-   goalWeight: number  
+   goalWeight: number
+   firstMealTime: string
+   lastMealTime: string
+   healthConcerns: string[]
 }
 
 export interface InitialPersonalData {
@@ -70,6 +69,9 @@ export interface InitialPersonalData {
    fastingFamiliar?: string
    goal?: string[]
    firstTimeTrackWater?: boolean
+   firstMealTime?: string
+   lastMealTime?: string
+   healthConcerns?: string[]
    isSurveyed?: boolean
 }
 

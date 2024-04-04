@@ -1,25 +1,26 @@
-import { useState, useEffect, memo, useRef, useCallback } from 'react'
+import { useState, useEffect, memo, useCallback } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Animated, Keyboard } from 'react-native'
 import { GoogleIcon, AtIcon, LockIcon } from '@assets/icons'
 import { useSelector } from 'react-redux'
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { Colors } from '@utils/constants/colors'
+import { darkHex, darkRgb, primaryHex, primaryRgb } from '@utils/constants/colors'
 import { LoginComponentProps } from '@utils/interfaces'
-import { AppState } from '../store'
+import { AppStore } from '../store'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
 import { GOOGLE_CLIENT_ID } from '@env'
 import { CornerArrowUpRightIcon } from '@assets/icons'
+import { commonStyles } from '@utils/stylesheet'
 import AuthInput from '@components/auth-input'
 import Button from '@components/shared/button/Button'
 import LottieView from 'lottie-react-native'
 import UserService from '@services/user'
+import useAnimValue from '@hooks/useAnimValue'
 
-const { hex: darkHex, rgb: darkRgb } = Colors.darkPrimary
-const { hex: primaryHex, rgb: primaryRgb } = Colors.primary
+const { hrz } = commonStyles
 
 export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginComponentProps): JSX.Element => {
-	const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current 
-	const translateY: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+	const animateValue = useAnimValue(0)
+	const translateY = useAnimValue(0)
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
@@ -66,7 +67,6 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 	}
 
 	const onBeforeNavigate = (onAnimateCompleted?: () => void) => {
-		invokeAuthMessage('Login success', 'success')
 		Animated.timing(animateValue, {
 			toValue: 0, 
 			duration: 640, 
@@ -93,7 +93,7 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 	}
 
 	const SignInButton = useCallback(() => {
-		const { email, password } = useSelector((state: AppState) => state.auth)
+		const { email, password } = useSelector((state: AppStore) => state.auth)
 		const [ processing, setProcessing ] = useState<boolean>(false)
 
 		const onSignIn = async() => {
@@ -116,7 +116,7 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 				}
 				const isSurveyed = await UserService.checkUserSurveyed(userId)
 				const routeName: string = isSurveyed && 'main' || 'survey'
-				onBeforeNavigate(() => { navigation.navigate(routeName) })
+				onBeforeNavigate(() => { invokeAuthMessage('Login success', 'success'); navigation.navigate(routeName) })
 			} catch (err) {
 				console.error(err)
 			}
@@ -152,12 +152,12 @@ export default memo(({ setIsLogin, invokeAuthMessage, navigation }: LoginCompone
 					outputRange: [-800, 0]
 				}) }]
 			}}>
-				<View style={styles.hrz}>
+				<View style={{...hrz, justifyContent: 'space-between' }}>
 					<View>
 						<Text style={styles.lgTitle}>Hello Friend,</Text>
 						<Text style={styles.smTitle}>Login to track your fasting now</Text>
 					</View>
-					<Pressable style={styles.hrz} onPress={onSkipLogin}>
+					<Pressable style={{...hrz, justifyContent: 'space-between' }} onPress={onSkipLogin}>
 						<Text style={styles.loginGuestText}>Skip</Text>
 						<CornerArrowUpRightIcon width={18} />
 					</Pressable>
@@ -215,12 +215,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'space-between'
-	},
-
-	hrz: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center'
 	},
 
 	loginGuestText: {

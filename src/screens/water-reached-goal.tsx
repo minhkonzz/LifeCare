@@ -1,11 +1,13 @@
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'       
 import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
+import { useNavigation } from '@react-navigation/native'
+import useAnimValue from '@hooks/useAnimValue'
 import LottieView from 'lottie-react-native'
 
 export default (): JSX.Element => {
-   // const navigation = useNavigation<any>()
-   const animateValue: Animated.Value = useRef<Animated.Value>(new Animated.Value(0)).current
+   const navigation = useNavigation<any>()
+   const animateValue = useAnimValue(0)
 
    useEffect(() => {
       Animated.timing(animateValue, {
@@ -52,7 +54,7 @@ export default (): JSX.Element => {
          <TouchableOpacity
             style={styles.button}
             activeOpacity={.8}
-            // onPress={() => navigation.navigate('water')}
+            onPress={() => navigation.goBack()}
             >
             <Text style={[styles.text, styles.buttonText]}>Continue</Text>
          </TouchableOpacity>

@@ -13,6 +13,34 @@ export const getCurrentDate = (): string => {
    return `${year}-${month}-${date}`
 }
 
+export const getCurrentUTCDate = (): string => {
+   const d: Date = new Date()
+   const y: number = d.getUTCFullYear()
+   const m: string = (d.getUTCMonth() + 1).toString().padStart(2, '0')
+   const _d: string = (d.getUTCDate()).toString().padStart(2, '0')
+   return `${y}-${m}-${_d}`
+}
+
+export const getCurrentUTCDateV2 = (): string => {
+   const d: Date = new Date()
+   const y: number = d.getUTCFullYear()
+   const m: string = (d.getUTCMonth() + 1).toString().padStart(2, '0')
+   const _d: string = (d.getUTCDate()).toString().padStart(2, '0')
+   return `${m}/${_d}/${y}`
+}
+
+export const getCurrentUTCDatetimeV1 = () => {
+   const d = new Date()
+   const year = d.getUTCFullYear()
+   const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+   const day = String(d.getUTCDate()).padStart(2, '0')
+   const hours = String(d.getUTCHours()).padStart(2, '0')
+   const minutes = String(d.getUTCMinutes()).padStart(2, '0')
+   const seconds = String(d.getUTCSeconds()).padStart(2, '0')
+   const milliseconds = String(d.getUTCMilliseconds()).padStart(3, '0')
+   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`
+}
+
 export const isSameDay = (d1: Date, d2: Date): boolean => {
    const yearD1: number = d1.getFullYear()
    const monthD1: number = d1.getMonth()
@@ -83,11 +111,22 @@ export const getLocalTimeV1 = (utcDate: Date): Date => {
    return new Date(`${year}-${month}-${day} ${hours}:${mins}:${secs}`)
 }
 
+export const getLocalDatetimeV2 = () => {
+   return new Intl.DateTimeFormat('en', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+   }).format(new Date())
+}
+
 // moi update cho nay, can sua toan bo cac cho lien quan
-export const getDatesRange = (limit: number) => {
+export const getDatesRange = (limit: number, inWeeks = false) => {
    const dateArray: Array<{ title: string, value: string, date: number, month: number, year: number }> = []
    const currentDate = new Date()
-   for (let i = -limit; i <= 10; i++) {
+   for (let i = -limit; i <= 10; i += (inWeeks ? 7 : 1)) {
       const newDate = new Date(currentDate)
       newDate.setDate(currentDate.getDate() + i)
       const month = newDate.getMonth()
@@ -106,26 +145,24 @@ export const getDatesRange = (limit: number) => {
    return dateArray
 }
 
-export const calculateAmountBetweenTimes = ({ 
-   startTime, 
-   endTime
-}: {
-   startTime: string, 
-   endTime: string
-}) => {
-   /* startTime: "22:30" */
+export const calculateAmountBetweenTimes = ({ startTime, endTime }: { startTime: string, endTime: string }) => {
    const startDate: Date = new Date("2000-01-01 " + startTime)
    const endDate: Date = new Date("2000-01-01 " + endTime)
-
    if (endDate < startDate) endDate.setDate(endDate.getDate() + 1)
-
    return endDate - startDate
 }
 
+export const milisecondsToHoursMins = (miliseconds: number) => {
+   const totalMins: number = Math.floor(miliseconds / (1000 * 60))
+	const hours: number = Math.floor(totalMins / 60)
+	const mins: number = totalMins % 60
+   return { hours, mins }
+}
+
 export const timestampToDateTime = (time: number) => {
-   const s = formatNum(Math.floor((time / 1000) % 60))
-   const m = formatNum(Math.floor((time / 1000 / 60) % 60))
-   const h = formatNum(Math.floor((time / 1000 / 60 / 60) % 24))
+   const h = formatNum(Math.floor(time / (1000 * 60 * 60)))
+   const m = formatNum(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)))
+   const s = formatNum(Math.floor((time % (1000 * 60)) / 1000))
    return `${h}:${m}:${s}`
 }
 
@@ -145,8 +182,8 @@ export const toTimestampV1 = (date: string, h: number, m: number) => {
    return d.getTime()
 }
 
-export const toDateTimeV1 = (timestamp: number): string => {
-   const d = new Date(timestamp)
+export const toDateTimeV1 = (timestamp?: number): string => {
+   const d = new Date(timestamp || Date.now())
    return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -155,4 +192,14 @@ export const toDateTimeV1 = (timestamp: number): string => {
       hour12: true
    }).format(d)
 }
+
+export const toDateTimeV2 = (timestamp?: number): { date: string, hour: number, min: number } => {
+   const d = new Date(timestamp || Date.now())
+   const hour: number = d.getHours()
+   const min: number = d.getMinutes()
+   const date: string = `${d.toLocaleString('en-US', { month: 'short' })} ${d.getDate()}`
+   return { date, hour, min }
+}
+
+
 

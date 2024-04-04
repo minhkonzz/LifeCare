@@ -1,14 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { SettingState } from '@utils/types'
 
-import { 
-   configPushNotification,
-   configPushWeightNotification,
-   configPushStartFastNotification,
-   configPushEndFastNotification,
-   configPushWaterDrinkNotification
-} from '@configs/push-notification'
-
 const initialState: SettingState = {
    notification: false, 
    darkmode: false, 
@@ -31,8 +23,8 @@ const initialState: SettingState = {
          m: 30
       },
       waterInterval: {
-         h: 1,
-         m: 30
+         h: 0,
+         m: 6
       }
    }
 }
@@ -55,55 +47,37 @@ const SettingSlice = createSlice({
 
       updateLang: (state, action) => {
          state.lang = action.payload 
-      }, 
-
-      initReminders: (state, action) => {
-         const drinked = action.payload
-         const { startWater, endWater, waterInterval } = state.reminders
-         configPushNotification({
-            startWater,
-            endWater,
-            waterInterval,
-            drinked
-         })
       },
 
-      // updateStartFastRemind: (state, action) => {
-      //    const { startFast, beforeStartFast } = action.payload
-      //    configPushStartFastNotification({ startFast, beforeStartFast })
-      //    state.reminders.beforeStartFast = beforeStartFast
-      // },
+      updateStartFastRemind: (state, action) => {
+         const beforeStartFast = action.payload
+         state.reminders = {...state.reminders, beforeStartFast }
+      },
 
-      // updateEndFastRemind: (state, action) => {
-      //    const { endFast, beforeEndFast } = action.payload
-      //    configPushEndFastNotification({ endFast, beforeEndFast })
-      //    state.reminders.beforeEndFast = action.payload
-      // },
+      updateEndFastRemind: (state, action) => {
+         const beforeEndFast = action.payload
+         state.reminders = {...state.reminders, beforeEndFast }
+      },
 
-      // updateWeightRemind: (state, action) => {
-      //    const { days, h, m } = action.payload
-      //    state.reminders.repeatWeight.days = [...days]
-      //    state.reminders.repeatWeight.h = h
-      //    state.reminders.repeatWeight.m = m
-      // },
+      updateWeightRemind: (state, action) => {
+         const { days, h, m } = action.payload
+         state.reminders.repeatWeight = { days, h, m }
+      },
 
-      // updateStartWaterRemind: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.startWater.h = h
-      //    state.reminders.startWater.m = m
-      // }, 
+      updateStartWaterRemind: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.startWater = { h, m }
+      }, 
 
-      // updateEndWaterRemind: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.endWater.h = h
-      //    state.reminders.endWater.m = m
-      // }, 
+      updateEndWaterRemind: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.endWater = { h, m }
+      }, 
 
-      // updateWaterInterval: (state, action) => {
-      //    const { h, m } = action.payload
-      //    state.reminders.waterInterval.h = h
-      //    state.reminders.waterInterval.m = m
-      // }
+      updateWaterInterval: (state, action) => {
+         const { h, m } = action.payload
+         state.reminders.waterInterval = { h, m }
+      }
    }
 })
 
@@ -112,9 +86,12 @@ export const {
    updateLang, 
    updateNotififcation,
    updateSyncGoogleFit,
-   initReminders,
-   // updateStartFastRemind, 
-   // updateEndFastRemind
+   updateStartFastRemind,
+   updateEndFastRemind,
+   updateWeightRemind,
+   updateStartWaterRemind,
+   updateEndWaterRemind,
+   updateWaterInterval
 } = SettingSlice.actions
 
 export default SettingSlice.reducer
