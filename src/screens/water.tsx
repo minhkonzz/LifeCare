@@ -16,129 +16,134 @@ import WaterWave from '@components/water-wave'
 import useAnimValue from '@hooks/useAnimValue'
 
 export default (): JSX.Element => {
-   const animateValue = useAnimValue(0)
-   const waveAnimateValue = useAnimValue(0)
+  const animateValue = useAnimValue(0)
+  const waveAnimateValue = useAnimValue(0)
    
-   const {
-      firstTimeReachGoal,
-      drinked: liquidDrinked, 
-      cupsize, 
-      needSync, 
-      specs, 
-      date, 
-      changes 
-   } = useSelector((state: AppStore) => state.water)
+  const {
+    firstTimeReachGoal,
+    drinked: liquidDrinked, 
+    cupsize, 
+    needSync, 
+    specs, 
+    date, 
+    changes 
+  } = useSelector((state: AppStore) => state.water)
 
-   const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
-   const navigation = useNavigation<any>()
-   const { userId } = useSession()
-   const dispatch = useDispatch()
+  const { dailyWater } = useSelector((state: AppStore) => state.user.metadata)
+  const navigation = useNavigation<any>()
+  const { userId } = useSession()
+  const dispatch = useDispatch()
 
-   useEffect(() => {
-      Animated.timing(animateValue, {
-         toValue: 1, 
-         duration: 840, 
-         useNativeDriver: true
-      }).start()
+  useEffect(() => {
+    Animated.timing(animateValue, {
+      toValue: 1, 
+      duration: 840, 
+      useNativeDriver: true
+    }).start()
 
-      Animated.loop(
-         Animated.timing(waveAnimateValue, {
-            toValue: 1, 
-            duration: 840, 
-            useNativeDriver: true,
-            easing: Easing.linear
-         })
-      ).start()
-   }, [])
+    Animated.loop(
+      Animated.timing(waveAnimateValue, {
+        toValue: 1, 
+        duration: 840, 
+        useNativeDriver: true,
+        easing: Easing.linear
+      })
+    ).start()
+  }, [])
 
-   const increaseLiquid = () => {
-      dispatch(updateLiquid(INCREASE))
-      if (!firstTimeReachGoal && (liquidDrinked + cupsize >= dailyWater)) {
-         dispatch(updateFirstTimeReachGoal())
-         const timeout = setTimeout(() => {
-            clearTimeout(timeout)
-            navigation.navigate('water-reached-goal')
-         }, 2000)  
-      }
-   }
+  const increaseLiquid = () => {
+    dispatch(updateLiquid(INCREASE))
+    if (!firstTimeReachGoal && (liquidDrinked + cupsize >= dailyWater)) {
+      dispatch(updateFirstTimeReachGoal())
+      const timeout = setTimeout(() => {
+        clearTimeout(timeout)
+        navigation.navigate('water-reached-goal')
+      }, 2000)  
+    }
+  }
 
-   const decreaseLiquid = () => {
-      if (!liquidDrinked) return
-      dispatch(updateLiquid(DECREASE))
-   }
+  const decreaseLiquid = () => {
+    if (!liquidDrinked) return
+    dispatch(updateLiquid(DECREASE))
+  }
 
-   const onSync = async () => {
-      if (userId) 
-         await UserService.syncDailyWater({ userId, date, drinked: liquidDrinked, goal: dailyWater, specs })
-      dispatch(resetSpecs())
-   }
+  const onSync = async () => {
+    if (userId) 
+      await UserService.syncDailyWater({ 
+        userId, 
+        date, 
+        drinked: liquidDrinked, 
+        goal: dailyWater, specs 
+      })
+      
+    dispatch(resetSpecs())
+  }
 
-   return (
-      <View style={styles.container}>
-         <WaterWave w={hS(792)} full />
-         <View style={styles.interacts}>
-            <View style={styles.header}>
-               <BackIcon width={hS(14)} height={vS(14)} />
-               <Text style={styles.headerTitle}>Total today</Text>
-               <Pressable onPress={() => navigation.navigate('water-setting') }>
-                  <SettingIcon width={hS(18)} height={vS(18)} />
-               </Pressable>
-            </View>
-            <View style={styles.results}>
-               <Animated.View 
-                  style={{
-                     ...styles.totalMilTextWrapper,    
-                     opacity: animateValue, 
-                     transform: [{ translateX: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-50, 0]
-                     }) }]
-                  }}>
-                  <AnimatedNumber style={styles.totalMilText} value={liquidDrinked} />
-                  <Text style={[styles.totalMilText, styles.totalMilSymbText]}>ml</Text>
-               </Animated.View>
-               <Animated.Text 
-                  style={{
-                     ...styles.goalMilText, 
-                     opacity: animateValue, 
-                     transform: [{ translateY: animateValue.interpolate({
-                        inputRange: [0, 1], 
-                        outputRange: [-20, 0]
-                     }) }]
-                  }}>
-                  {`Goal today: ${dailyWater} ml`}
-               </Animated.Text>
-
-               { needSync && 
-               <TouchableOpacity
-                  style={styles.syncButton}
-                  activeOpacity={.7}
-                  onPress={onSync}>
-                  <Text>Sync</Text>
-               </TouchableOpacity> }
-
-            </View>
-            <View style={styles.updates}>
-               <TouchableOpacity style={styles.increaseMilButton} activeOpacity={.9} onPress={increaseLiquid}>
-                  <LinearGradient
-                     style={styles.increaseMilButton}
-                     colors={[lightBlueHex, `rgba(${strongBlueRgb.join(', ')}, .6)`]}
-                     start={{ x: .2, y: 0 }}
-                     end={{ x: .5, y: 1 }}>
-                     <WhitePlusIcon width={hS(20)} height={vS(20)} />
-                     <Text style={styles.increaseMilAmount}>{`${cupsize} ml`}</Text>
-                  </LinearGradient>
-               </TouchableOpacity>
-               <TouchableOpacity
-                  style={styles.sideUpdateButton}
-                  activeOpacity={.8}
-                  onPress={decreaseLiquid}>
-                  <StrongBlueMinusIcon width={hS(22)} />
-               </TouchableOpacity>
-            </View>
-         </View>
+  return (
+    <View style={styles.container}>
+      <WaterWave w={hS(792)} full />
+      <View style={styles.interacts}>
+        <View style={styles.header}>
+          <BackIcon width={hS(14)} height={vS(14)} />
+          <Text style={styles.headerTitle}>Total today</Text>
+          <Pressable onPress={() => navigation.navigate('water-setting') }>
+            <SettingIcon width={hS(18)} height={vS(18)} />
+          </Pressable>
+        </View>
+        <View style={styles.results}>
+          <Animated.View style={{
+            ...styles.totalMilTextWrapper,    
+            opacity: animateValue, 
+            transform: [{ translateX: animateValue.interpolate({
+              inputRange: [0, 1], 
+              outputRange: [-50, 0]
+            }) }]
+          }}>
+            <AnimatedNumber style={styles.totalMilText} value={liquidDrinked} />
+            <Text style={[styles.totalMilText, styles.totalMilSymbText]}>ml</Text>
+          </Animated.View>
+          <Animated.Text style={{
+            ...styles.goalMilText, 
+            opacity: animateValue, 
+            transform: [{ translateY: animateValue.interpolate({
+              inputRange: [0, 1], 
+              outputRange: [-20, 0]
+            }) }]
+          }}>
+            {`Goal today: ${dailyWater} ml`}
+          </Animated.Text>
+          { needSync && 
+            <TouchableOpacity
+              style={styles.syncButton}
+              activeOpacity={.7}
+              onPress={onSync}>
+              <Text>Sync</Text>
+            </TouchableOpacity> }
+        </View>
+        <View style={styles.updates}>
+          <TouchableOpacity 
+            style={styles.increaseMilButton} 
+            activeOpacity={.9} 
+            onPress={increaseLiquid}>
+            <LinearGradient
+              style={styles.increaseMilButton}
+              colors={[lightBlueHex, `rgba(${strongBlueRgb.join(', ')}, .6)`]}
+              start={{ x: .2, y: 0 }}
+              end={{ x: .5, y: 1 }}>
+              <WhitePlusIcon width={hS(20)} height={vS(20)} />
+              <Text style={styles.increaseMilAmount}>{`${cupsize} ml`}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.sideUpdateButton}
+            activeOpacity={.8}
+            onPress={decreaseLiquid}>
+            <StrongBlueMinusIcon width={hS(22)} />
+          </TouchableOpacity>
+        </View>
       </View>
-   )
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({

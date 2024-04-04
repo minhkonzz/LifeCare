@@ -1,23 +1,24 @@
-import { useEffect } from 'react'
-import { View, StyleSheet, Animated } from 'react-native'
-import { primaryHex, primaryRgb, darkRgb } from '@utils/constants/colors'
-import { horizontalScale as hS, verticalScale as vS } from '@utils/responsive'
-import { useNavigation } from '@react-navigation/native'
-import Button from '@components/shared/button/Button'
-import useAnimValue from '@hooks/useAnimValue'
+import { useEffect } from "react";
+import { View, Animated } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { primaryHex, primaryRgb, darkRgb } from "@utils/constants/colors";
+import { horizontalScale as hS, verticalScale as vS } from "@utils/responsive";
+import Button from "@components/shared/button/Button";
+import useAnimValue from "@hooks/useAnimValue";
+import styles from "./styles";
 
 export default (): JSX.Element => {
-	const animateValue = useAnimValue(0)
+	const animateValue = useAnimValue(0);
 
 	useEffect(() => {
 		Animated.timing(animateValue, {
 			toValue: 1,
 			duration: 700,
 			useNativeDriver: true
-		}).start()
-	}, [])
+		}).start();
+	}, []);
 
-	const navigation = useNavigation<any>()
+	const navigation = useNavigation<any>();
 	return (
 		<View style={styles.container}>
 			<Animated.Image 
@@ -61,31 +62,3 @@ export default (): JSX.Element => {
 	)
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingBottom: vS(27),
-		paddingHorizontal: hS(24), 
-		paddingTop: vS(22),
-		backgroundColor: '#fff'
-	},
-
-	title: {
-		fontSize: hS(36),
-		fontFamily: 'Poppins-SemiBold',
-		textAlign: 'center',
-		color: primaryHex
-	},
-	
-	texts: {
-		justifyContent: 'center',
-		width: '100%'
-	},
-
-	storyset: {
-		width: hS(364),
-		height: vS(364)
-	}
-})
